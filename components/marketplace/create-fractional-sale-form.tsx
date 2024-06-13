@@ -331,18 +331,10 @@ export const CreateFractionalOrderForm = ({
     useFetchHypercertFractionsByHypercertId(hypercertId);
   const { data: currentOrdersForHypercert, isLoading: currentOrdersLoading } =
     useFetchMarketplaceOrdersForHypercert(hypercertId);
-  const { mutateAsync: createFractionalMakerAsk } = useCreateFractionalMakerAsk(
-    {
+  const { mutateAsync: createFractionalMakerAsk, isPending } =
+    useCreateFractionalMakerAsk({
       hypercertId,
-    },
-  );
-
-  console.log(
-    "fractions",
-    fractions,
-    "currentOrdersForHypercert",
-    currentOrdersForHypercert,
-  );
+    });
 
   const { address } = useAccount();
 
@@ -359,11 +351,6 @@ export const CreateFractionalOrderForm = ({
   });
 
   const { isValid, isSubmitting } = form.formState;
-  const { watch } = form;
-
-  const values = watch();
-  console.log(values);
-
   const loading = fractionsLoading || currentOrdersLoading;
 
   if (loading) {
@@ -400,167 +387,161 @@ export const CreateFractionalOrderForm = ({
 
   return (
     <div>
-      <Form {...form}>
-        {step === "form" && (
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            style={{ width: "100%", minHeight: "500px" }}
-          >
-            <div>
-              <div>Create fractional sale</div>
-
-              {hasFractionsWithoutActiveOrder ? (
-                <div>
-                  <FormField
-                    name={"fractionId"}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Fraction id to select</FormLabel>
-                        <FormControl>
-                          <Select
-                            {...field}
-                            onValueChange={(val) =>
-                              form.setValue("fractionId", val)
-                            }
-                          >
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Fraction" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {yourFractionsWithoutActiveOrder.map(
-                                (fraction) => (
-                                  <SelectItem
-                                    key={fraction.hypercert_id}
-                                    value={fraction.hypercert_id!}
-                                  >
-                                    {fraction.hypercert_id}
-                                  </SelectItem>
-                                ),
-                              )}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormDescription>Fraction id to select</FormDescription>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    name={"price"}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Price per unit</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormDescription>Price per unit</FormDescription>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    name={"minUnitAmount"}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Minimum amount of units per sale</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Minimum amount of units per sale
-                        </FormDescription>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    name={"maxUnitAmount"}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Maximum amount of units per sale</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Maximum amount of units per sale
-                        </FormDescription>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    name={"minUnitsToKeep"}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Minimum amount of units I would like to keep
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          How many units to keep at a minimum
-                        </FormDescription>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    name={"sellLeftoverFraction"}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Sell leftover fraction</FormLabel>
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={(checked) => {
-                              field.onChange(checked);
-                              if (checked) {
-                                field.onBlur();
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Sell leftover units if there are less then the minimum
-                        </FormDescription>
-                      </FormItem>
-                    )}
-                  />
-
-                  <div>
-                    <Button
-                      disabled={submitDisabled}
-                      variant={"outline"}
-                      type="submit"
-                    >
-                      Create
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div>You don{"'"}t have any fractions to sell</div>
-              )}
-            </div>
-          </form>
-        )}
-        {step === "confirmation" && (
+      {step === "form" && (
+        <Form {...form}>
           <div>
-            <div>
+            <div>Create fractional sale</div>
+
+            {hasFractionsWithoutActiveOrder ? (
               <div>
-                Successfully <br />
-                listed
+                <FormField
+                  name={"fractionId"}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fraction id to select</FormLabel>
+                      <FormControl>
+                        <Select
+                          {...field}
+                          onValueChange={(val) =>
+                            form.setValue("fractionId", val)
+                          }
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Fraction" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {yourFractionsWithoutActiveOrder.map((fraction) => (
+                              <SelectItem
+                                key={fraction.hypercert_id}
+                                value={fraction.hypercert_id!}
+                              >
+                                {fraction.hypercert_id}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormDescription>Fraction id to select</FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name={"price"}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price per unit</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormDescription>Price per unit</FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name={"minUnitAmount"}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Minimum amount of units per sale</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Minimum amount of units per sale
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name={"maxUnitAmount"}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Maximum amount of units per sale</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Maximum amount of units per sale
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name={"minUnitsToKeep"}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Minimum amount of units I would like to keep
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        How many units to keep at a minimum
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name={"sellLeftoverFraction"}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sell leftover fraction</FormLabel>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            if (checked) {
+                              field.onBlur();
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Sell leftover units if there are less then the minimum
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <div>
+                  <Button
+                    onClick={form.handleSubmit(onSubmit)}
+                    disabled={submitDisabled}
+                    variant={"outline"}
+                    type="button"
+                  >
+                    Create
+                  </Button>
+                </div>
               </div>
-              <div>Your hypercert fractions are on sale now.</div>
-            </div>
-            {onClickViewListings && (
-              <Button onClick={onClickViewListings} variant={"outline"}>
-                View your listings
-              </Button>
+            ) : (
+              <div>You don{"'"}t have any fractions to sell</div>
             )}
           </div>
-        )}
-      </Form>
+        </Form>
+      )}
+      {step === "confirmation" && (
+        <div>
+          <div>
+            <div>
+              Successfully <br />
+              listed
+            </div>
+            <div>Your hypercert fractions are on sale now.</div>
+          </div>
+          {onClickViewListings && (
+            <Button onClick={onClickViewListings} variant={"outline"}>
+              View your listings
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
