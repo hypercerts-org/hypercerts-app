@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { HYPERCERTS_API_URL } from "../../../../configs/hypercerts";
-import { gqlHypercerts } from "../../../../graphql/hypercerts";
 import graphQlrequest from "graphql-request";
-
+import { graphql } from "@/lib/graphql";
 // GraphQL query to fetch the image metadata for a given hypercert ID
-const IMAGE_QUERY = gqlHypercerts(`
+const IMAGE_QUERY = graphql(`
   query HypercertImage($hypercert_id: String!) {
     hypercerts(where: { hypercert_id: { eq: $hypercert_id } }) {
       data {
@@ -22,7 +21,7 @@ const PLACEHOLDER_IMAGE_URL = "/hypercert-placeholder.webp";
 
 // Extract image data from a base64 string or a URL
 async function getImageData(
-  imageOrUrl: string
+  imageOrUrl: string,
 ): Promise<{ contentType: string; buffer: Buffer }> {
   if (imageOrUrl.startsWith("data:image")) {
     const [metadata, base64Data] = imageOrUrl.split(",");
@@ -45,8 +44,8 @@ async function getImageData(
 async function placeholderImageResponse(request: NextRequest) {
   const placeholderResponse = await fetch(
     `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
-      "host"
-    )}${PLACEHOLDER_IMAGE_URL}`
+      "host",
+    )}${PLACEHOLDER_IMAGE_URL}`,
   );
   const blob = await placeholderResponse.blob();
   const buffer = Buffer.from(await blob.arrayBuffer());
@@ -59,7 +58,7 @@ async function placeholderImageResponse(request: NextRequest) {
 // GET handler to fetch and return the image associated with the given hypercert ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hypercertId: string } }
+  { params }: { params: { hypercertId: string } },
 ) {
   const { hypercertId } = params;
 

@@ -1,22 +1,22 @@
 import "server-only";
 
+import { graphql, readFragment } from "@/lib/graphql";
+
 import { HYPERCERTS_API_URL } from "../configs/hypercerts";
 import { HypercertFullFragment } from "./fragments/hypercert-full.fragment";
-import { gqlHypercerts } from "../graphql/hypercerts";
-import { readFragment } from "gql.tada";
 import request from "graphql-request";
 
-const query = gqlHypercerts(
+const query = graphql(
   `
     query Hypercert($hypercert_id: String) {
-      hypercerts(where: {hypercert_id: {eq: $hypercert_id}}) {
+      hypercerts(where: { hypercert_id: { eq: $hypercert_id } }) {
         data {
           ...HypercertFullFragment
         }
       }
     }
   `,
-  [HypercertFullFragment]
+  [HypercertFullFragment],
 );
 
 export async function getHypercert(hypercertId: string) {

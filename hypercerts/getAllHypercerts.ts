@@ -1,10 +1,9 @@
 import "server-only";
 
-import { VariablesOf, readFragment } from "gql.tada";
+import { VariablesOf, graphql, readFragment } from "@/lib/graphql";
 
 import { HYPERCERTS_API_URL } from "../configs/hypercerts";
 import { HypercertListFragment } from "./fragments/hypercert-list.fragment";
-import { gqlHypercerts } from "../graphql/hypercerts";
 import request from "graphql-request";
 
 export type ClaimsOrderBy =
@@ -28,18 +27,30 @@ export function isClaimsOrderBy(value: string): value is ClaimsOrderBy {
 
 export type ClaimsFilter = "all" | "evaluated";
 
-const query = gqlHypercerts(
+const query = graphql(
   `
-    query AllHypercerts($where: HypercertsWhereInput, $sort: HypercertFetchInput, $first: Int, $offset: Int) {
-      hypercerts(where: $where, first: $first, offset: $offset, count: COUNT, sort: $sort) {
+    query AllHypercerts(
+      $where: HypercertsWhereInput
+      $sort: HypercertFetchInput
+      $first: Int
+      $offset: Int
+    ) {
+      hypercerts(
+        where: $where
+        first: $first
+        offset: $offset
+        count: COUNT
+        sort: $sort
+      ) {
         count
+
         data {
           ...HypercertListFragment
         }
       }
     }
   `,
-  [HypercertListFragment]
+  [HypercertListFragment],
 );
 
 type VariableTypes = VariablesOf<typeof query>;
@@ -55,8 +66,7 @@ function createOrderBy({
     if (orderByAttribute === "timestamp") {
       return {
         by: {
-          creation_block_timestamp:
-            orderByDirection === "asc" ? "ascending" : "descending",
+          block_number: orderByDirection === "asc" ? "ascending" : "descending",
         },
       };
     }
@@ -90,7 +100,7 @@ function createFilter({
   if (chainId) {
     where.contract = {
       chain_id: {
-        eq: chainId,
+        eq: chainId.toString(),
       },
     };
   }

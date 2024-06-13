@@ -115,6 +115,6 @@ export const useMintClaim = ({
     txPending,
     mintSteps,
     currentStep,
-    readOnly: !client || client.readonly,
+    readOnly: !client || client.readOnly,
   };
 };

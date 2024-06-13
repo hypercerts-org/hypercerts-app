@@ -1,6 +1,6 @@
-import { gqlHypercerts } from "../../graphql/hypercerts";
+import { graphql } from "@/lib/graphql";
 
-export const HypercertListFragment = gqlHypercerts(`
+export const HypercertListFragment = graphql(`
   fragment HypercertListFragment on Hypercert {
     metadata {
       name
@@ -8,10 +8,10 @@ export const HypercertListFragment = gqlHypercerts(`
     attestations {
       count
     }
-		block_number
+    block_number
     hypercert_id
-		contract {
-        chain_id
-      }
+    contract {
+      chain_id
+    }
   }
 `);

@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import * as R from "remeda";
 
 export default function FormattedDate({
@@ -6,6 +9,12 @@ export default function FormattedDate({
 }: {
   seconds: unknown | string | number;
 }) {
+  const [language, setLanguage] = useState("en-US");
+
+  useEffect(() => {
+    setLanguage(window.navigator.language);
+  }, []);
+
   if (R.isString(seconds)) {
     seconds = Number.parseInt(seconds);
   }
@@ -18,7 +27,9 @@ export default function FormattedDate({
 
   return (
     <div {...props}>
-      {new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(date)}
+      {new Intl.DateTimeFormat(language, {
+        dateStyle: "medium",
+      }).format(date)}
     </div>
   );
 }

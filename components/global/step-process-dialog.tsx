@@ -1,3 +1,4 @@
+import { buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +54,14 @@ const StepProcessModal = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {triggerLabel && <DialogTrigger>{triggerLabel}</DialogTrigger>}
+      {triggerLabel && (
+        <DialogTrigger
+          asChild
+          className={buttonVariants({ variant: "secondary" })}
+        >
+          {triggerLabel}
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="font-serif text-3xl font-normal">

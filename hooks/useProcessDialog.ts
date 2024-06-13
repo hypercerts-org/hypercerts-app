@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export type StepState = "idle" | "active" | "completed";
 
@@ -27,24 +27,27 @@ const useProcessDialog = (steps: StepData[]) => {
     createDialogSteps()
   );
 
-  const setStep = (step: DialogStep["id"]) => {
-    const lastStep = dialogSteps[dialogSteps.length - 1];
-    const updatedDialogSteps = dialogSteps.map((dialogStep) => {
-      if (dialogStep.id === step) {
-        return {
-          ...dialogStep,
-          state: dialogStep.id === lastStep.id ? "completed" : "active",
-        };
-      } else if (
-        dialogSteps.indexOf(dialogStep) <
-        dialogSteps.findIndex((ds) => ds.id === step)
-      ) {
-        return { ...dialogStep, state: "completed" };
-      }
-      return dialogStep;
-    });
-    setDialogSteps(updatedDialogSteps as DialogStep[]);
-  };
+  const setStep = useCallback(
+    (step: DialogStep["id"]) => {
+      const lastStep = dialogSteps[dialogSteps.length - 1];
+      const updatedDialogSteps = dialogSteps.map((dialogStep) => {
+        if (dialogStep.id === step) {
+          return {
+            ...dialogStep,
+            state: dialogStep.id === lastStep.id ? "completed" : "active",
+          };
+        } else if (
+          dialogSteps.indexOf(dialogStep) <
+          dialogSteps.findIndex((ds) => ds.id === step)
+        ) {
+          return { ...dialogStep, state: "completed" };
+        }
+        return dialogStep;
+      });
+      setDialogSteps(updatedDialogSteps as DialogStep[]);
+    },
+    [dialogSteps]
+  );
 
   return {
     dialogSteps,

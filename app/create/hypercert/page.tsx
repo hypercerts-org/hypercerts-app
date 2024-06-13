@@ -5,6 +5,7 @@ import HypercertCard from "@/components/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
 import useProcessDialog, { StepData } from "@/hooks/useProcessDialog";
+import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   HypercertMetadata,
@@ -80,7 +81,7 @@ const formDefaultValues: HypercertFormValues = {
   logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
   link: "https://destinyemblemcollector.com/emblem?id=2069797998",
   cardImage: "",
-  tags: ["ghosts,deep,legend"],
+  tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
   projectDates: {
     from: new Date(),
     to: new Date(),
@@ -95,6 +96,7 @@ const formDefaultValues: HypercertFormValues = {
 
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [language, setLanguage] = useState("en-US");
   const { dialogSteps, setStep } = useProcessDialog(mintSteps);
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
@@ -114,6 +116,10 @@ export default function NewHypercertForm() {
   } = useMintClaim({
     onComplete: onMintComplete,
   });
+
+  useEffect(() => {
+    setLanguage(window.navigator.language);
+  }, []);
 
   useEffect(() => {
     setStep(mintStep as StepData["id"]);
@@ -144,6 +150,12 @@ export default function NewHypercertForm() {
       impactTimeframeEnd: values.projectDates.to.getTime() / 1000,
       contributors: values.contributors,
     });
+
+    if (!formattedMetadata.valid) {
+      console.log("Invalid metadata", { errors: formattedMetadata.errors });
+      return;
+    }
+
     console.log({ formattedMetadata });
 
     await mintClaim(
@@ -180,7 +192,15 @@ export default function NewHypercertForm() {
             description={form.getValues().description || undefined}
             banner={form.getValues().banner || undefined}
             logo={form.getValues().logo || undefined}
-            displayOnly
+            scopes={form.getValues().tags}
+            fromDateDisplay={formatDate(
+              form.getValues().projectDates?.from?.toISOString(),
+              language
+            )}
+            toDateDisplay={formatDate(
+              form.getValues().projectDates?.to?.toISOString(),
+              language
+            )}
           />
         </div>
       </section>
@@ -189,7 +209,7 @@ export default function NewHypercertForm() {
           steps={dialogSteps}
           currentStep={mintStep}
           title="Mint your hypercert"
-          triggerLabel="Mint hypercert"
+          triggerLabel="See progress"
           extraContent={
             txReceipt && (
               <Link

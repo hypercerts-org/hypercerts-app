@@ -352,7 +352,6 @@ const ReviewAndSubmit = ({ form }: FormStepsProps) => {
               form.getValues().logo
             }` || undefined
           }
-          displayOnly
           ref={cardRef}
         />
       </div>

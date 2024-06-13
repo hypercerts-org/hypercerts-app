@@ -19,3 +19,12 @@ export const truncateEthereumAddress = (
     address.length - length
   )}`;
 };
+
+export const formatDate = (date: string, locale?: string) => {
+  if (!date) {
+    return null;
+  }
+  return new Intl.DateTimeFormat(locale ?? "en-US", {
+    dateStyle: "medium",
+  }).format(new Date(date));
+};

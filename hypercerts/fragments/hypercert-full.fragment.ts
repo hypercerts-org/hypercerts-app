@@ -1,7 +1,6 @@
-import { ResultOf } from "gql.tada";
-import { gqlHypercerts } from "../../graphql/hypercerts";
+import { ResultOf, graphql } from "@/lib/graphql";
 
-export const HypercertFullFragment = gqlHypercerts(`
+export const HypercertFullFragment = graphql(`
   fragment HypercertFullFragment on Hypercert {
     metadata {
       name
@@ -12,7 +11,7 @@ export const HypercertFullFragment = gqlHypercerts(`
       work_timeframe_to
       contributors
     }
-		block_number
+    block_number
     hypercert_id
     contract {
       chain_id

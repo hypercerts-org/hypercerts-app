@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { ShieldCheck } from "lucide-react";
+import { SUPPORTED_CHAINS } from "@/lib/constants";
 
 export interface HypercertMiniDisplayProps {
   hypercertId: string;
@@ -16,6 +17,7 @@ export interface HypercertMiniDisplayProps {
   hasTrustedEvaluator?: boolean;
   percentAvailable?: number;
   lowestPrice?: string;
+  chainId: number;
 }
 
 const HypercertMiniDisplay = ({
@@ -24,7 +26,12 @@ const HypercertMiniDisplay = ({
   hasTrustedEvaluator,
   percentAvailable,
   lowestPrice,
+  chainId,
 }: HypercertMiniDisplayProps) => {
+  const cardChain = (chainId: number) => {
+    return SUPPORTED_CHAINS.get(chainId);
+  };
+
   return (
     <Link href={`/hypercert/${hypercertId}`}>
       <article
@@ -42,7 +49,7 @@ const HypercertMiniDisplay = ({
         </div>
         <div className="absolute top-4 right-4">
           <p className="text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-white tracking-wide">
-            Sepolia Testnet
+            {cardChain(chainId)}
           </p>
         </div>
         <section className="p-3 bg-white text-primary overflow-hidden rounded-lg border-[1.5px] border-slate-500 space-y-3">

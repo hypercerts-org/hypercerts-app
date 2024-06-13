@@ -1,4 +1,3 @@
-import FormattedDate from "@/components/formatted-date";
 import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import EthAddress from "../eth-address";
 
@@ -12,10 +11,10 @@ export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
           <EthAddress address={hypercert.owner_address} />
         </div>
       )}
-      {(hypercert?.block_number as number) && (
+      {hypercert?.block_number && (
         <div className="flex space-x-1 items-center">
           <span>•</span>
-          <FormattedDate seconds={Number(hypercert.block_number)} />
+          {hypercert.block_number}
         </div>
       )}
     </div>
