@@ -50,7 +50,7 @@ const query = graphql(
       }
     }
   `,
-  [HypercertListFragment],
+  [HypercertListFragment]
 );
 
 type VariableTypes = VariablesOf<typeof query>;

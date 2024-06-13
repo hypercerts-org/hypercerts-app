@@ -65,7 +65,7 @@ async function ExploreListInner({
             const props: HypercertMiniDisplayProps = {
               hypercertId: hypercert.hypercert_id as string,
               name: hypercert.metadata?.name as string,
-              chainId: hypercert.contract?.chain_id as number,
+              chainId: Number(hypercert.contract?.chain_id),
             };
             return (
               <HypercertMiniDisplay

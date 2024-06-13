@@ -8,8 +8,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { ShieldCheck } from "lucide-react";
 import { SUPPORTED_CHAINS } from "@/lib/constants";
+import { ShieldCheck } from "lucide-react";
 
 export interface HypercertMiniDisplayProps {
   hypercertId: string;
@@ -40,7 +40,7 @@ const HypercertMiniDisplay = ({
       >
         <div className="relative h-[170px] w-full rounded-lg overflow-hidden">
           <Image
-            src={`/hypercert/${hypercertId}/image`}
+            src={`/api/hypercert/${hypercertId}/image`}
             alt={name || "Untitled"}
             unoptimized
             fill

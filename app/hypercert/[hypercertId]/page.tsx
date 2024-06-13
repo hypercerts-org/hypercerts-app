@@ -4,6 +4,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import { ArrowLeftIcon } from "lucide-react";
 import Contributors from "@/components/hypercert/contributors";
 import Creator from "@/components/hypercert/creator";
+import EvaluateButton from "@/components/hypercert/evaluate-button";
+import EvaluationsList from "@/components/hypercert/evaluations-list";
 import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
@@ -25,7 +27,7 @@ type Props = {
 
 export async function generateMetadata(
   { params, searchParams }: Props,
-  parent: ResolvingMetadata,
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { hypercertId } = params;
 
@@ -37,7 +39,7 @@ export async function generateMetadata(
     title: hypercert?.metadata?.name || "Untitled Hypercert",
     description: hypercert?.metadata?.description || "",
     openGraph: {
-      images: [`/hypercert/${hypercertId}/image`, ...previousImages],
+      images: [`/api/hypercert/${hypercertId}/image`, ...previousImages],
     },
   };
 }
@@ -67,7 +69,7 @@ async function HypercertPageInner({
         <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
           <div className="relative w-full h-full bg-black border border-slate-800 rounded-lg overflow-hidden ">
             <Image
-              src={`/hypercert/${hypercertId}/image`}
+              src={`/api/hypercert/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
               fill
               className="object-contain object-top p-2"
@@ -106,6 +108,14 @@ async function HypercertPageInner({
           <WorkScope hypercert={hypercert} />
         </Fragment>
       )}
+      <Separator />
+      <div className="flex justify-between">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          Evaluations
+        </h5>
+        <EvaluateButton />
+      </div>
+      <EvaluationsList hypercertId={hypercertId} />
       <Separator />
 
       <ListForSaleButton hypercertId={hypercertId} />

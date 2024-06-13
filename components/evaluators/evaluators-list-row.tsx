@@ -14,11 +14,11 @@ export default function EvaluatorsListRow({
   [key: string]: any;
 }) {
   return (
-    <Link href={`/evaluator/${attestor.eth_address}`} className="w-full">
+    <Link href={`/evaluators/${attestor.eth_address}`} className="w-full">
       <div className="flex gap-2 w-full" {...props}>
         <UserIcon address={attestor.eth_address} size="large" />
         <div className="flex flex-col justify-center items-start w-52">
-          <EnsName address={attestor.eth_address} textStyle={"secondary"} />
+          <EnsName address={attestor.eth_address} />
           <EthAddress address={attestor.eth_address} />{" "}
         </div>
         <div className="flex-grow" />

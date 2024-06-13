@@ -1,18 +1,13 @@
-// import { Badge, Box, Spinner, Text } from "@chakra-ui/react";
+import { getEvaluatorAttestationsCount } from "../../attestations/getEvaluatorAttestationsCount";
 
-// import { MdErrorOutline } from "react-icons/md";
-// import { useCountEvaluatorAttestations } from "../../eas/useCountEvaluatorAttestations";
+export default async function EvaluationsCount({
+  address,
+}: {
+  address: string;
+}) {
+  const count = await getEvaluatorAttestationsCount(address);
 
-export default function EvaluationsCount({ address }: { address: string }) {
-  // const { data, isPending, error } = useCountEvaluatorAttestations(address);
+  if (!count) return <div>0</div>;
 
-  // if (isPending) return <Spinner size={"xs"} />;
-
-  // if (error) {
-  //   console.error(error);
-  //   return <MdErrorOutline />;
-  // }
-
-  // return <Badge>{data?.aggregateAttestation?._count?.id}</Badge>;
-  return <div>0</div>;
+  return <div>{count}</div>;
 }

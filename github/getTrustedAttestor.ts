@@ -1,7 +1,7 @@
 import { TrustedAttestor } from "./types/trusted-attestor.type";
 import { getTrustedAttestors } from "./getTrustedAttestors";
 
-export async function getTustedAttestor({
+export async function getTrustedAttestor({
   address,
 }: {
   address: string | undefined;
