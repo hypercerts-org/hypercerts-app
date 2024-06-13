@@ -14,6 +14,9 @@ import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import WorkTimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
+import { getAvailableOrders } from "@/marketplace/get-available-orders";
+import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
+import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
 
 type Props = {
   params: { hypercertId: string };
@@ -22,7 +25,7 @@ type Props = {
 
 export async function generateMetadata(
   { params, searchParams }: Props,
-  parent: ResolvingMetadata
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { hypercertId } = params;
 
@@ -51,6 +54,13 @@ async function HypercertPageInner({
   if (!hypercert) {
     throw new Error("Hypercert not found.");
   }
+
+  // Collect token ids to fetch orders
+  const tokenIds =
+    hypercert?.fractions?.data?.map((fraction) =>
+      parseClaimOrFractionId(fraction?.hypercert_id!)?.id.toString(),
+    ) || [];
+  const orders = await getAvailableOrders(tokenIds);
 
   return (
     <section className="flex flex-col space-y-4">
@@ -97,6 +107,9 @@ async function HypercertPageInner({
           <WorkScope hypercert={hypercert} />
         </Fragment>
       )}
+      <Separator />
+
+      <ListForSaleButton hypercertId={hypercertId} />
     </section>
   );
 }

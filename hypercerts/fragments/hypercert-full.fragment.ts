@@ -32,6 +32,7 @@ export const HypercertFullFragment = gqlHypercerts(`
       data {
         units
         owner_address
+        hypercert_id
       }
     }
     token_id
