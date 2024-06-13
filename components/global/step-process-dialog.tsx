@@ -6,21 +6,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
+import useProcessDialog, {
   type DialogStep,
   type StepData,
   type StepState,
 } from "@/hooks/useProcessDialog";
 import { cn } from "@/lib/utils";
 import { Badge, BadgeCheck, Loader } from "lucide-react";
-import { createElement, useState } from "react";
+import React, {
+  createContext,
+  createElement,
+  useContext,
+  useState,
+} from "react";
 
 interface DialogProps {
   steps: DialogStep[];
   title: string;
-  currentStep: StepData["id"];
   triggerLabel?: string;
   extraContent?: React.ReactNode;
+  open?: boolean;
 }
 
 const stepStateIcons: Record<StepState, React.ElementType> = {
@@ -46,14 +51,16 @@ const StepProcessModal = ({
   title,
   triggerLabel,
   extraContent,
-  currentStep,
+  open: openProp,
 }: DialogProps) => {
   const lastStep = steps[steps.length - 1];
-  const isLastStepCompleted = lastStep.state === "completed";
+  const isLastStepCompleted = lastStep?.state === "completed";
   const [open, setOpen] = useState(true);
 
+  const defOpen = openProp ?? open;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={defOpen} onOpenChange={setOpen}>
       {triggerLabel && (
         <DialogTrigger
           asChild
@@ -80,7 +87,7 @@ const StepProcessModal = ({
                   stateSpecificIconClasses[step.state],
                   step === lastStep &&
                     isLastStepCompleted &&
-                    "text-green-600 bg-green-100"
+                    "text-green-600 bg-green-100",
                 )}
               >
                 {createElement(stepStateIcons[step.state], {
@@ -92,7 +99,9 @@ const StepProcessModal = ({
                   className={cn(
                     "text-lg",
                     stateSpecificTextClasses[step.state],
-                    step === lastStep && isLastStepCompleted && "text-green-600"
+                    step === lastStep &&
+                      isLastStepCompleted &&
+                      "text-green-600",
                   )}
                 >
                   {step.description}
@@ -106,5 +115,40 @@ const StepProcessModal = ({
     </Dialog>
   );
 };
+
+export const StepProcessDialogContext = createContext<{
+  setStep: (step: DialogStep["id"]) => void;
+  setSteps: (steps: StepData[]) => void;
+  setOpen: (open: boolean) => void;
+}>({
+  setStep: () => {},
+  setSteps: () => {},
+  setOpen: () => {},
+});
+
+export const StepProcessDialogProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [steps, setSteps] = useState<StepData[]>([]);
+  const { setStep, dialogSteps } = useProcessDialog(steps);
+  const [open, setOpen] = useState(false);
+  return (
+    <StepProcessDialogContext.Provider
+      value={{
+        setStep,
+        setSteps,
+        setOpen,
+      }}
+    >
+      {children}
+      <StepProcessModal open={open} steps={dialogSteps} title="Test title" />
+    </StepProcessDialogContext.Provider>
+  );
+};
+
+export const useStepProcessDialogContext = () =>
+  useContext(StepProcessDialogContext);
 
 export { StepProcessModal as default };

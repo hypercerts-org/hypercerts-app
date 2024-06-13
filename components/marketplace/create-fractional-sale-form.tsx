@@ -38,6 +38,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  StepProcessDialogProvider,
+  useStepProcessDialogContext,
+} from "@/components/global/step-process-dialog";
 
 export interface CreateFractionalOfferFormValues {
   fractionId: string;
@@ -111,6 +115,8 @@ export const useCreateFractionalMakerAsk = ({
   const { data: currentFractions } =
     useFetchHypercertFractionsByHypercertId(hypercertId);
 
+  const { setSteps, setStep, setOpen } = useStepProcessDialogContext();
+
   return useMutation({
     mutationKey: ["createFractionalMakerAsk"],
     mutationFn: async (values: CreateFractionalOfferFormValues) => {
@@ -149,41 +155,33 @@ export const useCreateFractionalMakerAsk = ({
       if (!walletClientData) {
         throw new Error("Wallet client not initialized");
       }
-      //
-      // onOpen([
-      //   {
-      //     title: "Splitting",
-      //     description: "Splitting fraction units on-chain",
-      //   },
-      //   {
-      //     title: "Waiting",
-      //     description: "Awaiting confirmation",
-      //   },
-      //   {
-      //     title: "Create",
-      //     description: "Creating order in contract",
-      //   },
-      //   {
-      //     title: "Approve transfer manager",
-      //     description: "Approving transfer manager",
-      //   },
-      //   {
-      //     title: "Approve collection",
-      //     description: "Approving collection",
-      //   },
-      //   {
-      //     title: "Sign order",
-      //     description: "Signing order",
-      //   },
-      //   {
-      //     title: "Create order",
-      //     description: "Creating order",
-      //   },
-      // ]);
+      setSteps([
+        {
+          id: "Create",
+          description: "Creating order in contract",
+        },
+        {
+          id: "Approve transfer manager",
+          description: "Approving transfer manager",
+        },
+        {
+          id: "Approve collection",
+          description: "Approving collection",
+        },
+        {
+          id: "Sign order",
+          description: "Signing order",
+        },
+        {
+          id: "Create order",
+          description: "Creating order",
+        },
+      ]);
+      setOpen(true);
 
       let signature: string | undefined;
 
-      // setStep("Create");
+      setStep("Create");
       const hypercertExchangeClient = new HypercertExchangeClient(
         chainId,
         // TODO: Fix typing issue with provider
@@ -206,7 +204,7 @@ export const useCreateFractionalMakerAsk = ({
         });
 
       // Grant the TransferManager the right the transfer assets on behalf od the LooksRareProtocol
-      // setStep("Approve transfer manager");
+      setStep("Approve transfer manager");
       if (!isTransferManagerApproved) {
         const tx = await hypercertExchangeClient
           .grantTransferManagerApproval()
@@ -216,7 +214,7 @@ export const useCreateFractionalMakerAsk = ({
         });
       }
 
-      // setStep("Approve collection");
+      setStep("Approve collection");
       // Approve the collection items to be transferred by the TransferManager
       if (!isCollectionApproved) {
         const tx = await hypercertExchangeClient.approveAllCollectionItems(
@@ -228,14 +226,14 @@ export const useCreateFractionalMakerAsk = ({
       }
 
       // Sign your maker order
-      // setStep("Sign order");
+      setStep("Sign order");
       signature = await hypercertExchangeClient.signMakerOrder(maker);
 
       if (!signature) {
         throw new Error("Error signing order");
       }
 
-      // setStep("Create order");
+      setStep("Create order");
       try {
         await createOrder({
           order: maker,
@@ -249,7 +247,9 @@ export const useCreateFractionalMakerAsk = ({
       }
     },
     throwOnError: true,
-    onSuccess: () => {},
+    onSuccess: () => {
+      setOpen(false);
+    },
   });
 };
 
@@ -319,22 +319,21 @@ const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
   });
 };
 
-export const CreateFractionalOrderForm = ({
+const CreateFractionalOrderFormInner = ({
   hypercertId,
-  onClickViewListings,
 }: {
   hypercertId: string;
-  onClickViewListings?: () => void;
 }) => {
   const [step, setStep] = React.useState<"form" | "confirmation">("form");
   const { data: fractions, isLoading: fractionsLoading } =
     useFetchHypercertFractionsByHypercertId(hypercertId);
   const { data: currentOrdersForHypercert, isLoading: currentOrdersLoading } =
     useFetchMarketplaceOrdersForHypercert(hypercertId);
-  const { mutateAsync: createFractionalMakerAsk, isPending } =
-    useCreateFractionalMakerAsk({
+  const { mutateAsync: createFractionalMakerAsk } = useCreateFractionalMakerAsk(
+    {
       hypercertId,
-    });
+    },
+  );
 
   const { address } = useAccount();
 
@@ -535,13 +534,20 @@ export const CreateFractionalOrderForm = ({
             </div>
             <div>Your hypercert fractions are on sale now.</div>
           </div>
-          {onClickViewListings && (
-            <Button onClick={onClickViewListings} variant={"outline"}>
-              View your listings
-            </Button>
-          )}
         </div>
       )}
     </div>
+  );
+};
+
+export const CreateFractionalOrderForm = ({
+  hypercertId,
+}: {
+  hypercertId: string;
+}) => {
+  return (
+    <StepProcessDialogProvider>
+      <CreateFractionalOrderFormInner hypercertId={hypercertId} />
+    </StepProcessDialogProvider>
   );
 };
