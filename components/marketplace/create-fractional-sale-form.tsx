@@ -370,13 +370,11 @@ const CreateFractionalOrderFormInner = ({
   );
 
   const fractionsWithActiveOrder = currentOrdersForHypercert
-    ? Object.values(currentOrdersForHypercert).map(
-        (order) => order.fraction?.id,
-      )
+    ? Object.values(currentOrdersForHypercert).map((order) => order.itemIds[0])
     : [];
 
   const yourFractionsWithoutActiveOrder = yourFractions.filter(
-    (fraction) => !fractionsWithActiveOrder.includes(fraction.hypercert_id),
+    (fraction) => !fractionsWithActiveOrder.includes(fraction.hypercert_id!),
   );
 
   const hasFractionsWithoutActiveOrder =

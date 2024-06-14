@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "supabase:types": "npx supabase gen types typescript --project-id clagjjfinooizoqdkvqc --schema public > types/hypercerts-data-database.ts"
   },
   "packageManager": "pnpm@9.2.0",
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
+    "@hypercerts-org/contracts": "2.0.0-alpha.0",
     "@hypercerts-org/marketplace-sdk": "0.3.2",
     "@hypercerts-org/sdk": "2.0.0-alpha.19",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -65,6 +67,7 @@
     "eslint-config-next": "14.2.3",
     "postcss": "^8.4.38",
     "prettier": "3.3.2",
+    "supabase": "^1.176.10",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.4.5"
   }
