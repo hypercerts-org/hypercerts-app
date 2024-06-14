@@ -15,7 +15,7 @@ export default function EvaluatorEvaluationsListItem({
 }) {
   const hypercertId = `${data.chain_id}-${data.contract_address}-${data.token_id}`;
   return (
-    <Link href={`/hypercert/${hypercertId}`}>
+    <Link href={`/hypercerts/${hypercertId}`}>
       <FormattedDate seconds={blockTimestamp} />
       <HypercertRow hypercertId={hypercertId} />
       <Evaluations

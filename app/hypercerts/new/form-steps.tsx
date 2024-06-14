@@ -1,6 +1,6 @@
-import { HypercertFormValues } from "@/app/create/hypercert/page";
+import { HypercertFormValues } from "@/app/hypercerts/new/page";
 import ConnectDialog from "@/components/connect-dialog";
-import HypercertCard from "@/components/hypercert-card";
+import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";

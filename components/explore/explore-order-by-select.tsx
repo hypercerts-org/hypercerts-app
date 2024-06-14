@@ -21,15 +21,19 @@ export default function ExploreOrderBySelect() {
   };
 
   return (
-    <Select defaultValue="recent" onValueChange={orderBy}>
-      <SelectTrigger className="w-[180px]">
+    <Select defaultValue="timestamp_desc" onValueChange={orderBy}>
+      <SelectTrigger className="w-max">
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="timestamp_desc">Created: New-Old</SelectItem>
-        <SelectItem value="timestamp_asc">Created: Old-New</SelectItem>
-        <SelectItem value="attestations_desc">Evaluations: Many-Few</SelectItem>
-        <SelectItem value="attestations_asc">Evaluations: Few-Many</SelectItem>
+      <SelectContent className="w-max">
+        <SelectItem value="timestamp_desc">Newest first</SelectItem>
+        <SelectItem value="timestamp_asc">Oldest first</SelectItem>
+        <SelectItem value="attestations_desc">
+          Most evaluations first
+        </SelectItem>
+        <SelectItem value="attestations_asc">
+          Fewest evaluations first
+        </SelectItem>
       </SelectContent>
     </Select>
   );

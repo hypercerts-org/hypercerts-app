@@ -33,14 +33,14 @@ const HypercertMiniDisplay = ({
   };
 
   return (
-    <Link href={`/hypercert/${hypercertId}`}>
+    <Link href={`/hypercerts/${hypercertId}`}>
       <article
         className="w-[275px] rounded-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2 bg-slate-800 relative"
         title={name}
       >
         <div className="relative h-[170px] w-full rounded-lg overflow-hidden">
           <Image
-            src={`/api/hypercert/${hypercertId}/image`}
+            src={`/api/hypercerts/${hypercertId}/image`}
             alt={name || "Untitled"}
             unoptimized
             fill

@@ -1,13 +1,14 @@
 "use client";
-import { useState } from "react";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { usePublicClient } from "wagmi";
-import {
-  type HypercertMetadata,
-  TransferRestrictions,
-} from "@hypercerts-org/sdk";
 import { type StepData } from "@/hooks/useProcessDialog";
+import {
+  TransferRestrictions,
+  type HypercertMetadata,
+} from "@hypercerts-org/sdk";
+import { useState } from "react";
 import { TransactionReceipt } from "viem";
+import { waitForTransactionReceipt } from "viem/actions";
+import { useWalletClient } from "wagmi";
 
 export const mintSteps: StepData[] = [
   {
@@ -39,7 +40,7 @@ export const useMintClaim = ({
   );
 
   const { client } = useHypercertClient();
-  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
 
   const initializeWrite = async (
     metaData: HypercertMetadata,
@@ -73,7 +74,7 @@ export const useMintClaim = ({
       }
 
       setCurrentStep("confirming");
-      const receipt = await publicClient?.waitForTransactionReceipt({
+      const receipt = await waitForTransactionReceipt(walletClient!, {
         confirmations: 3,
         hash,
       });

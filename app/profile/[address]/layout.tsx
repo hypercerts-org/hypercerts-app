@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Profile",
-  description: "View and manage your Hypercerts and hyperboars",
+  description: "View and manage your hypercerts and hyperboards",
 };
 
 export default function ProfileLayout({

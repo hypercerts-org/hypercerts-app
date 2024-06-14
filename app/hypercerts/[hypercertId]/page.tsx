@@ -37,7 +37,7 @@ export async function generateMetadata(
     title: hypercert?.metadata?.name || "Untitled Hypercert",
     description: hypercert?.metadata?.description || "",
     openGraph: {
-      images: [`/api/hypercert/${hypercertId}/image`, ...previousImages],
+      images: [`/api/hypercerts/${hypercertId}/image`, ...previousImages],
     },
   };
 }
@@ -60,7 +60,7 @@ async function HypercertPageInner({
         <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
           <div className="relative w-full h-full bg-black border border-slate-800 rounded-lg overflow-hidden ">
             <Image
-              src={`/api/hypercert/${hypercertId}/image`}
+              src={`/api/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
               fill
               className="object-contain object-top p-2"

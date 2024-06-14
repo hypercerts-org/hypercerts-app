@@ -2,8 +2,8 @@ import "server-only";
 
 import { VariablesOf, graphql, readFragment } from "@/lib/graphql";
 
-import { HYPERCERTS_API_URL } from "../configs/hypercerts";
-import { HypercertListFragment } from "./fragments/hypercert-list.fragment";
+import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
+import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import request from "graphql-request";
 
 export type ClaimsOrderBy =

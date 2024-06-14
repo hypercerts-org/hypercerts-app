@@ -1,7 +1,7 @@
-import ExploreChainFilterSelect from "../../components/explore/explore-chain-filter-select";
-import ExploreList from "../../components/explore/explore-list";
-import ExploreOrderBySelect from "../../components/explore/explore-order-by-select";
-import ExploreSearchBar from "../../components/explore/explore-search-bar";
+import ExploreChainFilterSelect from "@/components/explore/explore-chain-filter-select";
+import ExploreList from "@/components/explore/explore-list";
+import ExploreOrderBySelect from "@/components/explore/explore-order-by-select";
+import ExploreSearchBar from "@/components/explore/explore-search-bar";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -1,7 +1,7 @@
 "use client";
 
 import StepProcessDialog from "@/components/global/step-process-dialog";
-import HypercertCard from "@/components/hypercert-card";
+import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
 import useProcessDialog, { StepData } from "@/hooks/useProcessDialog";

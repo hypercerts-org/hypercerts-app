@@ -11,7 +11,7 @@ export default async function HypercertRow({
   return (
     <div>
       <Image
-        src={`/api/hypercert/${hypercertId}/image`}
+        src={`/api/hypercerts/${hypercertId}/image`}
         alt={hypercert?.metadata?.name || ""}
         className="object-cover object-top w-[100px] h-[100px]"
         width={100}

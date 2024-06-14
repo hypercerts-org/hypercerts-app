@@ -5,7 +5,7 @@ import {
 } from "@/hypercerts/getAllHypercerts";
 import HypercertMiniDisplay, {
   HypercertMiniDisplayProps,
-} from "@/components/hypercert-mini-display";
+} from "@/components/hypercert/hypercert-mini-display";
 
 import ExploreListSkeleton from "./explore-list-skeleton";
 import ExplorePagination from "./explore-pagination";
@@ -53,34 +53,29 @@ async function ExploreListInner({
   }
 
   return (
-    <>
-      <div className="flex flex-col gap-5">
-        {search && (
-          <div>
-            Showing search results for: <b>{search}</b>
-          </div>
-        )}
-        <div className="flex flex-col md:flex-row flex-wrap gap-5">
-          {hypercerts?.data?.map((hypercert) => {
-            const props: HypercertMiniDisplayProps = {
-              hypercertId: hypercert.hypercert_id as string,
-              name: hypercert.metadata?.name as string,
-              chainId: Number(hypercert.contract?.chain_id),
-            };
-            return (
-              <HypercertMiniDisplay
-                {...props}
-                key={hypercert.hypercert_id as string}
-              />
-            );
-          })}
+    <div className="flex flex-col gap-5">
+      {search && (
+        <div>
+          Showing search results for: <b>{search}</b>
         </div>
+      )}
+      <div className="flex flex-row flex-wrap gap-5 justify-center md:justify-start">
+        {hypercerts?.data?.map((hypercert) => {
+          const props: HypercertMiniDisplayProps = {
+            hypercertId: hypercert.hypercert_id as string,
+            name: hypercert.metadata?.name as string,
+            chainId: Number(hypercert.contract?.chain_id),
+          };
+          return (
+            <HypercertMiniDisplay {...props} key={hypercert.hypercert_id} />
+          );
+        })}
       </div>
       <ExplorePagination
         searchParams={searchParams}
         hypercertsCount={hypercerts.count}
       />
-    </>
+    </div>
   );
 }
 
