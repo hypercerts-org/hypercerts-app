@@ -7,7 +7,7 @@ import { parseEther } from "viem";
 import { useMutation } from "@tanstack/react-query";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useGetCurrentERC20Allowance } from "@/components/marketplace/useGetCurrentERC20Allowance";
-import { MarketplaceOrder } from "@/types/alias";
+import { MarketplaceOrder } from "@/marketplace/alias";
 import { decodeContractError } from "@/lib/decodeContractError";
 
 export const useBuyFractionalMakerAsk = () => {

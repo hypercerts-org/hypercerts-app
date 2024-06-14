@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
-import { MarketplaceOrder } from "@/types/alias";
+import { MarketplaceOrder } from "@/marketplace/alias";
 import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 
 export const OrdersListRow = ({ order }: { order: MarketplaceOrder }) => {
