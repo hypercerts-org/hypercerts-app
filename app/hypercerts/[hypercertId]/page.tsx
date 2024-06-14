@@ -17,6 +17,7 @@ import WorkScope from "@/components/hypercert/scope";
 import WorkTimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+import OrdersList from "@/components/marketplace/orders-list";
 
 type Props = {
   params: { hypercertId: string };
@@ -108,8 +109,14 @@ async function HypercertPageInner({
       </div>
       <EvaluationsList hypercertId={hypercertId} />
       <Separator />
+      <div className="flex justify-between">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          Marketplace
+        </h5>
 
-      <ListForSaleButton hypercertId={hypercertId} />
+        <ListForSaleButton hypercertId={hypercertId} />
+      </div>
+      <OrdersList hypercertId={hypercertId} />
     </section>
   );
 }
@@ -117,7 +124,9 @@ async function HypercertPageInner({
 export default async function HypercertPage({
   params,
 }: {
-  params: { hypercertId: string };
+  params: {
+    hypercertId: string;
+  };
 }) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4">
