@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MarketplaceOrder } from "@/marketplace/alias";
-import { useBuyFractionalMakerAsk } from "@/components/marketplace/useBuyFractionalMakerAsk";
+import { MarketplaceOrder } from "@/marketplace/types";
 import React from "react";
+import { useBuyFractionalMakerAsk } from "@/marketplace/hooks";
 
 export interface BuyFractionalOrderFormValues {
   unitAmount: string;

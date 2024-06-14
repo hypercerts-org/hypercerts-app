@@ -4,7 +4,7 @@ import StepProcessDialog from "@/components/global/step-process-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
-import useProcessDialog, { StepData } from "@/hooks/useProcessDialog";
+import useProcessDialog, { StepData } from "@/hooks/use-process-dialog";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -46,7 +46,7 @@ const formSchema = z.object({
       },
       {
         required_error: "Please select a date range",
-      }
+      },
     )
     .refine((data) => data.from <= data.to, {
       path: ["projectDates"],
@@ -58,7 +58,7 @@ const formSchema = z.object({
       (data) => data.filter((contributor) => contributor !== "").length > 0,
       {
         message: "We need at least one contributor",
-      }
+      },
     ),
   acceptTerms: z.boolean().refine((data) => data === true, {
     message: "You must accept the terms and conditions",
@@ -161,7 +161,7 @@ export default function NewHypercertForm() {
     await mintClaim(
       formattedMetadata.data!,
       DEFAULT_NUM_FRACTIONS,
-      TransferRestrictions.FromCreatorOnly
+      TransferRestrictions.FromCreatorOnly,
     );
 
     form.reset();
@@ -195,11 +195,11 @@ export default function NewHypercertForm() {
             scopes={form.getValues().tags}
             fromDateDisplay={formatDate(
               form.getValues().projectDates?.from?.toISOString(),
-              language
+              language,
             )}
             toDateDisplay={formatDate(
               form.getValues().projectDates?.to?.toISOString(),
-              language
+              language,
             )}
           />
         </div>
@@ -207,7 +207,6 @@ export default function NewHypercertForm() {
       {mintStep !== "preparing" && (
         <StepProcessDialog
           steps={dialogSteps}
-          currentStep={mintStep}
           title="Mint your hypercert"
           triggerLabel="See progress"
           extraContent={

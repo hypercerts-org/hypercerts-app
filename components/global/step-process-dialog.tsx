@@ -10,7 +10,7 @@ import useProcessDialog, {
   type DialogStep,
   type StepData,
   type StepState,
-} from "@/hooks/useProcessDialog";
+} from "@/hooks/use-process-dialog";
 import { cn } from "@/lib/utils";
 import { Badge, BadgeCheck, Loader } from "lucide-react";
 import React, {

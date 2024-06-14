@@ -8,20 +8,25 @@ import { useEthersProvider } from "@/hooks/use-ethers-provider";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  addressesByNetwork,
   ApiClient,
   HypercertExchangeClient,
   Maker,
   QuoteType,
+  utils,
+  WETHAbi,
 } from "@hypercerts-org/marketplace-sdk";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 import { isAddress, parseEther } from "viem";
-import { waitForTransactionReceipt } from "viem/actions";
+import { readContract, waitForTransactionReceipt } from "viem/actions";
 import {
   CreateFractionalOfferFormValues,
   useFetchHypercertFractionsByHypercertId,
 } from "@/components/marketplace/create-fractional-sale-form";
+import { MarketplaceOrder } from "@/marketplace/types";
+import { decodeContractError } from "@/lib/decodeContractError";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -245,5 +250,152 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
       return orders;
     },
     enabled: !!client && !!chainId,
+  });
+};
+export const useGetCurrentERC20Allowance = () => {
+  const chainId = useChainId();
+  const { address } = useAccount();
+  const hypercertsExchangeAddress =
+    addressesByNetwork[utils.asDeployedChain(chainId)].EXCHANGE_V2;
+
+  const { data: walletClient } = useWalletClient();
+
+  return async (currency: `0x${string}`) => {
+    if (!walletClient) {
+      return BigInt(0);
+    }
+
+    const data = await readContract(walletClient, {
+      abi: WETHAbi,
+      address: currency as `0x${string}`,
+      functionName: "allowance",
+      args: [address, hypercertsExchangeAddress],
+    });
+
+    return data as bigint;
+  };
+};
+export const useBuyFractionalMakerAsk = () => {
+  const chainId = useChainId();
+  const { setStep, setSteps, setOpen } = useStepProcessDialogContext();
+  const { data: walletClientData } = useWalletClient();
+  const provider = useEthersProvider();
+  const signer = useEthersSigner();
+  const { address } = useAccount();
+  const getCurrentERC20Allowance = useGetCurrentERC20Allowance();
+
+  return useMutation({
+    mutationKey: ["buyFractionalMakerAsk"],
+    mutationFn: async ({
+      order,
+      unitAmount,
+      pricePerUnit,
+    }: {
+      order: MarketplaceOrder;
+      unitAmount: string;
+      pricePerUnit: string;
+    }) => {
+      if (!chainId) {
+        setOpen(false);
+        throw new Error("No chain id");
+      }
+
+      if (!walletClientData) {
+        setOpen(false);
+        throw new Error("No wallet client data");
+      }
+
+      setSteps([
+        {
+          id: "Setting up order execution",
+          description: "Setting up order execution",
+        },
+        {
+          id: "ERC20",
+          description: "Setting approval",
+        },
+        {
+          id: "Transfer manager",
+          description: "Approving transfer manager",
+        },
+        {
+          id: "Awaiting buy signature",
+          description: "Awaiting buy signature",
+        },
+        {
+          id: "Awaiting confirmation",
+          description: "Awaiting confirmation",
+        },
+      ]);
+      setOpen(true);
+
+      const hypercertExchangeClient = new HypercertExchangeClient(
+        chainId,
+        // @ts-ignore
+        provider,
+        signer,
+      );
+      setStep("Setting up order execution");
+      const takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
+        order,
+        address,
+        unitAmount,
+        parseEther(pricePerUnit),
+      );
+
+      try {
+        setStep("ERC20");
+        const currentAllowance = await getCurrentERC20Allowance(
+          order.currency as `0x${string}`,
+        );
+        if (currentAllowance < BigInt(order.price) * BigInt(unitAmount)) {
+          const approveTx = await hypercertExchangeClient.approveErc20(
+            order.currency,
+            BigInt(order.price) * BigInt(unitAmount),
+          );
+          await waitForTransactionReceipt(walletClientData, {
+            hash: approveTx.hash as `0x${string}`,
+          });
+        }
+
+        setStep("Transfer manager");
+        const isTransferManagerApproved =
+          await hypercertExchangeClient.isTransferManagerApproved();
+        if (!isTransferManagerApproved) {
+          const transferManagerApprove = await hypercertExchangeClient
+            .grantTransferManagerApproval()
+            .call();
+          await waitForTransactionReceipt(walletClientData, {
+            hash: transferManagerApprove.hash as `0x${string}`,
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        setOpen(false);
+        throw new Error("Approval error");
+      }
+
+      try {
+        setStep("Setting up order execution");
+        const { call } = hypercertExchangeClient.executeOrder(
+          order,
+          takerOrder,
+          order.signature,
+        );
+        setStep("Awaiting buy signature");
+        const tx = await call();
+        setStep("Awaiting confirmation");
+        await waitForTransactionReceipt(walletClientData, {
+          hash: tx.hash as `0x${string}`,
+        });
+      } catch (e) {
+        console.error(e);
+
+        const defaultMessage = `Error during step \"${"TO BE IMPLEMENTED CURRENT STEP"}\"`;
+        throw new Error(decodeContractError(e, defaultMessage));
+      } finally {
+        setOpen(false);
+      }
+    },
   });
 };

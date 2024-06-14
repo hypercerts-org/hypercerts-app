@@ -1,6 +1,6 @@
 "use client";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { type StepData } from "@/hooks/useProcessDialog";
+import { type StepData } from "@/hooks/use-process-dialog";
 import {
   TransferRestrictions,
   type HypercertMetadata,
@@ -36,7 +36,7 @@ export const useMintClaim = ({
 }) => {
   const [txPending, setTxPending] = useState(false);
   const [currentStep, setCurrentStep] = useState<StepData["id"]>(
-    mintSteps[0].id
+    mintSteps[0].id,
   );
 
   const { client } = useHypercertClient();
@@ -45,7 +45,7 @@ export const useMintClaim = ({
   const initializeWrite = async (
     metaData: HypercertMetadata,
     units: number,
-    transferRestrictions: TransferRestrictions
+    transferRestrictions: TransferRestrictions,
   ) => {
     setCurrentStep("minting");
     try {
@@ -62,7 +62,7 @@ export const useMintClaim = ({
       const hash = await client.mintClaim(
         metaData,
         BigInt(units),
-        transferRestrictions
+        transferRestrictions,
       );
 
       if (!hash) {
@@ -108,7 +108,7 @@ export const useMintClaim = ({
     write: async (
       metaData: HypercertMetadata,
       units: number,
-      transferRestrictions: TransferRestrictions = TransferRestrictions.FromCreatorOnly
+      transferRestrictions: TransferRestrictions = TransferRestrictions.FromCreatorOnly,
     ) => {
       console.log("Minting hypercert");
       await initializeWrite(metaData, units, transferRestrictions);
