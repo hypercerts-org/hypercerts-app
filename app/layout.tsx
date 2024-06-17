@@ -1,14 +1,17 @@
-import { siteConfig } from "@/configs/site";
-import { config } from "@/configs/wagmi";
-import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
-import { Instrument_Serif, Inter } from "next/font/google";
-import { headers } from "next/headers";
-import { cookieToInitialState } from "wagmi";
 import "./globals.css";
-import { Web3ModalProvider } from "@/contexts/wagmi";
-import Navbar from "@/components/global/navbar";
+
+import { Instrument_Serif, Inter } from "next/font/google";
+
+import type { Metadata } from "next";
 import MobileNav from "@/components/global/mobile-nav";
+import Navbar from "@/components/global/navbar";
+import { Toaster } from "../components/ui/toaster";
+import { Web3ModalProvider } from "@/contexts/wagmi";
+import { cn } from "@/lib/utils";
+import { config } from "@/configs/wagmi";
+import { cookieToInitialState } from "wagmi";
+import { headers } from "next/headers";
+import { siteConfig } from "@/configs/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,6 +56,7 @@ export default function RootLayout({
           {children}
           <MobileNav />
         </Web3ModalProvider>
+        <Toaster />
       </body>
     </html>
   );

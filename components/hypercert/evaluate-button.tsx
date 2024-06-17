@@ -10,10 +10,16 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Drawer } from "vaul";
+import { EvaluateDrawer } from "./evaluate-drawer";
+import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 import { TrustedAttestor } from "../../github/types/trusted-attestor.type";
 import { useAccount } from "wagmi";
 
-export default function EvaluateButton() {
+export default function EvaluateButton({
+  hypercert,
+}: {
+  hypercert: HypercertFull;
+}) {
   const { address } = useAccount();
   const [evaluator, setEvaluator] = useState<TrustedAttestor>();
 
@@ -42,20 +48,7 @@ export default function EvaluateButton() {
           <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] h-full w-[500px] mt-24 fixed bottom-0 right-0">
             <div className="p-4 bg-white flex-1 h-full">
               <div className="max-w-md mx-auto flex flex-col gap-5">
-                <Drawer.Title className="font-serif text-3xl lg:text-5xl tracking-tight">
-                  Evaluate Hypercert
-                </Drawer.Title>
-                <p>
-                  Review and evaluate the information in the Hypercert. Create
-                  attestations where you mark sections as <strong>valid</strong>{" "}
-                  or <strong>invalid</strong>. You also have the option to leave
-                  a comment that will be displayed along with your evaluation.
-                </p>
-                <p>
-                  All attestation fields are optional. Review only those
-                  sections where you confidently can attest to the correctness
-                  of the data.
-                </p>
+                <EvaluateDrawer hypercert={hypercert} />
               </div>
             </div>
           </Drawer.Content>

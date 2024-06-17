@@ -74,3 +74,26 @@
     @apply bg-background text-foreground font-sans tracking-normal antialiased;
   }
 }
+
+/* className="w-full border-slate-500 bg-slate-50 py-2 text-sm md:text-base font-medium placeholder:text-slate-500/60 ring-offset-white focus-visible:ring-offset-2 focus-visible:ring-slate-400 focus-visible:ring-2" */
+
+.tagify {
+  width: 100%;
+  --tags-border-color: RGB(100, 116, 139) !important;
+  @apply text-sm font-medium bg-slate-50;
+}
+
+.tags-input {
+  width: 100%;
+}
+
+.tagify__tag {
+  --tag-bg: black;
+  --tag-text-color: white;
+  --tag-remove-btn-color: white;
+  --tag-remove-btn-bg--hover: rgba(255, 255, 255, 0.5);
+  --tag-hover: rgba(0, 0, 0, 0.8);
+  --tag-remove-bg: rgba(0, 0, 0, 0.8);
+  --tag-border-radius: 3px;
+  --tag-inset-shadow-size: 1.5em;
+}

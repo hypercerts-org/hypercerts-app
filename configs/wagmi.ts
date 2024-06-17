@@ -1,12 +1,5 @@
-import {
-  base,
-  baseSepolia,
-  celo,
-  mainnet,
-  optimism,
-  sepolia,
-} from "viem/chains";
 import { cookieStorage, createConfig, createStorage, http } from "wagmi";
+import { mainnet, sepolia } from "viem/chains";
 
 import { siteConfig } from "./site";
 import { walletConnect } from "wagmi/connectors";
@@ -23,9 +16,10 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/124626532"],
 };
 
+export const supportedChains = [mainnet, sepolia];
+
 // Create wagmiConfig
 export const config = createConfig({
-  // chains: [sepolia, celo, base, baseSepolia, optimism],
   chains: [mainnet, sepolia],
   connectors: [walletConnect({ projectId })],
   pollingInterval: 2_000,

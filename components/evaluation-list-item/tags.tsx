@@ -1,4 +1,4 @@
-import { Badge } from "../../ui/badge";
+import { Badge } from "../ui/badge";
 import React from "react";
 
 export default function Tags({

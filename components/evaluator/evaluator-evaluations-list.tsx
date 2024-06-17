@@ -12,7 +12,7 @@ async function EvaluatorEvaluationsListInner({ address }: { address: string }) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-5 w-full">
       {attestations.data.map((attestation, i) => {
         if (!attestation) return null;
         return (

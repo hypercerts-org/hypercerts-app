@@ -1,10 +1,11 @@
-import Comments from "./evaluations-list-item/comments";
+import Comments from "../evaluation-list-item/comments";
 import { EvaluationData } from "../../eas/types/evaluation-data.type";
-import Evaluations from "./evaluations-list-item/evaluations";
+import Evaluations from "../evaluation-list-item/evaluations";
 import FormattedDate from "../formatted-date";
-import HypercertRow from "./evaluations-list-item/hypercert-row";
+import HypercertRow from "../evaluation-list-item/hypercert-row";
 import Link from "next/link";
-import Tags from "./evaluations-list-item/tags";
+import { Separator } from "../ui/separator";
+import Tags from "../evaluation-list-item/tags";
 
 export default function EvaluatorEvaluationsListItem({
   blockTimestamp,
@@ -15,7 +16,7 @@ export default function EvaluatorEvaluationsListItem({
 }) {
   const hypercertId = `${data.chain_id}-${data.contract_address}-${data.token_id}`;
   return (
-    <Link href={`/hypercerts/${hypercertId}`}>
+    <Link href={`/hypercerts/${hypercertId}`} className="flex flex-col gap-5">
       <FormattedDate seconds={blockTimestamp} />
       <HypercertRow hypercertId={hypercertId} />
       <Evaluations
@@ -26,6 +27,7 @@ export default function EvaluatorEvaluationsListItem({
       />
       <Tags tags={data.tags} />
       <Comments comments={data.comments} />
+      <Separator />
     </Link>
   );
 }
