@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { decodeAbiParameters, formatEther, parseAbiParameters } from "viem";
 import EthAddress from "@/components/eth-address";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 
 function OrdersListInner({ hypercertId }: { hypercertId: string }) {
   const { data: openOrders } =
@@ -132,6 +133,7 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => onRowClick(row.original)}
+                    className="cursor-pointer"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -178,9 +180,17 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
         </div>
       </div>
       {selectedOrder && (
-        <StepProcessDialogProvider>
-          <BuyFractionalOrderForm order={selectedOrder} />
-        </StepProcessDialogProvider>
+        <Dialog
+          open={!!selectedOrder}
+          onOpenChange={() => setSelectedOrder(null)}
+        >
+          <DialogContent>
+            <DialogHeader>Buy fractional sale</DialogHeader>
+            <StepProcessDialogProvider>
+              <BuyFractionalOrderForm order={selectedOrder} />
+            </StepProcessDialogProvider>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
