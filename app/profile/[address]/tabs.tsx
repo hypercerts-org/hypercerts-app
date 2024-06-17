@@ -2,6 +2,7 @@ import { EmptySection } from "@/app/profile/[address]/sections";
 import { Button } from "@/components/ui/button";
 import { HypercertMetadata } from "@hypercerts-org/sdk";
 import { Dispatch, ReactNode, SetStateAction } from "react";
+import Script from "next/script";
 
 type ProfileTabKey = "hypercerts" | "hyperboards";
 
@@ -76,10 +77,27 @@ const HyperboardsTabContent = ({
 }: {
   ownedHyperboards: string[]; // TODO: update to hyperboards
 }) => {
-  if (!ownedHyperboards || !ownedHyperboards.length) {
+  if (!ownedHyperboards?.length) {
     return <EmptySection />;
   }
-  return <div>Hyperboards</div>; // TODO: display actual data content
+
+  return (
+    <div>
+      <Script
+        src="https://hyperboards-git-feature-hyperboard-widget-hypercerts-foundation.vercel.app/widget/hyperboard-widget.js"
+        type="module"
+      />
+      <div className="flex flex-col gap-4">
+        {ownedHyperboards.map((hyperboard) => (
+          <div
+            key={hyperboard}
+            className="hyperboard-widget"
+            data-hyperboard-id={hyperboard}
+          ></div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 const ProfileTabContent = ({
@@ -87,11 +105,13 @@ const ProfileTabContent = ({
   data,
 }: {
   activeTab: "hypercerts" | "hyperboards";
-  data: any[];
+  data: { hyperboardIds: string[]; ownedHypercerts: HypercertMetadata[] };
 }) => {
   const tabContent: { [key in ProfileTabKey]: ReactNode } = {
-    hypercerts: <HypercertsTabContent ownedHypercerts={data} />,
-    hyperboards: <HyperboardsTabContent ownedHyperboards={data} />,
+    hypercerts: <HypercertsTabContent ownedHypercerts={data.ownedHypercerts} />,
+    hyperboards: (
+      <HyperboardsTabContent ownedHyperboards={data.hyperboardIds} />
+    ),
   };
 
   return <section className="py-2">{tabContent[activeTab]}</section>;

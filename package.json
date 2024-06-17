@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "supabase:types": "npx supabase gen types typescript --project-id clagjjfinooizoqdkvqc --schema public > types/hypercerts-data-database.ts"
+    "supabase:types": "npx supabase gen types typescript --project-id zgvoyckkistexkfdmjqc --schema public > types/hypercerts-data-database.ts"
   },
   "packageManager": "pnpm@9.2.0",
   "dependencies": {
@@ -32,6 +32,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@supabase/supabase-js": "^2.43.5",
     "@tanstack/query-core": "^5.32.0",
     "@tanstack/react-query": "^5.32.0",
     "@tanstack/react-query-devtools": "4",

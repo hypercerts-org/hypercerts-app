@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 import { useAccount } from "wagmi";
+import { supabaseData } from "@/lib/supabase";
 
 const Profile = () => {
   const { address } = useAccount();
@@ -48,6 +49,21 @@ const Profile = () => {
         first: 10,
       }),
     enabled: !!address && !!activeTab && activeTab === "hypercerts",
+  });
+
+  const {
+    data: hyperboardsByOwnerResponse,
+    isLoading: isHyperboardsByOwnerLoading,
+    error: hyperboardsByOwnerError,
+  } = useQuery({
+    queryKey: ["hyperboards", address],
+    queryFn: async () => {
+      return await supabaseData
+        .from("hyperboards")
+        .select("id")
+        .eq("admin_id", address!.toLowerCase());
+    },
+    enabled: !!address,
   });
 
   // const {
@@ -146,16 +162,32 @@ const Profile = () => {
       </section>
       <Separator className="my-4" />
       <section className="flex space-x-2">
-        {profileTabs.map((tab) => (
-          <ProfileTabButton
-            {...tab}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            key={tab.tabKey}
-          />
-        ))}
+        <ProfileTabButton
+          tabLabel="Hypercerts"
+          tabKey="hypercerts"
+          count={hypercertsByOwnerResponse?.hypercerts.count || 0}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+        <ProfileTabButton
+          tabLabel="Hyperboards"
+          tabKey="hyperboards"
+          count={hyperboardsByOwnerResponse?.data?.length || 0}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
       </section>
-      <ProfileTabContent activeTab={activeTab} data={[]} />
+      <ProfileTabContent
+        activeTab={activeTab}
+        data={{
+          hyperboardIds:
+            hyperboardsByOwnerResponse?.data?.map(
+              (hyperboard) => hyperboard.id,
+            ) || [],
+          //@ts-ignore
+          ownedHypercerts: hypercertsByOwnerResponse?.hypercerts.data || [],
+        }}
+      />
     </Fragment>
   );
 };

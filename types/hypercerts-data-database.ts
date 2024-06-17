@@ -9,333 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      allowlistCache: {
+      blueprints: {
         Row: {
-          address: string | null
-          claimId: string | null
-          created_at: string | null
-          fractionCounter: number | null
-          hidden: boolean
-          id: number
-        }
-        Insert: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Update: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Relationships: []
-      }
-      "allowlistCache-chainId": {
-        Row: {
-          address: string | null
-          chainId: number
-          claimId: string | null
-          created_at: string | null
-          fractionCounter: number | null
-          hidden: boolean
-          id: number
-        }
-        Insert: {
-          address?: string | null
-          chainId: number
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Update: {
-          address?: string | null
-          chainId?: number
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Relationships: []
-      }
-      "allowlistCache-goerli": {
-        Row: {
-          address: string | null
-          claimId: string | null
-          created_at: string | null
-          fractionCounter: number | null
-          hidden: boolean
-          id: number
-        }
-        Insert: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Update: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Relationships: []
-      }
-      "allowlistCache-optimism": {
-        Row: {
-          address: string | null
-          claimId: string | null
-          created_at: string | null
-          fractionCounter: number | null
-          hidden: boolean
-          id: number
-        }
-        Insert: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Update: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Relationships: []
-      }
-      "allowlistCache-sepolia": {
-        Row: {
-          address: string | null
-          claimId: string | null
-          created_at: string | null
-          fractionCounter: number | null
-          hidden: boolean
-          id: number
-        }
-        Insert: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Update: {
-          address?: string | null
-          claimId?: string | null
-          created_at?: string | null
-          fractionCounter?: number | null
-          hidden?: boolean
-          id?: number
-        }
-        Relationships: []
-      }
-      "claims-metadata-mapping": {
-        Row: {
-          chainId: number | null
-          claimId: string
-          collectionName: string | null
-          collision: string | null
-          createdAt: number | null
-          creatorAddress: string | null
-          date: string | null
-          featured: boolean | null
-          hidden: boolean
-          hypercert: Json | null
-          id: number
-          properties: Json | null
-          title: string | null
-          totalPrice: number | null
-          totalUnits: number | null
-        }
-        Insert: {
-          chainId?: number | null
-          claimId: string
-          collectionName?: string | null
-          collision?: string | null
-          createdAt?: number | null
-          creatorAddress?: string | null
-          date?: string | null
-          featured?: boolean | null
-          hidden?: boolean
-          hypercert?: Json | null
-          id?: number
-          properties?: Json | null
-          title?: string | null
-          totalPrice?: number | null
-          totalUnits?: number | null
-        }
-        Update: {
-          chainId?: number | null
-          claimId?: string
-          collectionName?: string | null
-          collision?: string | null
-          createdAt?: number | null
-          creatorAddress?: string | null
-          date?: string | null
-          featured?: boolean | null
-          hidden?: boolean
-          hypercert?: Json | null
-          id?: number
-          properties?: Json | null
-          title?: string | null
-          totalPrice?: number | null
-          totalUnits?: number | null
-        }
-        Relationships: []
-      }
-      collections: {
-        Row: {
-          chainId: number | null
-          claimId: string | null
-          collectionName: string | null
-          created_at: string | null
-          featured: boolean | null
-          id: number
-        }
-        Insert: {
-          chainId?: number | null
-          claimId?: string | null
-          collectionName?: string | null
-          created_at?: string | null
-          featured?: boolean | null
-          id?: number
-        }
-        Update: {
-          chainId?: number | null
-          claimId?: string | null
-          collectionName?: string | null
-          created_at?: string | null
-          featured?: boolean | null
-          id?: number
-        }
-        Relationships: []
-      }
-      "ftc-purchase": {
-        Row: {
-          address: string
-          ethValue: number
-          id: number
-          textForSponsor: string | null
-          timestamp: string
-          values: Json
-        }
-        Insert: {
-          address: string
-          ethValue: number
-          id?: number
-          textForSponsor?: string | null
-          timestamp?: string
-          values: Json
-        }
-        Update: {
-          address?: string
-          ethValue?: number
-          id?: number
-          textForSponsor?: string | null
-          timestamp?: string
-          values?: Json
-        }
-        Relationships: []
-      }
-      "gtc-alpha-allowlist": {
-        Row: {
-          address: string | null
-          id: number
-          project: string | null
-          units: number | null
-        }
-        Insert: {
-          address?: string | null
-          id: number
-          project?: string | null
-          units?: number | null
-        }
-        Update: {
-          address?: string | null
-          id?: number
-          project?: string | null
-          units?: number | null
-        }
-        Relationships: []
-      }
-      "hidden-hypercerts": {
-        Row: {
-          chainId: number | null
-          claimId: string | null
-          entry_created_at: string
-          hidden: boolean
-          id: number
-        }
-        Insert: {
-          chainId?: number | null
-          claimId?: string | null
-          entry_created_at?: string
-          hidden?: boolean
-          id?: number
-        }
-        Update: {
-          chainId?: number | null
-          claimId?: string | null
-          entry_created_at?: string
-          hidden?: boolean
-          id?: number
-        }
-        Relationships: []
-      }
-      "hyperboard-claims": {
-        Row: {
+          admin_id: string
           created_at: string
-          hypercert_id: string
-          id: string
+          display_size: number
+          form_values: Json
+          id: number
+          minter_address: string
           registry_id: string
         }
         Insert: {
+          admin_id: string
           created_at?: string
-          hypercert_id: string
-          id?: string
+          display_size?: number
+          form_values: Json
+          id?: number
+          minter_address: string
           registry_id: string
         }
         Update: {
+          admin_id?: string
           created_at?: string
-          hypercert_id?: string
-          id?: string
+          display_size?: number
+          form_values?: Json
+          id?: number
+          minter_address?: string
           registry_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "hyperboard-claims_registry_id_fkey"
+            foreignKeyName: "blueprints_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["address"]
+          },
+          {
+            foreignKeyName: "blueprints_registry_id_fkey"
             columns: ["registry_id"]
             isOneToOne: false
-            referencedRelation: "registries-optimism"
+            referencedRelation: "registries"
             referencedColumns: ["id"]
           },
         ]
       }
-      "hyperboard-sponsor-metadata": {
+      claims: {
+        Row: {
+          admin_id: string
+          chain_id: number
+          created_at: string
+          display_size: number
+          hypercert_id: string
+          id: string
+          owner_id: string
+          registry_id: string
+        }
+        Insert: {
+          admin_id: string
+          chain_id: number
+          created_at?: string
+          display_size?: number
+          hypercert_id: string
+          id?: string
+          owner_id: string
+          registry_id: string
+        }
+        Update: {
+          admin_id?: string
+          chain_id?: number
+          created_at?: string
+          display_size?: number
+          hypercert_id?: string
+          id?: string
+          owner_id?: string
+          registry_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claims_registry_id_fkey"
+            columns: ["registry_id"]
+            isOneToOne: false
+            referencedRelation: "registries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      default_sponsor_metadata: {
         Row: {
           address: string
           companyName: string | null
           created_at: string
           firstName: string | null
-          id: string
           image: string
           lastName: string | null
           type: string
@@ -345,7 +110,6 @@ export type Database = {
           companyName?: string | null
           created_at?: string
           firstName?: string | null
-          id?: string
           image: string
           lastName?: string | null
           type: string
@@ -355,89 +119,130 @@ export type Database = {
           companyName?: string | null
           created_at?: string
           firstName?: string | null
-          id?: string
           image?: string
           lastName?: string | null
           type?: string
         }
         Relationships: []
       }
-      "hypercert-projects": {
+      fraction_sponsor_metadata: {
         Row: {
-          date_to_order: string | null
-          description: string | null
-          hidden: boolean
-          id: number
-          link: string | null
-          link_display_text: string | null
-          name: string | null
-          organization: string | null
-          stage: string | null
-          time_created: string | null
-          type: string | null
-          visible_date: string | null
-        }
-        Insert: {
-          date_to_order?: string | null
-          description?: string | null
-          hidden?: boolean
-          id?: number
-          link?: string | null
-          link_display_text?: string | null
-          name?: string | null
-          organization?: string | null
-          stage?: string | null
-          time_created?: string | null
-          type?: string | null
-          visible_date?: string | null
-        }
-        Update: {
-          date_to_order?: string | null
-          description?: string | null
-          hidden?: boolean
-          id?: number
-          link?: string | null
-          link_display_text?: string | null
-          name?: string | null
-          organization?: string | null
-          stage?: string | null
-          time_created?: string | null
-          type?: string | null
-          visible_date?: string | null
-        }
-        Relationships: []
-      }
-      "hypercerts-store": {
-        Row: {
-          chainId: number | null
-          claimId: string | null
-          collectionName: string | null
+          chain_id: number
+          companyName: string | null
           created_at: string
-          hidden: boolean
-          id: number
-          maxPurchase: number
+          firstName: string | null
+          fraction_id: string
+          hypercert_id: string
+          id: string
+          image: string
+          lastName: string | null
+          strategy: string
+          type: string
+          value: string
         }
         Insert: {
-          chainId?: number | null
-          claimId?: string | null
-          collectionName?: string | null
+          chain_id: number
+          companyName?: string | null
           created_at?: string
-          hidden?: boolean
-          id?: number
-          maxPurchase?: number
+          firstName?: string | null
+          fraction_id: string
+          hypercert_id: string
+          id?: string
+          image: string
+          lastName?: string | null
+          strategy: string
+          type: string
+          value: string
         }
         Update: {
-          chainId?: number | null
-          claimId?: string | null
-          collectionName?: string | null
+          chain_id?: number
+          companyName?: string | null
           created_at?: string
-          hidden?: boolean
-          id?: number
-          maxPurchase?: number
+          firstName?: string | null
+          fraction_id?: string
+          hypercert_id?: string
+          id?: string
+          image?: string
+          lastName?: string | null
+          strategy?: string
+          type?: string
+          value?: string
         }
         Relationships: []
       }
-      "marketplace-order-nonces": {
+      hyperboard_registries: {
+        Row: {
+          created_at: string | null
+          hyperboard_id: string
+          label: string | null
+          registry_id: string
+          render_method: string
+        }
+        Insert: {
+          created_at?: string | null
+          hyperboard_id: string
+          label?: string | null
+          registry_id: string
+          render_method?: string
+        }
+        Update: {
+          created_at?: string | null
+          hyperboard_id?: string
+          label?: string | null
+          registry_id?: string
+          render_method?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hyperboard_registries_hyperboard_id_fkey"
+            columns: ["hyperboard_id"]
+            isOneToOne: false
+            referencedRelation: "hyperboards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hyperboard_registries_registries_id_fk"
+            columns: ["registry_id"]
+            isOneToOne: false
+            referencedRelation: "registries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hyperboards: {
+        Row: {
+          admin_id: string
+          background_image: string | null
+          chain_id: number
+          created_at: string | null
+          grayscale_images: boolean
+          id: string
+          name: string
+          tile_border_color: string | null
+        }
+        Insert: {
+          admin_id: string
+          background_image?: string | null
+          chain_id: number
+          created_at?: string | null
+          grayscale_images?: boolean
+          id?: string
+          name: string
+          tile_border_color?: string | null
+        }
+        Update: {
+          admin_id?: string
+          background_image?: string | null
+          chain_id?: number
+          created_at?: string | null
+          grayscale_images?: boolean
+          id?: string
+          name?: string
+          tile_border_color?: string | null
+        }
+        Relationships: []
+      }
+      marketplace_order_nonces: {
         Row: {
           address: string
           chain_id: number
@@ -458,7 +263,7 @@ export type Database = {
         }
         Relationships: []
       }
-      "marketplace-orders": {
+      marketplace_orders: {
         Row: {
           additionalParameters: string
           amounts: number[]
@@ -524,9 +329,10 @@ export type Database = {
         }
         Relationships: []
       }
-      "registries-optimism": {
+      registries: {
         Row: {
           admin_id: string
+          chain_id: number
           created_at: string
           description: string
           hidden: boolean
@@ -535,6 +341,7 @@ export type Database = {
         }
         Insert: {
           admin_id: string
+          chain_id: number
           created_at?: string
           description: string
           hidden?: boolean
@@ -543,6 +350,7 @@ export type Database = {
         }
         Update: {
           admin_id?: string
+          chain_id?: number
           created_at?: string
           description?: string
           hidden?: boolean
@@ -551,102 +359,108 @@ export type Database = {
         }
         Relationships: []
       }
-      "zuconnect-funders": {
+      users: {
         Row: {
-          budget: number | null
+          address: string
+          auth: Json
           created_at: string
-          fid: string | null
-          id: number
-        }
-        Insert: {
-          budget?: number | null
-          created_at?: string
-          fid?: string | null
-          id?: number
-        }
-        Update: {
-          budget?: number | null
-          created_at?: string
-          fid?: string | null
-          id?: number
-        }
-        Relationships: []
-      }
-      "zuzalu-community-hypercerts": {
-        Row: {
-          chainId: number | null
-          claimId: string
-          collectionName: string | null
-          collision: string | null
-          createdAt: number | null
-          creatorAddress: string | null
-          date: string | null
-          featured: boolean | null
-          hidden: boolean
-          hypercert: Json | null
-          id: number
-          properties: Json | null
-          title: string | null
-          totalUnits: number | null
-        }
-        Insert: {
-          chainId?: number | null
-          claimId: string
-          collectionName?: string | null
-          collision?: string | null
-          createdAt?: number | null
-          creatorAddress?: string | null
-          date?: string | null
-          featured?: boolean | null
-          hidden?: boolean
-          hypercert?: Json | null
-          id?: number
-          properties?: Json | null
-          title?: string | null
-          totalUnits?: number | null
-        }
-        Update: {
-          chainId?: number | null
-          claimId?: string
-          collectionName?: string | null
-          collision?: string | null
-          createdAt?: number | null
-          creatorAddress?: string | null
-          date?: string | null
-          featured?: boolean | null
-          hidden?: boolean
-          hypercert?: Json | null
-          id?: number
-          properties?: Json | null
-          title?: string | null
-          totalUnits?: number | null
-        }
-        Relationships: []
-      }
-      "zuzalu-purchase": {
-        Row: {
-          address: string
-          ethValue: number
-          id: number
-          textForSponsor: string | null
-          timestamp: string
-          values: Json
+          email: string | null
+          id: string | null
         }
         Insert: {
           address: string
-          ethValue: number
-          id?: number
-          textForSponsor?: string | null
-          timestamp?: string
-          values: Json
+          auth?: Json
+          created_at?: string
+          email?: string | null
+          id?: string | null
         }
         Update: {
           address?: string
-          ethValue?: number
+          auth?: Json
+          created_at?: string
+          email?: string | null
+          id?: string | null
+        }
+        Relationships: []
+      }
+      zuconnect_voting: {
+        Row: {
+          allocation_hc01: number | null
+          allocation_hc02: number | null
+          allocation_hc03: number | null
+          allocation_hc04: number | null
+          allocation_hc05: number | null
+          allocation_hc06: number | null
+          allocation_hc07: number | null
+          allocation_hc08: number | null
+          created_at: string
+          feedback: string | null
+          fid: string | null
+          id: number
+          link_to_image: string | null
+          percent_core_team: number | null
+          percent_direct_allocation: number | null
+          percent_matching_fund: number | null
+        }
+        Insert: {
+          allocation_hc01?: number | null
+          allocation_hc02?: number | null
+          allocation_hc03?: number | null
+          allocation_hc04?: number | null
+          allocation_hc05?: number | null
+          allocation_hc06?: number | null
+          allocation_hc07?: number | null
+          allocation_hc08?: number | null
+          created_at?: string
+          feedback?: string | null
+          fid?: string | null
           id?: number
-          textForSponsor?: string | null
-          timestamp?: string
-          values?: Json
+          link_to_image?: string | null
+          percent_core_team?: number | null
+          percent_direct_allocation?: number | null
+          percent_matching_fund?: number | null
+        }
+        Update: {
+          allocation_hc01?: number | null
+          allocation_hc02?: number | null
+          allocation_hc03?: number | null
+          allocation_hc04?: number | null
+          allocation_hc05?: number | null
+          allocation_hc06?: number | null
+          allocation_hc07?: number | null
+          allocation_hc08?: number | null
+          created_at?: string
+          feedback?: string | null
+          fid?: string | null
+          id?: number
+          link_to_image?: string | null
+          percent_core_team?: number | null
+          percent_direct_allocation?: number | null
+          percent_matching_fund?: number | null
+        }
+        Relationships: []
+      }
+      zuzalu_donations: {
+        Row: {
+          address: string
+          amount: string | null
+          created_at: string
+          email: string
+          id: number
+        }
+        Insert: {
+          address: string
+          amount?: string | null
+          created_at?: string
+          email: string
+          id?: number
+        }
+        Update: {
+          address?: string
+          amount?: string | null
+          created_at?: string
+          email?: string
+          id?: number
         }
         Relationships: []
       }
@@ -655,54 +469,50 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      citext:
-        | {
-            Args: {
-              "": boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              "": string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: string
-          }
-      citext_hash: {
+      add_claim_from_blueprint: {
         Args: {
-          "": string
-        }
-        Returns: number
-      }
-      citextin: {
-        Args: {
-          "": unknown
+          registry_id: string
+          hypercert_id: string
+          chain_id: number
+          admin_id: string
+          owner_id: string
+          blueprint_id: number
         }
         Returns: string
       }
-      citextout: {
+      default_sponsor_metadata_by_address: {
         Args: {
-          "": string
+          addresses: string[]
         }
-        Returns: unknown
+        Returns: {
+          address: string
+          companyName: string | null
+          created_at: string
+          firstName: string | null
+          image: string
+          lastName: string | null
+          type: string
+        }[]
       }
-      citextrecv: {
+      fraction_sponsor_metadata_by_fraction_id: {
         Args: {
-          "": unknown
+          fractions: string[]
+          chain: number
         }
-        Returns: string
-      }
-      citextsend: {
-        Args: {
-          "": string
-        }
-        Returns: string
+        Returns: {
+          chain_id: number
+          companyName: string | null
+          created_at: string
+          firstName: string | null
+          fraction_id: string
+          hypercert_id: string
+          id: string
+          image: string
+          lastName: string | null
+          strategy: string
+          type: string
+          value: string
+        }[]
       }
     }
     Enums: {
