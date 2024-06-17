@@ -231,8 +231,6 @@ export const useCreateFractionalMakerAsk = ({
 export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
   const { client } = useHypercertClient();
   const chainId = useChainId();
-  const { data: fractions } =
-    useFetchHypercertFractionsByHypercertId(hypercertId);
   const provider = usePublicClient();
 
   return useQuery({
@@ -242,10 +240,8 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
         return null;
       }
       const apiClient = new ApiClient();
-      const { data: orders } = await apiClient.fetchOrders({
-        claimTokenIds: fractions?.map((fraction) =>
-          parseClaimOrFractionId(fraction.hypercert_id!).id.toString(),
-        ),
+      const { data: orders } = await apiClient.fetchOrdersByHypercertId({
+        hypercertId,
       });
       return orders;
     },
