@@ -12,6 +12,8 @@ import ExplorePagination from "./explore-pagination";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import { Suspense } from "react";
 import { InfoSection } from "@/app/profile/[address]/sections";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { formatEther } from "viem";
 
 function HypercertsListNoResults() {
   return "No results found";
@@ -62,11 +64,21 @@ async function ExploreListInner({
       )}
       <div className="flex flex-row flex-wrap gap-5 justify-center md:justify-start">
         {hypercerts?.data?.map((hypercert) => {
+          const percentAvailable = calculateBigIntPercentage(
+            hypercert.orders?.totalUnitsForSale,
+            hypercert.units,
+          );
+          const unitsPerPercent = BigInt(hypercert.units || 0) / BigInt(100);
+          const lowestPricePerPercent =
+            unitsPerPercent *
+            BigInt(hypercert.orders?.lowestAvailablePrice || 0);
           const props: HypercertMiniDisplayProps = {
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
             chainId: Number(hypercert.contract?.chain_id),
             attestations: hypercert.attestations,
+            lowestPrice: formatEther(lowestPricePerPercent),
+            percentAvailable,
           };
           return (
             <HypercertMiniDisplay {...props} key={hypercert.hypercert_id} />

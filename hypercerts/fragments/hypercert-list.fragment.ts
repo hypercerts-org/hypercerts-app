@@ -16,6 +16,11 @@ export const HypercertListFragment = graphql(`
     contract {
       chain_id
     }
+    units
+    orders {
+      lowestAvailablePrice
+      totalUnitsForSale
+    }
   }
 `);
 export type HypercertListFragment = ResultOf<typeof HypercertListFragment>;

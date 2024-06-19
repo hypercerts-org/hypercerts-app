@@ -78,7 +78,7 @@ export function ListForSaleButton({
         !marketplaceOrders?.find(
           (order) =>
             order.itemIds[0] ===
-            parseClaimOrFractionId(fraction.hypercert_id!).id.toString(),
+            parseClaimOrFractionId(fraction.fraction_id!).id.toString(),
         ),
     );
 
