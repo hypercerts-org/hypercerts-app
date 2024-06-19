@@ -133,7 +133,7 @@ const CreateFractionalOrderFormInner = ({
     : [];
 
   const yourFractionsWithoutActiveOrder = yourFractions.filter(
-    (fraction) => !fractionsWithActiveOrder.includes(fraction.hypercert_id!),
+    (fraction) => !fractionsWithActiveOrder.includes(fraction.fraction_id!),
   );
 
   const hasFractionsWithoutActiveOrder =
@@ -168,10 +168,10 @@ const CreateFractionalOrderFormInner = ({
                           <SelectContent>
                             {yourFractionsWithoutActiveOrder.map((fraction) => (
                               <SelectItem
-                                key={fraction.hypercert_id}
-                                value={fraction.hypercert_id!}
+                                key={fraction.fraction_id}
+                                value={fraction.fraction_id!}
                               >
-                                {fraction.hypercert_id}
+                                {fraction.fraction_id}
                               </SelectItem>
                             ))}
                           </SelectContent>
