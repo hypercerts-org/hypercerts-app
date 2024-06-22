@@ -7,11 +7,10 @@ import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { type SupportedChainIdType } from "@/lib/constants";
 import { supabaseData } from "@/lib/supabase";
 import Link from "next/link";
-import Script from "next/script";
 import { Suspense } from "react";
 import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 
-const defaultDescription =
+export const defaultDescription =
   "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
 
 const CollectionsTabContentInner = async ({ address }: { address: string }) => {
@@ -26,10 +25,6 @@ const CollectionsTabContentInner = async ({ address }: { address: string }) => {
 
   return (
     <div>
-      <Script
-        src="https://hyperboards-git-feature-hyperboard-widget-hypercerts-foundation.vercel.app/widget/hyperboard-widget.js"
-        type="module"
-      />
       <div className="flex flex-col gap-4">
         {hyperboards.data.map((hyperboard) => (
           <HyperboardRow
