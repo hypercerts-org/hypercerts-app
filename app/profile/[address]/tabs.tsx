@@ -9,11 +9,15 @@ import { supabaseData } from "@/lib/supabase";
 import Link from "next/link";
 import Script from "next/script";
 import { Suspense } from "react";
+import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 
-const HyperBoardsTabContentInner = async ({ address }: { address: string }) => {
+const defaultDescription =
+  "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
+
+const CollectionsTabContentInner = async ({ address }: { address: string }) => {
   const hyperboards = await supabaseData
     .from("hyperboards")
-    .select("id")
+    .select("id, name")
     .eq("admin_id", address.toLowerCase());
 
   if (!hyperboards || !hyperboards.data) {
@@ -28,21 +32,22 @@ const HyperBoardsTabContentInner = async ({ address }: { address: string }) => {
       />
       <div className="flex flex-col gap-4">
         {hyperboards.data.map((hyperboard) => (
-          <div
+          <HyperboardRow
             key={hyperboard.id}
-            className="hyperboard-widget"
-            data-hyperboard-id={hyperboard.id}
-          ></div>
+            hyperboardId={hyperboard.id}
+            name={hyperboard.name}
+            description={defaultDescription}
+          />
         ))}
       </div>
     </div>
   );
 };
 
-const HyperboardsTabContent = ({ address }: { address: string }) => {
+const CollectionsTabContent = ({ address }: { address: string }) => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <HyperBoardsTabContentInner address={address} />
+      <CollectionsTabContentInner address={address} />
     </Suspense>
   );
 };
@@ -114,13 +119,13 @@ const ProfileTabSection = ({
             <h3 className={`text-lg`}>Hypercerts</h3>
           </Button>
         </Link>
-        <Link href={`/profile/${address}?tab=hyperboards`}>
+        <Link href={`/profile/${address}?tab=collections`}>
           <Button
-            variant={active === "hyperboards" ? "default" : "outline"}
+            variant={active === "collections" ? "default" : "outline"}
             size={"default"}
             className={`space-x-1 border-[1.5px]`}
           >
-            <h3 className={`text-lg`}>Hyperboards</h3>
+            <h3 className={`text-lg`}>Collections</h3>
           </Button>
         </Link>
       </section>
@@ -128,4 +133,4 @@ const ProfileTabSection = ({
   );
 };
 
-export { HyperboardsTabContent, HypercertsTabContent, ProfileTabSection };
+export { CollectionsTabContent, HypercertsTabContent, ProfileTabSection };

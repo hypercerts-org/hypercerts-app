@@ -1,5 +1,5 @@
 import {
-  HyperboardsTabContent,
+  CollectionsTabContent,
   HypercertsTabContent,
   ProfileTabSection,
 } from "@/app/profile/[address]/tabs";
@@ -33,7 +33,7 @@ export default function ProfilePage({
         {(tab === undefined || tab === "hypercerts") && (
           <HypercertsTabContent address={address} />
         )}
-        {tab === "hyperboards" && <HyperboardsTabContent address={address} />}
+        {tab === "collections" && <CollectionsTabContent address={address} />}
       </section>
     </section>
   );
