@@ -1,18 +1,14 @@
-import { supabaseData } from "@/lib/supabase";
 import { Suspense } from "react";
 import { defaultDescription } from "@/app/profile/[address]/tabs";
 import { HyperboardWidget } from "@/components/hyperboard/hyperboardWidget";
+import { getCollectionById } from "@/collections/getCollectionById";
 
 const CollectionPageInner = async ({
   collectionId,
 }: {
   collectionId: string;
 }) => {
-  const { data } = await supabaseData
-    .from("hyperboards")
-    .select("id, name")
-    .eq("id", collectionId)
-    .maybeSingle();
+  const data = await getCollectionById(collectionId);
 
   if (!data) {
     return <div>Collection not found</div>;

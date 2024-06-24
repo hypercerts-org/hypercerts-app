@@ -5,28 +5,25 @@ import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-l
 import { Button } from "@/components/ui/button";
 import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { type SupportedChainIdType } from "@/lib/constants";
-import { supabaseData } from "@/lib/supabase";
 import Link from "next/link";
 import { Suspense } from "react";
 import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
+import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
 
 export const defaultDescription =
   "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
 
 const CollectionsTabContentInner = async ({ address }: { address: string }) => {
-  const hyperboards = await supabaseData
-    .from("hyperboards")
-    .select("id, name")
-    .eq("admin_id", address.toLowerCase());
+  const hyperboards = await getCollectionsByAdminAddress(address.toLowerCase());
 
-  if (!hyperboards || !hyperboards.data) {
+  if (!hyperboards) {
     return <EmptySection />;
   }
 
   return (
     <div>
       <div className="flex flex-col gap-4">
-        {hyperboards.data.map((hyperboard) => (
+        {hyperboards.map((hyperboard) => (
           <HyperboardRow
             key={hyperboard.id}
             hyperboardId={hyperboard.id}

@@ -14,16 +14,16 @@ export const HypercertListFragment = graphql(`
     creation_block_number
     creation_block_timestamp
     last_update_block_number
-    last_update_block_timestamp 
+    last_update_block_timestamp
     hypercert_id
     contract {
       chain_id
     }
     units
-    # orders {
-    #   lowestAvailablePrice
-    #   totalUnitsForSale
-    # }
+    orders {
+      lowestAvailablePrice
+      totalUnitsForSale
+    }
   }
 `);
 export type HypercertListFragment = ResultOf<typeof HypercertListFragment>;
