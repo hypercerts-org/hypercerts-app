@@ -27,6 +27,7 @@ import {
 } from "@/components/marketplace/create-fractional-sale-form";
 import { MarketplaceOrder } from "@/marketplace/types";
 import { decodeContractError } from "@/lib/decodeContractError";
+import { apiEnvironment } from "@/lib/constants";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -238,7 +239,7 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
       if (!provider) {
         return null;
       }
-      const apiClient = new ApiClient();
+      const apiClient = new ApiClient(apiEnvironment);
       const { data: orders } = await apiClient.fetchOrdersByHypercertId({
         hypercertId,
       });

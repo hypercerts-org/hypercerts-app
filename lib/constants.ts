@@ -9,3 +9,7 @@ const chainEntries = [
 export const SUPPORTED_CHAINS = new Map(chainEntries);
 
 export type SupportedChainIdType = (typeof chainEntries)[number][0];
+
+export const apiEnvironment: "test" | "production" = (process.env[
+  "API_ENVIRONMENT"
+] || "test") as "test" | "production";
