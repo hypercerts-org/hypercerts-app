@@ -229,7 +229,6 @@ export const useCreateFractionalMakerAsk = ({
 };
 
 export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
-  const { client } = useHypercertClient();
   const chainId = useChainId();
   const provider = usePublicClient();
 
@@ -245,7 +244,7 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
       });
       return orders;
     },
-    enabled: !!client && !!chainId,
+    enabled: !!chainId,
   });
 };
 export const useGetCurrentERC20Allowance = () => {

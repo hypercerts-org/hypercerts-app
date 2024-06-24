@@ -18,8 +18,8 @@ importers:
         specifier: 2.0.0-alpha.0
         version: 2.0.0-alpha.0(bufferutil@4.0.8)(typescript@5.4.5)
       '@hypercerts-org/marketplace-sdk':
-        specifier: 0.3.9
-        version: 0.3.9(bufferutil@4.0.8)(ethers@6.13.0(bufferutil@4.0.8))(graphql@16.8.1)(svelte@4.2.17)(typescript@5.4.5)
+        specifier: 0.3.10
+        version: 0.3.10(bufferutil@4.0.8)(ethers@6.13.0(bufferutil@4.0.8))(graphql@16.8.1)(svelte@4.2.17)(typescript@5.4.5)
       '@hypercerts-org/sdk':
         specifier: 2.0.0-alpha.26
         version: 2.0.0-alpha.26(bufferutil@4.0.8)(typescript@5.4.5)
@@ -1219,8 +1219,8 @@ packages:
   '@hypercerts-org/contracts@2.0.0-alpha.0':
     resolution: {integrity: sha512-xkvl2goo1Uz39TdALs4ypjxarmxk4Lu0X8JZc5+TdmVw/hsaywjE5WpPgil/AFE5Ccm3qyNGVsY6fz6co5GvVg==}
 
-  '@hypercerts-org/marketplace-sdk@0.3.9':
-    resolution: {integrity: sha512-wxRk/GZDHl/W/6mmQnxWQq0klQvwpn0lNUfxsM/mx9MK9wByGc17fVbDFb56iMv3+Y8y6VkVEptE0VJuG2+2yQ==}
+  '@hypercerts-org/marketplace-sdk@0.3.10':
+    resolution: {integrity: sha512-1WqboIR/JF25e66pyMz7JBnCAfuGZmp730StQPqn9Pm49Ts0ef5kMCpb/Jppn6+Uy4qjzM9C984EbKar5DUgEw==}
     engines: {node: '>= 16.15.1 <= 20.x'}
     peerDependencies:
       ethers: ^6.6.2
@@ -2596,8 +2596,8 @@ packages:
   '@types/pbkdf2@3.1.2':
     resolution: {integrity: sha512-uRwJqmiXmh9++aSu1VNEn3iIxWOhd8AHXNSdlaLfdAAdSTY9jYVeGWnzejM3dvrkbqE3/hyQkQQ29IFATEGlew==}
 
-  '@types/phoenix@1.6.4':
-    resolution: {integrity: sha512-B34A7uot1Cv0XtaHRYDATltAdKx0BvVKNgYNqE4WjtPUa4VQJM7kxeXcVKaH+KS+kCmZ+6w+QaUdcljiheiBJA==}
+  '@types/phoenix@1.6.5':
+    resolution: {integrity: sha512-xegpDuR+z0UqG9fwHqNoy3rI7JDlvaPh2TY47Fl80oq6g+hXT+c/LEuE43X48clZ6lOfANl5WrPur9fYO1RJ/w==}
 
   '@types/prop-types@15.7.12':
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
@@ -8240,7 +8240,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/marketplace-sdk@0.3.9(bufferutil@4.0.8)(ethers@6.13.0(bufferutil@4.0.8))(graphql@16.8.1)(svelte@4.2.17)(typescript@5.4.5)':
+  '@hypercerts-org/marketplace-sdk@0.3.10(bufferutil@4.0.8)(ethers@6.13.0(bufferutil@4.0.8))(graphql@16.8.1)(svelte@4.2.17)(typescript@5.4.5)':
     dependencies:
       '@hypercerts-org/sdk': 2.0.0-alpha.26(bufferutil@4.0.8)(typescript@5.4.5)
       '@supabase/supabase-js': 2.43.5(bufferutil@4.0.8)
@@ -10010,7 +10010,7 @@ snapshots:
   '@supabase/realtime-js@2.9.5(bufferutil@4.0.8)':
     dependencies:
       '@supabase/node-fetch': 2.6.15
-      '@types/phoenix': 1.6.4
+      '@types/phoenix': 1.6.5
       '@types/ws': 8.5.10
       ws: 8.17.1(bufferutil@4.0.8)
     transitivePeerDependencies:
@@ -10114,7 +10114,7 @@ snapshots:
     dependencies:
       '@types/node': 20.0.0
 
-  '@types/phoenix@1.6.4': {}
+  '@types/phoenix@1.6.5': {}
 
   '@types/prop-types@15.7.12': {}
 
@@ -11684,7 +11684,7 @@ snapshots:
       eslint: 8.56.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.56.0))(eslint@8.56.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@8.56.0)
       eslint-plugin-react: 7.34.2(eslint@8.56.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.56.0)
@@ -11708,7 +11708,7 @@ snapshots:
       enhanced-resolve: 5.16.1
       eslint: 8.56.0
       eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
       is-core-module: 2.13.1
@@ -11730,7 +11730,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.56.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5

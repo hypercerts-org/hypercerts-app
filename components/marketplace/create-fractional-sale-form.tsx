@@ -69,7 +69,8 @@ export const useFetchHypercertFractionsByHypercertId = (
       return fractions.map((fraction) => ({
         ...fraction,
         percentage: Number(
-          (BigInt(fraction?.units ?? "0") * BigInt(100)) / totalUnitsForAllFractions,
+          (BigInt(fraction?.units ?? "0") * BigInt(100)) /
+            totalUnitsForAllFractions,
         ),
       }));
     },
@@ -131,12 +132,12 @@ const CreateFractionalOrderFormInner = ({
     ? Object.values(currentOrdersForHypercert).map((order) => order.itemIds[0])
     : [];
 
-  // const yourFractionsWithoutActiveOrder = yourFractions.filter(
-  //   (fraction) => !fractionsWithActiveOrder.includes(fraction.fraction_id!),
-  // );
+  const yourFractionsWithoutActiveOrder = yourFractions.filter(
+    (fraction) => !fractionsWithActiveOrder.includes(fraction.fraction_id!),
+  );
 
-  // const hasFractionsWithoutActiveOrder =
-  //   yourFractionsWithoutActiveOrder.length > 0;
+  const hasFractionsWithoutActiveOrder =
+    yourFractionsWithoutActiveOrder.length > 0;
 
   const submitDisabled = !isValid || isSubmitting;
 
@@ -147,7 +148,7 @@ const CreateFractionalOrderFormInner = ({
           <div>
             <div>Create fractional sale</div>
 
-            {/* {hasFractionsWithoutActiveOrder ? (
+            {hasFractionsWithoutActiveOrder ? (
               <div>
                 <FormField
                   name={"fractionId"}
@@ -277,7 +278,7 @@ const CreateFractionalOrderFormInner = ({
               </div>
             ) : (
               <div>You don{"'"}t have any fractions to sell</div>
-            )} */}
+            )}
           </div>
         </Form>
       )}
