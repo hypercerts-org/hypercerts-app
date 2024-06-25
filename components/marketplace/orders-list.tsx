@@ -26,10 +26,16 @@ import { ArrowUpDown } from "lucide-react";
 import { decodeAbiParameters, formatEther, parseAbiParameters } from "viem";
 import EthAddress from "@/components/eth-address";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { cn } from "@/lib/utils";
 
 function OrdersListInner({ hypercertId }: { hypercertId: string }) {
   const { data: openOrders } =
     useFetchMarketplaceOrdersForHypercert(hypercertId);
+  const { client } = useHypercertClient();
+
+  const hypercertOnConnectedChain =
+    client.isClaimOrFractionOnConnectedChain(hypercertId);
 
   const columnHelper = createColumnHelper<MarketplaceOrder>();
   const columns = [
@@ -103,6 +109,11 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
     return <div></div>;
   }
 
+  const classes = cn({
+    "cursor-pointer": hypercertOnConnectedChain,
+    "opacity-50": !hypercertOnConnectedChain,
+  });
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -132,8 +143,12 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={() => onRowClick(row.original)}
-                    className="cursor-pointer"
+                    onClick={
+                      hypercertOnConnectedChain
+                        ? () => onRowClick(row.original)
+                        : undefined
+                    }
+                    className={classes}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
