@@ -8,28 +8,36 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { useAccount, useSwitchChain } from "wagmi";
-import { SUPPORTED_CHAINS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import { supportedChains } from "@/lib/constants";
 
 const ChainDisplay = () => {
-  const { address, chain, connector } = useAccount();
+  const { address, chain: connectedChain, connector } = useAccount();
   const { switchChain } = useSwitchChain();
-  const [chosenChainId, setChosenChainId] = useState<number>(11155111);
+  const [chosenChainId, setChosenChainId] = useState<number | undefined>();
   const [open, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (chosenChainId === chain?.id) return;
+    if (!chosenChainId || chosenChainId === connectedChain?.id) {
+      return;
+    }
+    console.log(
+      "switching chains from",
+      connectedChain?.id,
+      "to",
+      chosenChainId,
+    );
     switchChain({ chainId: chosenChainId, connector });
-  }, [chosenChainId, switchChain, connector, chain?.id]);
+  }, [chosenChainId, switchChain, connector, connectedChain?.id]);
 
-  if (!address || !chain) return;
+  if (!address) return;
 
   return (
     <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="flex justify-between space-x-2">
-          <span>{chain.name}</span>
+          <span>{connectedChain?.name || "Not connected"}</span>
           <ChevronDown size={16} />
         </Button>
       </DialogTrigger>
@@ -38,18 +46,18 @@ const ChainDisplay = () => {
           <DialogTitle className="text-xl">Switch chains</DialogTitle>
         </DialogHeader>
         <ul>
-          {Array.from(SUPPORTED_CHAINS.entries()).map(([key, value]) => {
-            const isActiveChain = chain?.id === key;
+          {supportedChains.map((chain) => {
+            const isActiveChain = connectedChain?.id === chain.id;
             const activeChainClasses = isActiveChain
               ? "bg-slate-800 text-white"
               : "hover:bg-slate-100 text-primary";
             return (
-              <li key={key.toString()}>
+              <li key={chain.id}>
                 <button
                   className={`p-3 cursor-pointer rounded-sm ${activeChainClasses} font-medium flex items-center justify-between text-base w-full`}
-                  onClick={() => setChosenChainId(key)}
+                  onClick={() => setChosenChainId(chain.id)}
                 >
-                  <span>{value}</span>
+                  <span>{chain.name}</span>
                   {isActiveChain && (
                     <section className="flex gap-2 text-xs items-center text-slate-50">
                       <span>Connected</span>

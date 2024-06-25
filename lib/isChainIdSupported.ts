@@ -1,4 +1,4 @@
-import { supportedChains } from "../configs/wagmi";
+import { supportedChains } from "@/lib/constants";
 
 export function isChainIdSupported(id: number | undefined) {
   if (id === undefined) return false;

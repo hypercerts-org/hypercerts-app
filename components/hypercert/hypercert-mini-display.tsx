@@ -5,11 +5,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { type SupportedChainIdType, SUPPORTED_CHAINS } from "@/lib/constants";
+import { type SupportedChainIdType, supportedChains } from "@/lib/constants";
 import { ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getEvaluationStatus } from "../../hypercerts/getEvaluationStatus";
+import { getEvaluationStatus } from "@/hypercerts/getEvaluationStatus";
 
 export type HypercertMiniDisplayProps = {
   hypercertId: string;
@@ -38,7 +38,7 @@ const HypercertMiniDisplay = ({
   attestations,
 }: HypercertMiniDisplayProps) => {
   const cardChain = (chainId: SupportedChainIdType) => {
-    return SUPPORTED_CHAINS.get(chainId);
+    return supportedChains.find((x) => x.id === chainId)?.name;
   };
 
   const evaluationStatus = getEvaluationStatus(attestations);
