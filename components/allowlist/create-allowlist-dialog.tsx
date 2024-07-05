@@ -1,21 +1,20 @@
 import { ChangeEvent, use, useEffect, useState } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { LoaderCircle, MinusCircle, PlusCircle } from "lucide-react";
 import { isAddress, parseEther } from "viem";
 
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { cn } from "../../lib/utils";
-import { errorHasMessage } from "../../lib/errorHasMessage";
+import { cn } from "@/lib/utils";
+import { errorHasMessage } from "@/lib/errorHasMessage";
 import { toast } from "../ui/use-toast";
-import { useCreateAllowList } from "../../hypercerts/hooks/useCreateAllowLists";
+import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
+import { AllowlistEntry } from "@hypercerts-org/sdk";
 
 type AllowListItem = {
   address?: string;
@@ -23,21 +22,21 @@ type AllowListItem = {
 };
 
 export default function CreateAllowlistDialog({
-  setAllowlistUrl,
+  setAllowlistEntries,
   setOpen,
   open,
 }: {
-  setAllowlistUrl: (url: string) => void;
+  setAllowlistEntries: (allowlistEntries: AllowlistEntry[]) => void;
   setOpen: (open: boolean) => void;
   open: boolean;
 }) {
   const {
-    mutate: createAllowList,
-    data: createAllowListResponse,
+    mutate: validateAllowlist,
+    data: validateAllowlistResponse,
     isPending,
     error: createAllowListError,
     reset,
-  } = useCreateAllowList();
+  } = useValidateAllowlist();
   const [allowList, setAllowList] = useState<AllowListItem[]>([
     {
       address: "",
@@ -46,28 +45,15 @@ export default function CreateAllowlistDialog({
   ]);
 
   useEffect(() => {
-    if (
-      createAllowListResponse &&
-      (createAllowListResponse.status === 200 ||
-        createAllowListResponse.status === 201)
-    ) {
+    if (validateAllowlistResponse?.valid) {
       (async () => {
-        const res = await createAllowListResponse.json();
-        if (
-          "success" in res &&
-          res.success &&
-          "data" in res &&
-          "cid" in res.data
-        ) {
-          const cid = res.data.cid;
-          const url = `ipfs://${cid}`;
-          setAllowlistUrl(url);
-          reset();
-          setOpen(false);
-        }
+        const values = validateAllowlistResponse.values;
+        setAllowlistEntries(values);
+        reset();
+        setOpen(false);
       })();
     }
-  }, [createAllowListResponse, setAllowlistUrl, setOpen, reset]);
+  }, [validateAllowlistResponse, setAllowlistEntries, setOpen, reset]);
 
   const setAddress = (e: ChangeEvent<HTMLInputElement>, i: number) => {
     setAllowList((allowList) =>
@@ -137,7 +123,7 @@ export default function CreateAllowlistDialog({
       if (!parsedAllowList) {
         throw new Error("Allow list is empty");
       }
-      createAllowList({ allowList: parsedAllowList, totalUnits });
+      validateAllowlist({ allowList: parsedAllowList, totalUnits });
     } catch (e) {
       if (errorHasMessage(e)) {
         toast({
@@ -164,7 +150,7 @@ export default function CreateAllowlistDialog({
         <div className="text-red-600 text-sm">Couldnt create allow list</div>
       );
     }
-    if (createAllowListResponse && createAllowListResponse.status >= 400) {
+    if (validateAllowlistResponse && validateAllowlistResponse.status >= 400) {
       return (
         <div className="text-red-600 text-sm">Failed to create allow list</div>
       );

@@ -1,12 +1,12 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { AllowlistEntry } from "@hypercerts-org/sdk";
-import { HYPERCERTS_API_URL_REST } from "../../configs/hypercerts";
+import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 
-export const useCreateAllowList = () => {
+export const useValidateAllowlist = () => {
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       allowList,
       totalUnits,
     }: {
@@ -18,16 +18,27 @@ export const useCreateAllowList = () => {
         entry.units.toString(),
       ]);
       const tree = StandardMerkleTree.of(values, ["address", "uint256"]);
-      return fetch(`${HYPERCERTS_API_URL_REST}/allowlists`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        `${HYPERCERTS_API_URL_REST}/allowlists/validate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            allowList: JSON.stringify(tree.dump()),
+            totalUnits: totalUnits.toString(),
+          }),
         },
-        body: JSON.stringify({
-          allowList: JSON.stringify(tree.dump()),
-          totalUnits: totalUnits.toString(),
-        }),
-      });
+      );
+      if (!res.ok || !(res.status === 200 || res.status === 201)) {
+        throw new Error("Failed to validate allowlist");
+      }
+      const jsonRes = await res.json();
+      return {
+        ...jsonRes,
+        values,
+      };
     },
   });
 };

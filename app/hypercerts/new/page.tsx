@@ -74,7 +74,9 @@ const formSchema = z.object({
   confirmContributorsPermission: z.boolean().refine((data) => data === true, {
     message: "You must confirm that all contributors gave their permission",
   }),
-  allowlistURL: z.union([z.string().url(), z.literal(""), z.null().optional()]),
+  allowlistEntries: z
+    .array(z.array(z.string().or(z.number())).length(2))
+    .optional(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
@@ -176,7 +178,6 @@ export default function NewHypercertForm() {
       description: values.description,
       image: values.cardImage,
       external_url: values.link,
-      allowList: values.allowlistURL ?? undefined,
     };
 
     const formattedMetadata = formatHypercertData({

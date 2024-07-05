@@ -17,7 +17,6 @@ import { useState } from "react";
 
 import { HypercertFormValues } from "@/app/hypercerts/new/page";
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
-import UploadAllowlistDialog from "@/components/allowlist/upload-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +30,15 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
 import { useAccount } from "wagmi";
+import { AllowlistEntry } from "@hypercerts-org/sdk";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -161,10 +169,12 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
 
 const DatesAndPeople = ({ form }: FormStepsProps) => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const setAllowlistUrl = (url: string) => {
-    form.setValue("allowlistURL", url);
+  const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
+    // TODO: fix zod typing
+    // @ts-ignore
+    form.setValue("allowlistEntries", allowlistEntries);
   };
+  const allowlistEntries = form.watch("allowlistEntries");
   return (
     <section className="space-y-8">
       <FormField
@@ -294,21 +304,17 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
 
       <FormField
         control={form.control}
-        name="allowlistURL"
+        name="allowlistEntries"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Allowlist URL (optional)</FormLabel>
+            <FormLabel>Allowlist (optional)</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                value={field.value || ""}
-                placeholder="https://"
-              />
+              {/*<Input {...field} value={field.value} placeholder="https://" />*/}
             </FormControl>
             <FormDescription>
               Allowlists determine the number of units each address is allowed
-              to mint. You can submit an already available allowlist, create a
-              new one or upload a CSV file. If you want to keep any fraction,
+              to mint. You can create a new allowlist, or prefill from an
+              existing, already uploaded file. If you want to keep any fraction,
               include yourself in the allowlist.
             </FormDescription>
             <div className="flex text-xs space-x-2 w-full justify-end">
@@ -316,27 +322,32 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 variant="outline"
                 onClick={() => setCreateDialogOpen(true)}
               >
-                Create allowlist
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setUploadDialogOpen(true)}
-              >
-                Upload allowlist
+                {allowlistEntries ? "Edit allowlist" : "Create allowlist"}
               </Button>
 
               <CreateAllowlistDialog
-                setAllowlistUrl={setAllowlistUrl}
+                setAllowlistEntries={setAllowlistEntries}
                 open={createDialogOpen}
                 setOpen={setCreateDialogOpen}
               />
-              <UploadAllowlistDialog
-                setAllowlistUrl={setAllowlistUrl}
-                open={uploadDialogOpen}
-                setOpen={setUploadDialogOpen}
-              />
             </div>
             <FormMessage />
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Address</TableHead>
+                  <TableHead>Units</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allowlistEntries?.map((entry) => (
+                  <TableRow key={entry[0]}>
+                    <TableCell>{entry[0]}</TableCell>
+                    <TableCell>{entry[1]}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </FormItem>
         )}
       />
