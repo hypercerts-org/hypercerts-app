@@ -25,7 +25,7 @@ export type AllowListRecord = ResultOf<typeof AllowListRecordFragment>;
 const query = graphql(
   `
     query allowlistRecords($address: String) {
-      allowlistRecords(where: { user_address: { contains: $address } }) {
+      allowlistRecords(where: { user_address: { eq: $address } }) {
         count
         data {
           ...AllowListRecordFragment
