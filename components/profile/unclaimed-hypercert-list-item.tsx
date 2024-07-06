@@ -1,21 +1,14 @@
-import { FragmentOf, readFragment } from "../../lib/graphql";
-
-import { AllowListRecordFragment } from "../../allowlists/getAllowListRecordsForAddress";
+import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddress";
 import Image from "next/image";
 import UnclaimedHypercertClaimButton from "./unclaimed-hypercert-claim-button";
 import WorkTimeFrame from "../hypercert/time-frame";
-import { getHypercert } from "../../hypercerts/getHypercert";
+import { getHypercert } from "@/hypercerts/getHypercert";
 
 export default async function UnclaimedHypercertListItem({
-  allowListRecordFragment,
+  allowListRecordFragment: allowListRecord,
 }: {
-  allowListRecordFragment: FragmentOf<typeof AllowListRecordFragment>;
+  allowListRecordFragment: AllowListRecord;
 }) {
-  const allowListRecord = readFragment(
-    AllowListRecordFragment,
-    allowListRecordFragment,
-  );
-
   const hypercertId = allowListRecord.hypercert_id;
   if (!hypercertId) {
     return null;

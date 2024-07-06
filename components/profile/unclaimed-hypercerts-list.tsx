@@ -9,7 +9,7 @@ export default async function UnclaimedHypercertsList({
   const allowList = await getAllowListRecordsForAddress(address);
 
   // TODO: Do this in the query. Currently it doesn't support multiple filters at the same time
-  const unclaimedCerts = allowList.data?.filter((item) => !item.claimed) || [];
+  const unclaimedCerts = allowList?.data.filter((item) => !item.claimed) || [];
 
   if (
     !allowList ||
