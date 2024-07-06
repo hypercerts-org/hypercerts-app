@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useWalletClient } from "wagmi";
+import { useRouter } from "next/navigation";
 
 export default function UnclaimedHypercertClaimButton({
   allowListRecord,
@@ -14,6 +15,7 @@ export default function UnclaimedHypercertClaimButton({
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
+  const { refresh } = useRouter();
 
   const claimHypercert = async () => {
     if (!client) {
@@ -56,6 +58,10 @@ export default function UnclaimedHypercertClaimButton({
     await waitForTransactionReceipt(walletClient, {
       hash: tx,
     });
+
+    setTimeout(() => {
+      refresh();
+    }, 5000);
   };
   return <Button onClick={claimHypercert}>Claim</Button>;
 }

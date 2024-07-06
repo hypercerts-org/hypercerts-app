@@ -171,8 +171,6 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
 const DatesAndPeople = ({ form }: FormStepsProps) => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
-    // TODO: fix zod typing
-    // @ts-ignore
     form.setValue("allowlistEntries", allowlistEntries);
   };
   const allowlistEntries = form.watch("allowlistEntries");
