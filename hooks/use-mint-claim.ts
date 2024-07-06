@@ -4,6 +4,7 @@ import { type StepData } from "@/hooks/use-process-dialog";
 import {
   TransferRestrictions,
   type HypercertMetadata,
+  AllowlistEntry,
 } from "@hypercerts-org/sdk";
 import { useState } from "react";
 import { TransactionReceipt } from "viem";
@@ -44,8 +45,9 @@ export const useMintClaim = ({
 
   const initializeWrite = async (
     metaData: HypercertMetadata,
-    units: number,
+    units: bigint,
     transferRestrictions: TransferRestrictions,
+    allowlistRecords?: AllowlistEntry[],
   ) => {
     setCurrentStep("minting");
     try {
@@ -59,11 +61,12 @@ export const useMintClaim = ({
         return;
       }
 
-      const hash = await client.mintClaim(
+      const hash = await client.mintHypercert({
         metaData,
-        BigInt(units),
-        transferRestrictions,
-      );
+        totalUnits: units,
+        transferRestriction: transferRestrictions,
+        allowList: allowlistRecords,
+      });
 
       if (!hash) {
         // toast("No tx hash returned", {
@@ -107,11 +110,17 @@ export const useMintClaim = ({
   return {
     write: async (
       metaData: HypercertMetadata,
-      units: number,
+      units: bigint,
       transferRestrictions: TransferRestrictions = TransferRestrictions.FromCreatorOnly,
+      allowlistRecords?: AllowlistEntry[],
     ) => {
       console.log("Minting hypercert");
-      await initializeWrite(metaData, units, transferRestrictions);
+      await initializeWrite(
+        metaData,
+        units,
+        transferRestrictions,
+        allowlistRecords,
+      );
     },
     txPending,
     mintSteps,

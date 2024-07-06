@@ -14,7 +14,7 @@
     "@hookform/resolvers": "^3.3.4",
     "@hypercerts-org/contracts": "2.0.0-alpha.0",
     "@hypercerts-org/marketplace-sdk": "0.3.13",
-    "@hypercerts-org/sdk": "2.0.0-alpha.27",
+    "@hypercerts-org/sdk": "2.0.0-alpha.28",
     "@openzeppelin/merkle-tree": "^1.0.6",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-avatar": "^1.0.4",

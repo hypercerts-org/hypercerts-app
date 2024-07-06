@@ -12,16 +12,17 @@ import {
   HypercertMetadata,
   TransferRestrictions,
   formatHypercertData,
+  AllowlistEntry,
 } from "@hypercerts-org/sdk";
 import { toPng } from "html-to-image";
 import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TransactionReceipt } from "viem";
+import { parseEther, TransactionReceipt } from "viem";
 import { z } from "zod";
-const DEFAULT_NUM_FRACTIONS: number = 10000;
-const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
+const DEFAULT_NUM_FRACTIONS = parseEther("1");
+const DEFAULT_HYPERCERT_VERSION = "0.0.1";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),
@@ -75,48 +76,46 @@ const formSchema = z.object({
     message: "You must confirm that all contributors gave their permission",
   }),
   allowlistEntries: z
-    .array(z.array(z.string().or(z.number())).length(2))
+    .array(z.object({ address: z.string(), units: z.bigint() }))
     .optional(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
 
-// const formDefaultValues: HypercertFormValues = {
-//   title: "A Grave Matter",
-//   banner:
-//     "https://www.bungie.net/common/destiny2_content/icons/2f1a39b33e30b98402b2badaa13f8631.jpg",
-//   description: "Complete the 'Ghosts of the Deep' Dungeon solo, flawlessly.",
-//   logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
-//   link: "https://destinyemblemcollector.com/emblem?id=2069797998",
-//   cardImage: "",
-//   tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
-//   projectDates: {
-//     from: new Date(),
-//     to: new Date(),
-//   },
-//   contributors: ["0x123, 0xlos, peter.eth"],
-//   acceptTerms: false,
-//   confirmContributorsPermission: false,
-//   allowlistURL: "",
-// };
-
 const formDefaultValues: HypercertFormValues = {
-  title: "",
-  banner: "",
-  description: "",
-  logo: "",
-  link: "",
+  title: "A Grave Matter",
+  banner:
+    "https://www.bungie.net/common/destiny2_content/icons/2f1a39b33e30b98402b2badaa13f8631.jpg",
+  description: "Complete the 'Ghosts of the Deep' Dungeon solo, flawlessly.",
+  logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
+  link: "https://destinyemblemcollector.com/emblem?id=2069797998",
   cardImage: "",
-  tags: [],
+  tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
   projectDates: {
     from: new Date(),
-    to: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    to: new Date(),
   },
-  contributors: [],
+  contributors: ["0x123, 0xlos, peter.eth"],
   acceptTerms: false,
   confirmContributorsPermission: false,
-  allowlistURL: "",
 };
+//
+// const formDefaultValues: HypercertFormValues = {
+//   title: "",
+//   banner: "",
+//   description: "",
+//   logo: "",
+//   link: "",
+//   cardImage: "",
+//   tags: [],
+//   projectDates: {
+//     from: new Date(),
+//     to: new Date(Date.now() + 24 * 60 * 60 * 1000),
+//   },
+//   contributors: [],
+//   acceptTerms: false,
+//   confirmContributorsPermission: false,
+// };
 
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -209,6 +208,10 @@ export default function NewHypercertForm() {
       formattedMetadata.data!,
       DEFAULT_NUM_FRACTIONS,
       TransferRestrictions.FromCreatorOnly,
+      values.allowlistEntries?.map((entry) => ({
+        ...entry,
+        units: BigInt(entry.units),
+      })),
     );
 
     form.reset();

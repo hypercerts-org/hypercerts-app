@@ -37,7 +37,7 @@ export const useValidateAllowlist = () => {
       const jsonRes = await res.json();
       return {
         ...jsonRes,
-        values,
+        values: allowList,
       };
     },
   });

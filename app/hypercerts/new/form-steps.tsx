@@ -340,10 +340,10 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {allowlistEntries?.map((entry) => (
-                  <TableRow key={entry[0]}>
-                    <TableCell>{entry[0]}</TableCell>
-                    <TableCell>{entry[1]}</TableCell>
+                {allowlistEntries?.map((entry, index) => (
+                  <TableRow key={`${entry.address}-${entry.units}-${index}`}>
+                    <TableCell>{entry.address}</TableCell>
+                    <TableCell>{entry.units}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
