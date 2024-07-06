@@ -12,7 +12,6 @@ import {
   HypercertMetadata,
   TransferRestrictions,
   formatHypercertData,
-  AllowlistEntry,
 } from "@hypercerts-org/sdk";
 import { toPng } from "html-to-image";
 import { ArrowUpRightIcon } from "lucide-react";
@@ -69,10 +68,10 @@ const formSchema = z.object({
         message: "We need at least one contributor",
       },
     ),
-  acceptTerms: z.boolean().refine((data) => data === true, {
+  acceptTerms: z.boolean().refine((data) => data, {
     message: "You must accept the terms and conditions",
   }),
-  confirmContributorsPermission: z.boolean().refine((data) => data === true, {
+  confirmContributorsPermission: z.boolean().refine((data) => data, {
     message: "You must confirm that all contributors gave their permission",
   }),
   allowlistEntries: z
@@ -82,40 +81,40 @@ const formSchema = z.object({
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
 
-const formDefaultValues: HypercertFormValues = {
-  title: "A Grave Matter",
-  banner:
-    "https://www.bungie.net/common/destiny2_content/icons/2f1a39b33e30b98402b2badaa13f8631.jpg",
-  description: "Complete the 'Ghosts of the Deep' Dungeon solo, flawlessly.",
-  logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
-  link: "https://destinyemblemcollector.com/emblem?id=2069797998",
-  cardImage: "",
-  tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
-  projectDates: {
-    from: new Date(),
-    to: new Date(),
-  },
-  contributors: ["0x123, 0xlos, peter.eth"],
-  acceptTerms: false,
-  confirmContributorsPermission: false,
-};
-//
 // const formDefaultValues: HypercertFormValues = {
-//   title: "",
-//   banner: "",
-//   description: "",
-//   logo: "",
-//   link: "",
+//   title: "A Grave Matter",
+//   banner:
+//     "https://www.bungie.net/common/destiny2_content/icons/2f1a39b33e30b98402b2badaa13f8631.jpg",
+//   description: "Complete the 'Ghosts of the Deep' Dungeon solo, flawlessly.",
+//   logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
+//   link: "https://destinyemblemcollector.com/emblem?id=2069797998",
 //   cardImage: "",
-//   tags: [],
+//   tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
 //   projectDates: {
 //     from: new Date(),
-//     to: new Date(Date.now() + 24 * 60 * 60 * 1000),
+//     to: new Date(),
 //   },
-//   contributors: [],
+//   contributors: ["0x123, 0xlos, peter.eth"],
 //   acceptTerms: false,
 //   confirmContributorsPermission: false,
 // };
+
+const formDefaultValues: HypercertFormValues = {
+  title: "",
+  banner: "",
+  description: "",
+  logo: "",
+  link: "",
+  cardImage: "",
+  tags: [],
+  projectDates: {
+    from: new Date(),
+    to: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  },
+  contributors: [],
+  acceptTerms: false,
+  confirmContributorsPermission: false,
+};
 
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);

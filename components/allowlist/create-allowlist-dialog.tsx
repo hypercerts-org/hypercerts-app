@@ -1,4 +1,4 @@
-import { ChangeEvent, use, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -221,7 +221,9 @@ export default function CreateAllowlistDialog({
             </div>
           ))}
           {percentageError && (
-            <div className="text-red-600 text-sm">Sum of units must be 100</div>
+            <div className="text-red-600 text-sm">
+              Sum of percentages must be 100
+            </div>
           )}
           <div className="flex items-center gap-2">
             <Button

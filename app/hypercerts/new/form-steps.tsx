@@ -39,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { parseEther } from "viem";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -336,6 +337,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Address</TableHead>
+                  <TableHead>Percentage</TableHead>
                   <TableHead>Units</TableHead>
                 </TableRow>
               </TableHeader>
@@ -343,7 +345,10 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 {allowlistEntries?.map((entry, index) => (
                   <TableRow key={`${entry.address}-${entry.units}-${index}`}>
                     <TableCell>{entry.address}</TableCell>
-                    <TableCell>{entry.units}</TableCell>
+                    <TableCell>
+                      {calculatePercentageBigInt(entry.units).toString()}%
+                    </TableCell>
+                    <TableCell>{entry.units.toString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -353,6 +358,13 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
       />
     </section>
   );
+};
+
+const calculatePercentageBigInt = (
+  units: bigint,
+  total: bigint = parseEther("1"),
+) => {
+  return (units * BigInt(100)) / total;
 };
 
 const ReviewAndSubmit = ({ form }: FormStepsProps) => {

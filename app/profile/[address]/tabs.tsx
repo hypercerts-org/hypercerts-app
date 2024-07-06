@@ -47,35 +47,39 @@ const CollectionsTabContent = ({ address }: { address: string }) => {
 const HypercertsTabContentInner = async ({ address }: { address: string }) => {
   const hypercerts = await getHypercertsByCreator({ creatorAddress: address });
 
-  if (!hypercerts || hypercerts.data?.length === 0) {
-    return <EmptySection />;
-  }
+  const showHypercerts = !!hypercerts?.data?.length;
 
   return (
     <>
-      <div>
-        <Button variant="secondary" size="sm" className={`space-x-1`}>
-          <h2 className={`text-sm`}>Created by me</h2>
-          <span
-            className={`bg-black text-white text-xs px-1 py-0.5 rounded-lg h-max`}
-          >
-            {hypercerts.count}
-          </span>
-        </Button>
-      </div>
-      <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
-        {hypercerts.data.map((hypercert, index) => {
-          const props = {
-            hypercertId: hypercert.hypercert_id as string,
-            name: hypercert.metadata?.name as string,
-            chainId: Number(
-              hypercert.contract?.chain_id,
-            ) as SupportedChainIdType,
-            attestations: hypercert.attestations,
-          };
-          return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
-        })}
-      </div>
+      {showHypercerts ? (
+        <>
+          <div>
+            <Button variant="secondary" size="sm" className={`space-x-1`}>
+              <h2 className={`text-sm`}>Created by me</h2>
+              <span
+                className={`bg-black text-white text-xs px-1 py-0.5 rounded-lg h-max`}
+              >
+                {hypercerts?.count}
+              </span>
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
+            {hypercerts?.data.map((hypercert, index) => {
+              const props = {
+                hypercertId: hypercert.hypercert_id as string,
+                name: hypercert.metadata?.name as string,
+                chainId: Number(
+                  hypercert.contract?.chain_id,
+                ) as SupportedChainIdType,
+                attestations: hypercert.attestations,
+              };
+              return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
+            })}
+          </div>
+        </>
+      ) : (
+        <EmptySection />
+      )}
       <h1 className="font-serif text-2xl lg:text-3xl tracking-tight">
         Unclaimed hypercerts
       </h1>
