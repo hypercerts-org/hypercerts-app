@@ -303,12 +303,16 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
 
       <FormField
         control={form.control}
-        name="allowlistEntries"
+        name="allowlistURL"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Allowlist (optional)</FormLabel>
             <FormControl>
-              {/*<Input {...field} value={field.value} placeholder="https://" />*/}
+              <Input
+                {...field}
+                value={field.value}
+                placeholder="https:// | ipfs://"
+              />
             </FormControl>
             <FormDescription>
               Allowlists determine the number of units each address is allowed
@@ -318,6 +322,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             </FormDescription>
             <div className="flex text-xs space-x-2 w-full justify-end">
               <Button
+                disabled={!!field.value}
                 variant="outline"
                 onClick={() => setCreateDialogOpen(true)}
               >
@@ -331,26 +336,28 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
               />
             </div>
             <FormMessage />
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Address</TableHead>
-                  <TableHead>Percentage</TableHead>
-                  <TableHead>Units</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allowlistEntries?.map((entry, index) => (
-                  <TableRow key={`${entry.address}-${entry.units}-${index}`}>
-                    <TableCell>{entry.address}</TableCell>
-                    <TableCell>
-                      {calculatePercentageBigInt(entry.units).toString()}%
-                    </TableCell>
-                    <TableCell>{entry.units.toString()}</TableCell>
+            {!!allowlistEntries?.length && (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Address</TableHead>
+                    <TableHead>Percentage</TableHead>
+                    <TableHead>Units</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {allowlistEntries?.map((entry, index) => (
+                    <TableRow key={`${entry.address}-${entry.units}-${index}`}>
+                      <TableCell>{entry.address}</TableCell>
+                      <TableCell>
+                        {calculatePercentageBigInt(entry.units).toString()}%
+                      </TableCell>
+                      <TableCell>{entry.units.toString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </FormItem>
         )}
       />
@@ -429,10 +436,11 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
 
   const isCurrentStepValid = () => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
-    const fieldsTouched = currentStepFields.every(
-      (field) =>
-        form.formState.touchedFields[field as keyof HypercertFormValues],
-    );
+    const fieldsTouched =
+      currentStepFields.every(
+        (field) =>
+          form.formState.touchedFields[field as keyof HypercertFormValues],
+      ) || true;
 
     const currentStepErrors = currentStepFields.some(
       (field) => form.formState.errors[field as keyof HypercertFormValues],

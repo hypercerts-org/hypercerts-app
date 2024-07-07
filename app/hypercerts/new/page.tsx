@@ -77,6 +77,7 @@ const formSchema = z.object({
   allowlistEntries: z
     .array(z.object({ address: z.string(), units: z.bigint() }))
     .optional(),
+  allowlistURL: z.string().url().optional(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
@@ -97,6 +98,7 @@ export type HypercertFormValues = z.infer<typeof formSchema>;
 //   contributors: ["0x123, 0xlos, peter.eth"],
 //   acceptTerms: false,
 //   confirmContributorsPermission: false,
+//   allowlistURL: "",
 // };
 
 const formDefaultValues: HypercertFormValues = {
@@ -114,6 +116,7 @@ const formDefaultValues: HypercertFormValues = {
   contributors: [],
   acceptTerms: false,
   confirmContributorsPermission: false,
+  allowlistURL: "",
 };
 
 export default function NewHypercertForm() {
@@ -207,10 +210,11 @@ export default function NewHypercertForm() {
       formattedMetadata.data!,
       DEFAULT_NUM_FRACTIONS,
       TransferRestrictions.FromCreatorOnly,
-      values.allowlistEntries?.map((entry) => ({
-        ...entry,
-        units: BigInt(entry.units),
-      })),
+      values.allowlistURL ||
+        values.allowlistEntries?.map((entry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        })),
     );
 
     form.reset();

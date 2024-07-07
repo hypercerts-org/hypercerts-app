@@ -47,7 +47,7 @@ export const useMintClaim = ({
     metaData: HypercertMetadata,
     units: bigint,
     transferRestrictions: TransferRestrictions,
-    allowlistRecords?: AllowlistEntry[],
+    allowlistRecords?: AllowlistEntry[] | string,
   ) => {
     setCurrentStep("minting");
     try {
@@ -112,7 +112,7 @@ export const useMintClaim = ({
       metaData: HypercertMetadata,
       units: bigint,
       transferRestrictions: TransferRestrictions = TransferRestrictions.FromCreatorOnly,
-      allowlistRecords?: AllowlistEntry[],
+      allowlistRecords?: AllowlistEntry[] | string,
     ) => {
       console.log("Minting hypercert");
       await initializeWrite(
