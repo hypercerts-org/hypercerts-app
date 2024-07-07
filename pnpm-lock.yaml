@@ -21,8 +21,8 @@ importers:
         specifier: 0.3.13
         version: 0.3.13(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)
       '@hypercerts-org/sdk':
-        specifier: 2.0.0-alpha.28
-        version: 2.0.0-alpha.28(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
+        specifier: 2.0.0-alpha.29
+        version: 2.0.0-alpha.29(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
       '@openzeppelin/merkle-tree':
         specifier: ^1.0.6
         version: 1.0.6
@@ -1129,8 +1129,8 @@ packages:
   '@hypercerts-org/sdk@2.0.0-alpha.27':
     resolution: {integrity: sha512-EP0pO8SioYIkmNJBnm/g0L3xUue6LY7f7CqgxKtfDIFCj5eCxuSCTgpe8gHNVAEKSn+NOXBdZ3ucP/ibj3F12Q==}
 
-  '@hypercerts-org/sdk@2.0.0-alpha.28':
-    resolution: {integrity: sha512-XVoe49C8X8jw7eABZA/0kCxUbJZ+nbcRt3n4eYmIIF7CauvdVsYf1zDgdAZVLw99AOcLm5gt3rzpD2b2BbLiRg==}
+  '@hypercerts-org/sdk@2.0.0-alpha.29':
+    resolution: {integrity: sha512-HIsAp87K4xBSkiy9IPjI3Tu8oi9qY9sfop46UFiy87Ih0vGcAw/WyYXybpWHw3nQ9bWuzWzPCdG5bl7VLYqdjw==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -8210,7 +8210,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/sdk@2.0.0-alpha.28(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)':
+  '@hypercerts-org/sdk@2.0.0-alpha.29(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
       '@hypercerts-org/contracts': 2.0.0-alpha.0(bufferutil@4.0.8)(typescript@5.5.2)
