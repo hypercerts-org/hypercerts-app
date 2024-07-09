@@ -16,16 +16,16 @@ export default function ListFractionSelect({
   setSelected,
 }: {
   fraction: Fraction;
-  units: number;
+  units: bigint;
   selected: boolean;
   setSelected: (fractionId: string) => void;
 }) {
   if (!fraction.fraction_id) return;
 
-  const fractionUnits = Number.parseInt(fraction.units || "0", 10);
+  const fractionUnits = BigInt(fraction.units || "0");
   const fractionId =
     fraction.fraction_id.slice(0, 3) + "..." + fraction.fraction_id.slice(-3);
-  const fractionShare = round((fractionUnits / units) * 100, 2);
+  const fractionShare = round(Number((fractionUnits / units) * BigInt(100)), 2);
 
   return (
     <tr
@@ -38,7 +38,7 @@ export default function ListFractionSelect({
       <td className="pl-3">{selected ? <CircleCheck /> : <Circle />}</td>
       <td>{fractionId}</td>
       <td>
-        <FormattedUnits>{fractionUnits}</FormattedUnits>
+        <FormattedUnits>{fractionUnits.toString()}</FormattedUnits>
       </td>
       <td className="pr-3">{fractionShare}%</td>
     </tr>

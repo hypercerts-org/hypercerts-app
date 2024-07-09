@@ -14,8 +14,11 @@ import ListDialogSettingsForm from "./list-dialog-settings-form";
 import ListFractionSelect from "./list-fraction-select";
 import { LoaderCircle } from "lucide-react";
 import { useAccount } from "wagmi";
-import { useCreateFractionalMakerAsk } from "../../marketplace/hooks";
+import { useCreateFractionalMakerAsk } from "@/marketplace/hooks";
 import { useState } from "react";
+import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
+import { toast } from "@/components/ui/use-toast";
+import { getCurrencyByAddress } from "@/marketplace/utils";
 
 type State = {
   fractionId: string;
@@ -39,8 +42,9 @@ export default function ListDialog({
     useCreateFractionalMakerAsk({
       hypercertId: hypercert.hypercert_id || "",
     });
+  const { client } = useHypercertExchangeClient();
 
-  const units = Number.parseInt(hypercert.units || "0");
+  const units = BigInt(hypercert.units || "0");
   const fractions = hypercert.fractions?.data || [];
   const fractionsOwnedByUser = fractions.filter(
     (fraction) => fraction.owner_address === address,
@@ -49,7 +53,7 @@ export default function ListDialog({
   const [state, setState] = useState<State>({
     fractionId: fractions.length === 1 ? fractions[0].fraction_id || "" : "",
     price: "",
-    currency: "ETH",
+    currency: Object.values(client.currencies)[0].address,
     unitsForSale: fractions.length === 1 ? fractions[0].units || "" : "",
     unitsMinPerOrder: "1",
     unitsMaxPerOrder: fractions.length === 1 ? fractions[0].units || "" : "",
@@ -81,16 +85,28 @@ export default function ListDialog({
       return;
     }
 
-    await createFractionalMakerAsk({
-      fractionId: state.fractionId,
-      minUnitAmount: state.unitsMinPerOrder,
-      maxUnitAmount: state.unitsMaxPerOrder || state.unitsForSale,
-      minUnitsToKeep: (
-        units - Number.parseInt(state.unitsForSale, 10)
-      ).toString(),
-      price: state.price,
-      sellLeftoverFraction: false,
-    });
+    try {
+      await createFractionalMakerAsk({
+        fractionId: state.fractionId,
+        minUnitAmount: state.unitsMinPerOrder,
+        maxUnitAmount: state.unitsMaxPerOrder || state.unitsForSale,
+        minUnitsToKeep: (units - BigInt(state.unitsForSale)).toString(),
+        price: state.price,
+        sellLeftoverFraction: false,
+      });
+
+      setIsOpen(false);
+      toast({
+        description: "Listing created successfully",
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        description:
+          (e as Error).toString() ||
+          "Something went wrong while creating the order",
+      });
+    }
   };
 
   return (
@@ -153,7 +169,7 @@ export default function ListDialog({
             </b>{" "}
             units for sale at a total price of{" "}
             <b>
-              {floatPrice} {state.currency}
+              {floatPrice} {getCurrencyByAddress(state.currency)?.symbol}
             </b>
             .
           </div>

@@ -7,6 +7,7 @@ import {
 } from "../ui/select";
 
 import { Input } from "../ui/input";
+import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 
 export function ListAskedPrice({
   price,
@@ -19,6 +20,7 @@ export function ListAskedPrice({
   currency: string;
   setCurrency: (currency: string) => void;
 }) {
+  const { client } = useHypercertExchangeClient();
   return (
     <div className="flex gap-2 w-full">
       <Input
@@ -34,10 +36,11 @@ export function ListAskedPrice({
           <SelectValue placeholder="Currency" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="ETH">ETH</SelectItem>
-          <SelectItem value="wETH">wETH</SelectItem>
-          <SelectItem value="USDC">USDC</SelectItem>
-          <SelectItem value="DAI">DAI</SelectItem>
+          {Object.values(client.currencies).map((currency) => (
+            <SelectItem key={currency.address} value={currency.address}>
+              {currency.symbol}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

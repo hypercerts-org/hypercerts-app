@@ -24,7 +24,7 @@ type Props = {
 };
 
 export async function generateMetadata(
-  { params, searchParams }: Props,
+  { params }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { hypercertId } = params;
@@ -122,7 +122,7 @@ async function HypercertPageInner({
           <ListForSaleButton2 hypercert={hypercert} />
         </div>
       </div>
-      <OrdersList hypercertId={hypercertId} />
+      <OrdersList hypercert={hypercert} />
     </section>
   );
 }

@@ -4,13 +4,10 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { useEthersProvider } from "@/hooks/use-ethers-provider";
-import { useEthersSigner } from "@/hooks/use-ethers-signer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   addressesByNetwork,
   ApiClient,
-  HypercertExchangeClient,
   Maker,
   QuoteType,
   utils,
@@ -28,11 +25,11 @@ import {
 import { MarketplaceOrder } from "@/marketplace/types";
 import { decodeContractError } from "@/lib/decodeContractError";
 import { apiEnvironment } from "@/lib/constants";
+import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
-  const provider = useEthersProvider();
-  const signer = useEthersSigner();
+  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
   return useMutation({
     mutationKey: ["createOrderInSupabase"],
@@ -50,22 +47,9 @@ export const useCreateOrderInSupabase = () => {
         throw new Error("No chainId");
       }
 
-      if (!provider) {
-        throw new Error("No provider");
+      if (!hypercertExchangeClient) {
+        throw new Error("No client");
       }
-
-      if (!signer) {
-        throw new Error("No signer");
-      }
-
-      const hypercertExchangeClient = new HypercertExchangeClient(
-        chainId,
-        // TODO: Fix typing issue with provider
-        // @ts-ignore
-        provider as unknown as Provider,
-        // @ts-ignore
-        signer,
-      );
 
       return hypercertExchangeClient.registerOrder({
         order,
@@ -80,14 +64,14 @@ export const useCreateFractionalMakerAsk = ({
 }: {
   hypercertId: string;
 }) => {
+  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
+
   const { mutateAsync: createOrder } = useCreateOrderInSupabase();
 
   const chainId = useChainId();
   const client = useHypercertClient();
   const { address } = useAccount();
   const { data: walletClientData } = useWalletClient();
-  const provider = useEthersProvider();
-  const signer = useEthersSigner();
   const { data: currentFractions } =
     useFetchHypercertFractionsByHypercertId(hypercertId);
 
@@ -112,12 +96,8 @@ export const useCreateFractionalMakerAsk = ({
         throw new Error("Fractions not found");
       }
 
-      if (!provider) {
-        throw new Error("Provider not initialized");
-      }
-
-      if (!signer) {
-        throw new Error("Signer not initialized");
+      if (!hypercertExchangeClient) {
+        throw new Error("Hypercert exchange client not initialized");
       }
 
       const { contractAddress, id: fractionTokenId } = parseClaimOrFractionId(
@@ -158,14 +138,6 @@ export const useCreateFractionalMakerAsk = ({
       let signature: string | undefined;
 
       setStep("Create");
-      const hypercertExchangeClient = new HypercertExchangeClient(
-        chainId,
-        // TODO: Fix typing issue with provider
-        // @ts-ignore
-        provider as unknown as Provider,
-        // @ts-ignore
-        signer,
-      );
 
       const { maker, isCollectionApproved, isTransferManagerApproved } =
         await hypercertExchangeClient.createFractionalSaleMakerAsk({
@@ -173,10 +145,11 @@ export const useCreateFractionalMakerAsk = ({
           endTime: Math.floor(Date.now() / 1000) + 86400, // If you use a timestamp in ms, the function will revert
           price: parseEther(values.price), // Be careful to use a price in wei, this example is for 1 ETH
           itemIds: [fractionTokenId.toString()], // Token id of the NFT(s) you want to sell, add several ids to create a bundle
-          minUnitAmount: BigInt(values.minUnitsToKeep), // Minimum amount of units to keep after the sale
+          minUnitAmount: BigInt(values.minUnitAmount), // Minimum amount of units to keep after the sale
           maxUnitAmount: BigInt(values.maxUnitAmount), // Maximum amount of units to sell
           minUnitsToKeep: BigInt(values.minUnitsToKeep), // Minimum amount of units to keep after the sale
           sellLeftoverFraction: values.sellLeftoverFraction, // If you want to sell the leftover fraction
+          currency: values.currency, // Currency address (0x0 for ETH)
         });
 
       // Grant the TransferManager the right the transfer assets on behalf od the LooksRareProtocol
@@ -272,11 +245,11 @@ export const useGetCurrentERC20Allowance = () => {
   };
 };
 export const useBuyFractionalMakerAsk = () => {
+  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
+
   const chainId = useChainId();
   const { setStep, setSteps, setOpen } = useStepProcessDialogContext();
   const { data: walletClientData } = useWalletClient();
-  const provider = useEthersProvider();
-  const signer = useEthersSigner();
   const { address } = useAccount();
   const getCurrentERC20Allowance = useGetCurrentERC20Allowance();
 
@@ -291,6 +264,11 @@ export const useBuyFractionalMakerAsk = () => {
       unitAmount: string;
       pricePerUnit: string;
     }) => {
+      if (!hypercertExchangeClient) {
+        setOpen(false);
+        throw new Error("No client");
+      }
+
       if (!chainId) {
         setOpen(false);
         throw new Error("No chain id");
@@ -325,12 +303,6 @@ export const useBuyFractionalMakerAsk = () => {
       ]);
       setOpen(true);
 
-      const hypercertExchangeClient = new HypercertExchangeClient(
-        chainId,
-        // @ts-ignore
-        provider,
-        signer,
-      );
       setStep("Setting up order execution");
       const takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
         order,

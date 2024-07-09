@@ -36,6 +36,7 @@ export interface CreateFractionalOfferFormValues {
   minUnitsToKeep: string;
   price: string;
   sellLeftoverFraction: boolean;
+  currency?: string;
 }
 
 export const useFetchHypercertFractionsByHypercertId = (
