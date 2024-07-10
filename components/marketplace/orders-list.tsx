@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { decodeAbiParameters, formatEther, parseAbiParameters } from "viem";
+import { formatEther } from "viem";
 
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { decodeFractionalOrderParams } from "@/marketplace/utils";
 
 function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   const { hypercert_id: hypercertId } = hypercert;
@@ -80,27 +81,21 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
       header: "Min units per order",
       cell: (row) => {
         const params = row.getValue();
-        const [minUnitsToBuy] = decodeAbiParameters(
-          parseAbiParameters(
-            "uint256 minUnitAmount, uint256 maxUnitAmount, uint256 minUnitsToKeep, uint256 sellLeftoverFraction",
-          ),
+        const { minUnitAmount } = decodeFractionalOrderParams(
           params as `0x{string}`,
         );
-        return <div>{minUnitsToBuy.toString()}</div>;
+        return <div>{minUnitAmount.toString()}</div>;
       },
     }),
     columnHelper.accessor("additionalParameters", {
-      id: "maxUnitsToBuy",
+      id: "maxUnitAmount",
       header: "Max units per order",
       cell: (row) => {
         const params = row.getValue();
-        const [_, maxUnitsToBuy] = decodeAbiParameters(
-          parseAbiParameters(
-            "uint256 minUnitAmount, uint256 maxUnitAmount, uint256 minUnitsToKeep, uint256 sellLeftoverFraction",
-          ),
+        const { maxUnitAmount } = decodeFractionalOrderParams(
           params as `0x{string}`,
         );
-        return <div>{maxUnitsToBuy.toString()}</div>;
+        return <div>{maxUnitAmount.toString()}</div>;
       },
     }),
   ];
