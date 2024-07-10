@@ -23,7 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatEther } from "viem";
 
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,7 +34,10 @@ import { cn } from "@/lib/utils";
 import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
-import { decodeFractionalOrderParams } from "@/marketplace/utils";
+import {
+  decodeFractionalOrderParams,
+  getPricePerPercent,
+} from "@/marketplace/utils";
 
 function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   const { hypercert_id: hypercertId } = hypercert;
@@ -65,12 +67,20 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Price per unit
+            Price per %
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
-      cell: (row) => <div>{formatEther(BigInt(row.getValue()))} ETH</div>,
+      cell: (row) => (
+        <div>
+          {getPricePerPercent(
+            row.getValue(),
+            BigInt(hypercert.units || BigInt(0)),
+          )}{" "}
+          ETH
+        </div>
+      ),
       sortingFn: (rowA, rowB) =>
         BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
           ? 1

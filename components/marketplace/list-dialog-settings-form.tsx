@@ -88,6 +88,10 @@ export default function ListDialogSettingsForm({
       return [false, "Must be no more than the units for sale."];
     }
 
+    if (_unitsForSale % _unitsMinPerOrder !== 0) {
+      return [false, "Must divide evenly into the units for sale."];
+    }
+
     return [
       true,
       <>
@@ -120,6 +124,10 @@ export default function ListDialogSettingsForm({
 
     if (_unitsMaxPerOrder < _unitsMinPerOrder) {
       return [false, "Must be at least the minimum units per order."];
+    }
+
+    if (_unitsMaxPerOrder % _unitsMinPerOrder !== 0) {
+      return [false, "Must be a multiple of the minimum units per order."];
     }
 
     return [

@@ -26,6 +26,7 @@ import { MarketplaceOrder } from "@/marketplace/types";
 import { decodeContractError } from "@/lib/decodeContractError";
 import { apiEnvironment } from "@/lib/constants";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
+import { toast } from "@/components/ui/use-toast";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -195,9 +196,16 @@ export const useCreateFractionalMakerAsk = ({
         throw new Error("Error registering order");
       }
     },
-    throwOnError: true,
     onSuccess: () => {
       setOpen(false);
+    },
+    onError: (e) => {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: e.message,
+        duration: 5000,
+      });
     },
   });
 };
@@ -255,6 +263,14 @@ export const useBuyFractionalMakerAsk = () => {
 
   return useMutation({
     mutationKey: ["buyFractionalMakerAsk"],
+    onError: (e) => {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: e.message,
+        duration: 5000,
+      });
+    },
     mutationFn: async ({
       order,
       unitAmount,

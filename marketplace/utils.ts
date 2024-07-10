@@ -1,5 +1,10 @@
 import { currenciesByNetwork, Currency } from "@hypercerts-org/marketplace-sdk";
-import { decodeAbiParameters, parseAbiParameters } from "viem";
+import {
+  decodeAbiParameters,
+  formatEther,
+  parseAbiParameters,
+  parseEther,
+} from "viem";
 
 export const getCurrencyByAddress = (address: string) => {
   const allCurrencies = Object.values(currenciesByNetwork).flatMap(
@@ -24,4 +29,18 @@ export const decodeFractionalOrderParams = (params: string) => {
     minUnitsToKeep,
     sellLeftoverFraction: !!sellLeftoverFraction,
   };
+};
+
+export const getPricePerUnit = (
+  pricePerPercent: string,
+  totalUnits: bigint,
+) => {
+  const unitsPerPercent = totalUnits / BigInt(100);
+  const pricePerPercentWei = parseEther(pricePerPercent);
+  return formatEther(pricePerPercentWei / unitsPerPercent);
+};
+
+export const getPricePerPercent = (price: string, totalUnits: bigint) => {
+  const unitsPerPercent = totalUnits / BigInt(100);
+  return formatEther(BigInt(price) * unitsPerPercent);
 };
