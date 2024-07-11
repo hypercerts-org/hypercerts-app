@@ -18,8 +18,8 @@ importers:
         specifier: 2.0.0-alpha.0
         version: 2.0.0-alpha.0(bufferutil@4.0.8)(typescript@5.5.2)
       '@hypercerts-org/marketplace-sdk':
-        specifier: 0.3.15
-        version: 0.3.15(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)
+        specifier: 0.3.21
+        version: 0.3.21(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)
       '@hypercerts-org/sdk':
         specifier: 2.0.0-alpha.29
         version: 2.0.0-alpha.29(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
@@ -1120,8 +1120,8 @@ packages:
   '@hypercerts-org/contracts@2.0.0-alpha.0':
     resolution: {integrity: sha512-xkvl2goo1Uz39TdALs4ypjxarmxk4Lu0X8JZc5+TdmVw/hsaywjE5WpPgil/AFE5Ccm3qyNGVsY6fz6co5GvVg==}
 
-  '@hypercerts-org/marketplace-sdk@0.3.15':
-    resolution: {integrity: sha512-N99vk+T95rsgorf31wZds52THoky8Qnf/eWnuGYSAj5/KssIL6p2KFn3eLzi7LfBVfAQDmLWaloKld3MT7f5vg==}
+  '@hypercerts-org/marketplace-sdk@0.3.21':
+    resolution: {integrity: sha512-cBYw0bLywhWqud2ug0iXsukuH6KrvUKZvORaAsjKlFvCKty2TPzBco3hL2Z9B088FaSTjezv63tA3AKvHYjknQ==}
     engines: {node: '>= 16.15.1 <= 20.x'}
     peerDependencies:
       ethers: ^6.6.2
@@ -8165,7 +8165,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/marketplace-sdk@0.3.15(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)':
+  '@hypercerts-org/marketplace-sdk@0.3.21(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)':
     dependencies:
       '@hypercerts-org/sdk': 2.0.0-alpha.27(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
       '@supabase/supabase-js': 2.44.0(bufferutil@4.0.8)

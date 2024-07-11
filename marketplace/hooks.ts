@@ -27,6 +27,7 @@ import { decodeContractError } from "@/lib/decodeContractError";
 import { apiEnvironment } from "@/lib/constants";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -213,6 +214,8 @@ export const useCreateFractionalMakerAsk = ({
 export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
   const chainId = useChainId();
   const provider = usePublicClient();
+  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
+  const [checkedValidity, setCheckedValidity] = useState(false);
 
   return useQuery({
     queryKey: ["hypercert", "id", hypercertId, "chain", chainId, "orders"],
@@ -220,15 +223,40 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
       if (!provider) {
         return null;
       }
-      const apiClient = new ApiClient(apiEnvironment);
-      const { data: orders } = await apiClient.fetchOrdersByHypercertId({
+      const apiClient = new ApiClient(
+        apiEnvironment,
+        process.env.NEXT_PUBLIC_HYPERCERT_API_ENDPOINT,
+      );
+      let { data: orders } = await apiClient.fetchOrdersByHypercertId({
         hypercertId,
       });
+      if (!checkedValidity) {
+        const validityResults =
+          await hypercertExchangeClient.checkOrdersValidity(
+            orders.filter((order: MarketplaceOrder) => !order.invalidated),
+          );
+        const tokenIdsWithInvalidOrder = validityResults
+          .filter((result) => !result.valid)
+          .map((result) => BigInt(result.order.itemIds[0]));
+        if (tokenIdsWithInvalidOrder.length) {
+          console.error("Invalid orders", tokenIdsWithInvalidOrder);
+          orders = orders.map((order: MarketplaceOrder) => {
+            if (tokenIdsWithInvalidOrder.includes(BigInt(order.itemIds[0]))) {
+              return { ...order, invalidated: true };
+            }
+            return order;
+          });
+          // Do not await but update validity in the background
+          apiClient.updateOrderValidity(tokenIdsWithInvalidOrder, chainId);
+          setCheckedValidity(true);
+        }
+      }
       return orders as MarketplaceOrder[];
     },
     enabled: !!chainId,
   });
 };
+
 export const useGetCurrentERC20Allowance = () => {
   const chainId = useChainId();
   const { address } = useAccount();
@@ -252,6 +280,7 @@ export const useGetCurrentERC20Allowance = () => {
     return data as bigint;
   };
 };
+
 export const useBuyFractionalMakerAsk = () => {
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 

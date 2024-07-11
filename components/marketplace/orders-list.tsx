@@ -111,7 +111,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   ];
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
-    data: openOrders || [],
+    data: openOrders?.filter((x) => !x.invalidated) || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
