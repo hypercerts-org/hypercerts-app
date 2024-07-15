@@ -24,7 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, InfoIcon, RefreshCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import EthAddress from "@/components/eth-address";
@@ -38,19 +38,53 @@ import {
   decodeFractionalOrderParams,
   getPricePerPercent,
 } from "@/marketplace/utils";
+import { useAccount, useChainId } from "wagmi";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 
 function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   const { hypercert_id: hypercertId } = hypercert;
-  const { data: openOrders } = useFetchMarketplaceOrdersForHypercert(
+  const chainId = useChainId();
+  const { address } = useAccount();
+  const { data: openOrders, refetch } = useFetchMarketplaceOrdersForHypercert(
     hypercertId!,
   );
   const { client } = useHypercertClient();
+  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
   const hypercertOnConnectedChain = client.isClaimOrFractionOnConnectedChain(
     hypercertId!,
   );
 
   const columnHelper = createColumnHelper<MarketplaceOrder>();
+
+  const hasInvalidatedOrdersForCurrentUser = (openOrders || []).some(
+    (order) => order.invalidated && order.signer === address,
+  );
+
+  const refreshOrderValidity = async (tokenId: string) => {
+    if (!hypercertExchangeClient) {
+      console.log("No hypercert exchange client");
+      return;
+    }
+
+    if (!chainId) {
+      console.log("No chain ID");
+      return;
+    }
+
+    await hypercertExchangeClient.api.updateOrderValidity(
+      [BigInt(tokenId)],
+      chainId,
+    );
+    await refetch();
+  };
+
   const columns = [
     columnHelper.accessor("signer", {
       cell: (row) => (
@@ -108,10 +142,59 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
         return <div>{maxUnitAmount.toString()}</div>;
       },
     }),
+    ...(hasInvalidatedOrdersForCurrentUser
+      ? [
+          columnHelper.accessor("invalidated", {
+            id: "invalidated",
+            header: "Invalidated",
+            cell: (row) => {
+              const order = row.row.original;
+              if (order.signer !== address) {
+                return <div></div>;
+              }
+              return (
+                <div className="flex">
+                  <Button onClick={() => console.log("bala")}>Test</Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <InfoIcon className="cursor-default" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px]">
+                        This order has been evaluated to be invalid. You can
+                        refresh the order status by clicking the refresh icon.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div
+                          className="ml-2"
+                          onClick={() => refreshOrderValidity(order.itemIds[0])}
+                        >
+                          <RefreshCwIcon />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px]">
+                        Refresh the order status.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              );
+            },
+          }),
+        ]
+      : []),
   ];
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
-    data: openOrders?.filter((x) => !x.invalidated) || [],
+    data:
+      openOrders?.filter((order) =>
+        order.invalidated ? order.signer === address : false,
+      ) || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -166,12 +249,17 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={
-                      hypercertOnConnectedChain
-                        ? () => onRowClick(row.original)
-                        : undefined
-                    }
-                    className={classes}
+                    onClick={() => {
+                      if (
+                        hypercertOnConnectedChain &&
+                        !row.original.invalidated
+                      ) {
+                        onRowClick(row.original);
+                      }
+                    }}
+                    className={cn(classes, {
+                      "bg-red-100": row.original.invalidated,
+                    })}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
