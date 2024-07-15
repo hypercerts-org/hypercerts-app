@@ -9,7 +9,6 @@ import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import { ListForSaleButton2 } from "@/components/marketplace/list-for-sale-button2";
 import OrdersList from "@/components/marketplace/orders-list";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
@@ -121,8 +120,7 @@ async function HypercertPageInner({
         </h5>
 
         <div className="flex gap-2">
-          <ListForSaleButton hypercertId={hypercertId} />
-          <ListForSaleButton2 hypercert={hypercert} />
+          <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
       <OrdersList hypercert={hypercert} />

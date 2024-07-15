@@ -20,14 +20,14 @@ import { isAddress, parseEther } from "viem";
 import { readContract, waitForTransactionReceipt } from "viem/actions";
 import {
   CreateFractionalOfferFormValues,
-  useFetchHypercertFractionsByHypercertId,
-} from "@/components/marketplace/create-fractional-sale-form";
-import { MarketplaceOrder } from "@/marketplace/types";
+  MarketplaceOrder,
+} from "@/marketplace/types";
 import { decodeContractError } from "@/lib/decodeContractError";
 import { apiEnvironment } from "@/lib/constants";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
+import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -61,6 +61,47 @@ export const useCreateOrderInSupabase = () => {
     throwOnError: true,
   });
 };
+
+export const useFetchHypercertFractionsByHypercertId = (
+  hypercertId: string,
+) => {
+  const { client } = useHypercertClient();
+  const chainId = useChainId();
+
+  return useQuery({
+    queryKey: ["hypercert", "id", hypercertId, "chain", chainId, "fractions"],
+    queryFn: async () => {
+      if (!client) {
+        console.log("no client");
+        return null;
+      }
+
+      if (!chainId) {
+        console.log("no chainId");
+        return null;
+      }
+
+      const fractions =
+        (await getFractionsByHypercert(hypercertId).then((res) => {
+          return res?.data;
+        })) || [];
+      const totalUnitsForAllFractions = fractions?.reduce(
+        (acc, cur) => acc + BigInt(cur?.units ?? "0"),
+        BigInt(0),
+      );
+
+      return fractions.map((fraction) => ({
+        ...fraction,
+        percentage: Number(
+          (BigInt(fraction?.units ?? "0") * BigInt(100)) /
+            totalUnitsForAllFractions,
+        ),
+      }));
+    },
+    enabled: !!client && !!chainId,
+  });
+};
+
 export const useCreateFractionalMakerAsk = ({
   hypercertId,
 }: {

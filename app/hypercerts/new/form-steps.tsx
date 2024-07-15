@@ -13,9 +13,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import { RefObject, useState } from "react";
 
-import { HypercertFormValues } from "@/app/hypercerts/new/page";
+import {
+  HyperCertFormKeys,
+  HypercertFormValues,
+} from "@/app/hypercerts/new/page";
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -40,11 +43,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { parseEther } from "viem";
+import { toPng } from "html-to-image";
+import { FormattedUnits } from "@/components/formatted-units";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  cardRef: RefObject<HTMLDivElement>;
 }
 
 const GeneralInformation = ({ form }: FormStepsProps) => {
@@ -59,10 +65,10 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             <FormControl>
               <Input {...field} />
             </FormControl>
+            <FormMessage />
             <FormDescription>
               Keep it short but descriptive! (max 100 characters)
             </FormDescription>
-            <FormMessage />
           </FormItem>
         )}
       />
@@ -75,10 +81,10 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             <FormControl>
               <Textarea {...field} />
             </FormControl>
+            <FormMessage />
             <FormDescription>
               Describe your project: why it was created, and how it works
             </FormDescription>
-            <FormMessage />
           </FormItem>
         )}
       />
@@ -91,10 +97,10 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             <FormControl>
               <Input {...field} placeholder="https://" />
             </FormControl>
+            <FormMessage />
             <FormDescription>
               Paste a link to your impact report or your project
             </FormDescription>
-            <FormMessage />
           </FormItem>
         )}
       />
@@ -107,8 +113,8 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             <FormControl>
               <Input {...field} placeholder="https://" />
             </FormControl>
-            <FormDescription>The URL to your project logo</FormDescription>
             <FormMessage />
+            <FormDescription>The URL to your project logo</FormDescription>
           </FormItem>
         )}
       />
@@ -121,10 +127,10 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             <FormControl>
               <Input {...field} placeholder="https://" />
             </FormControl>
+            <FormMessage />
             <FormDescription>
               The URL to an image to be displayed as the banner
             </FormDescription>
-            <FormMessage />
           </FormItem>
         )}
       />
@@ -147,10 +153,10 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
                 }}
               />
             </FormControl>
+            <FormMessage />
             <FormDescription>
               Tags are used to categorize your project.
             </FormDescription>
-            <FormMessage />
             {field.value &&
               field.value.filter((tag: string) => tag !== "").length > 0 && (
                 <div className="flex flex-wrap gap-0.5">
@@ -225,10 +231,10 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 />
               </PopoverContent>
             </Popover>
+            <FormMessage />
             <FormDescription>
               The start and end date of the work represented by the hypercert
             </FormDescription>
-            <FormMessage />
           </FormItem>
         )}
       />
@@ -252,11 +258,11 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 }}
               />
             </FormControl>
+            <FormMessage />
             <FormDescription>
               “Add contributor addresses, names or pseudonyms, whose work is
               represented by the hypercert. All information is public.
             </FormDescription>
-            <FormMessage />
             {field.value &&
               field.value.filter((contributor) => contributor !== "").length >
                 0 && (
@@ -279,24 +285,27 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
         control={form.control}
         name="confirmContributorsPermission"
         render={({ field }) => (
-          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-            <FormControl>
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked);
-                  if (checked === true) {
-                    field.onBlur();
-                  }
-                }}
-              />
-            </FormControl>
-            <div className="space-y-1 leading-none">
-              <FormLabel>
-                I confirm that all listed contributors have permitted their
-                works&apos; inclusion in this hypercert.
-              </FormLabel>
+          <FormItem>
+            <div className="flex flex-row items-center space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked === true) {
+                      field.onBlur();
+                    }
+                  }}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  I confirm that all listed contributors have permitted their
+                  works&apos; inclusion in this hypercert.
+                </FormLabel>
+              </div>
             </div>
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -314,6 +323,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 placeholder="https:// | ipfs://"
               />
             </FormControl>
+            <FormMessage />
             <FormDescription>
               Allowlists determine the number of units each address is allowed
               to mint. You can create a new allowlist, or prefill from an
@@ -322,6 +332,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             </FormDescription>
             <div className="flex text-xs space-x-2 w-full justify-end">
               <Button
+                type="button"
                 disabled={!!field.value}
                 variant="outline"
                 onClick={() => setCreateDialogOpen(true)}
@@ -335,24 +346,30 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 setOpen={setCreateDialogOpen}
               />
             </div>
-            <FormMessage />
             {!!allowlistEntries?.length && (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Address</TableHead>
+                  <TableRow className="hover:bg-inherit">
+                    <TableHead className="pl-0">Address</TableHead>
                     <TableHead>Percentage</TableHead>
-                    <TableHead>Units</TableHead>
+                    <TableHead className="pr-0">Units</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {allowlistEntries?.map((entry, index) => (
-                    <TableRow key={`${entry.address}-${entry.units}-${index}`}>
-                      <TableCell>{entry.address}</TableCell>
+                    <TableRow
+                      key={`${entry.address}-${entry.units}-${index}`}
+                      className="hover:bg-inherit"
+                    >
+                      <TableCell className="pl-0">{entry.address}</TableCell>
                       <TableCell>
                         {calculatePercentageBigInt(entry.units).toString()}%
                       </TableCell>
-                      <TableCell>{entry.units.toString()}</TableCell>
+                      <TableCell className="pr-0">
+                        <FormattedUnits>
+                          {entry.units.toString()}
+                        </FormattedUnits>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -379,36 +396,44 @@ const ReviewAndSubmit = ({ form }: FormStepsProps) => {
         control={form.control}
         name="acceptTerms"
         render={({ field }) => (
-          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-            <FormControl>
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked);
-                  if (checked === true) {
-                    field.onBlur();
-                  }
-                }}
-              />
-            </FormControl>
-            <div className="space-y-1 leading-none">
-              <FormLabel>
-                I have read and agree to the{" "}
-                <Link
-                  href="https://hypercerts.org/terms/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline text-slate-500"
-                >
-                  terms and conditions
-                </Link>
-              </FormLabel>
+          <FormItem>
+            <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked === true) {
+                      field.onBlur();
+                    }
+                  }}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  I have read and agree to the{" "}
+                  <Link
+                    href="https://hypercerts.org/terms/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline text-slate-500"
+                  >
+                    terms and conditions
+                  </Link>
+                </FormLabel>
+              </div>
             </div>
+            <FormMessage />
           </FormItem>
         )}
       />
     </section>
   );
+};
+
+type FormStep = {
+  title: string;
+  fields: HyperCertFormKeys[];
 };
 
 export const hypercertFormSteps = new Map([
@@ -417,36 +442,63 @@ export const hypercertFormSteps = new Map([
     {
       title: "General",
       fields: ["title", "banner", "description", "logo", "tags"],
-    },
+    } as FormStep,
   ],
   [
     2,
     {
       title: "Who did what & when",
       fields: ["contributors", "confirmContributorsPermission"],
-    },
+    } as FormStep,
   ],
-  [3, { title: "Mint", fields: ["acceptTerms"] }],
+  [3, { title: "Mint", fields: ["acceptTerms"] } as FormStep],
 ]);
 
-const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
+const FormSteps = ({
+  form,
+  currentStep,
+  setCurrentStep,
+  cardRef,
+}: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const { address } = useAccount();
   const [isOpen, setIsOpen] = useState(false);
 
+  const takeCardSnapshot = async () => {
+    if (cardRef.current === null) {
+      return;
+    }
+
+    console.log(cardRef.current);
+    try {
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        fetchRequestInit: { mode: "cors" },
+      });
+      form.setValue("cardImage", dataUrl);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const isCurrentStepValid = () => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
-    const fieldsTouched =
-      currentStepFields.every(
-        (field) =>
-          form.formState.touchedFields[field as keyof HypercertFormValues],
-      ) || true;
-
-    const currentStepErrors = currentStepFields.some(
-      (field) => form.formState.errors[field as keyof HypercertFormValues],
+    const allFieldsValid = currentStepFields.every(
+      (field) => form.getFieldState(field)?.invalid === false,
     );
+    return allFieldsValid;
+  };
 
-    return fieldsTouched && !currentStepErrors;
+  const handleNextClick = async () => {
+    if (currentStep === 1) {
+      await takeCardSnapshot();
+    }
+    const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
+    await form.trigger(currentStepFields);
+    if (!isCurrentStepValid()) {
+      return;
+    }
+    setCurrentStep(currentStep + 1);
   };
 
   return (
@@ -483,6 +535,7 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
           form={form}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
+          cardRef={cardRef}
         />
       )}
       {currentStep === 2 && (
@@ -490,6 +543,7 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
           form={form}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
+          cardRef={cardRef}
         />
       )}
       {currentStep === 3 && (
@@ -497,6 +551,7 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
           form={form}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
+          cardRef={cardRef}
         />
       )}
 
@@ -514,7 +569,7 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         </Button>
         {!isLastStep && (
           <Button
-            onClick={() => setCurrentStep(currentStep + 1)}
+            onClick={handleNextClick}
             disabled={!isCurrentStepValid()}
             type="button"
           >
@@ -522,8 +577,8 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
         )}
-        {isLastStep && address && isCurrentStepValid() && (
-          <Button type="submit">
+        {isLastStep && address && (
+          <Button type="submit" disabled={!isCurrentStepValid()}>
             Mint hypercert
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>

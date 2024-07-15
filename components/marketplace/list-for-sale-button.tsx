@@ -1,6 +1,5 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -9,53 +8,38 @@ import {
 } from "@/components/ui/tooltip";
 
 import { Button } from "@/components/ui/button";
-import { ListForSaleForm } from "@/components/marketplace/list-for-sale-form";
-import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
+import { Dialog } from "@/components/ui/dialog";
+import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
+import ListDialog from "./list-dialog";
+import { StepProcessDialogProvider } from "../global/step-process-dialog";
 import { useAccount } from "wagmi";
-import { useFetchHypercertFractionsByHypercertId } from "@/components/marketplace/create-fractional-sale-form";
-import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useState } from "react";
 
-type Props = {
-  hypercertId: string;
-  text?: string;
-  onClickViewListings?: () => void;
-  onClick?: () => void;
-};
-
-export function ListForSaleButton({
-  hypercertId,
-  text = "List for sale (OLD)",
-  onClickViewListings,
-  onClick,
-  ...props
-}: Props) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const onClickButton = () => {
-    onClick?.();
-    setIsOpen(true);
-  };
-
+export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
   const { isConnected, address } = useAccount();
   const { client } = useHypercertClient();
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const hypercertId = hypercert.hypercert_id;
+  const fractions = hypercert.fractions?.data || [];
+  const fractionsOwnedByUser = fractions.filter(
+    (fraction) => fraction.owner_address === address,
+  );
+
   const disabled =
-    !client || !client.isClaimOrFractionOnConnectedChain(hypercertId);
-
-  const { data: fractions } =
-    useFetchHypercertFractionsByHypercertId(hypercertId);
-  const { data: marketplaceOrders } =
-    useFetchMarketplaceOrdersForHypercert(hypercertId);
-
-  if (!fractions) {
-    return null;
-  }
+    !hypercert ||
+    !hypercertId ||
+    !client ||
+    !client.isClaimOrFractionOnConnectedChain(hypercertId) ||
+    !fractionsOwnedByUser.length;
 
   const getToolTipMessage = () => {
+    if (!hypercert || !hypercertId) return;
+
     if (!isConnected || !address) {
-      return "Please connect your wallet to use the marketplace";
+      return "Connect your wallet to access this feature";
     }
 
     if (!client) {
@@ -66,44 +50,23 @@ export function ListForSaleButton({
       return "This hypercert is not on the connected chain";
     }
 
-    const fractionsOwnedByUser = fractions.filter(
-      (fraction) => fraction.owner_address === address,
-    );
-
     if (!fractionsOwnedByUser.length) {
       return "You do not own any fractions of this hypercert";
     }
 
-    // const fractionsWithoutOrder = fractionsOwnedByUser.filter(
-    //   (fraction) =>
-    //     !marketplaceOrders?.find(
-    //       (order) =>
-    //         order.itemIds[0] ===
-    //         parseClaimOrFractionId(fraction.fraction_id!).id.toString(),
-    //     ),
-    // );
-
-    // if (!fractionsWithoutOrder.length) {
-    //   return "All your fractions are already listed for sale";
-    // }
-
     return null;
   };
 
-  const tooltipMessage = getToolTipMessage();
-
-  if (tooltipMessage) {
+  if (disabled) {
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <div>
-              <Button disabled {...props}>
-                {text}
-              </Button>
+              <Button disabled>List for sale</Button>
             </div>
           </TooltipTrigger>
-          <TooltipContent>{tooltipMessage}</TooltipContent>
+          <TooltipContent>{getToolTipMessage()}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     );
@@ -111,21 +74,12 @@ export function ListForSaleButton({
 
   return (
     <>
-      <Button
-        disabled={disabled}
-        variant="outline"
-        onClick={onClickButton}
-        {...props}
-      >
-        {text}
-      </Button>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent>
-          <ListForSaleForm hypercertId={hypercertId} />
-        </DialogContent>
-      </Dialog>
+      <Button onClick={() => setIsOpen(true)}>List for sale</Button>
+      <StepProcessDialogProvider>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <ListDialog hypercert={hypercert} setIsOpen={setIsOpen} />
+        </Dialog>
+      </StepProcessDialogProvider>
     </>
   );
 }
-
-ListForSaleButton.displayName = "ListForSaleButton";

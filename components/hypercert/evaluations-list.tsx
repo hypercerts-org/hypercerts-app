@@ -18,7 +18,7 @@ export default async function EvaluationsList({
   const attestations = hypercert.attestations?.data;
 
   if (!attestations || attestations.length === 0) {
-    return <div>This Hypercert have not yet been evaluated.</div>;
+    return <div>This Hypercert has not yet been evaluated.</div>;
   }
 
   return (

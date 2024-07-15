@@ -57,7 +57,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
-  const hypercertOnConnectedChain = client.isClaimOrFractionOnConnectedChain(
+  const hypercertOnConnectedChain = client?.isClaimOrFractionOnConnectedChain(
     hypercertId!,
   );
 
@@ -212,7 +212,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   };
 
   if (!openOrders?.length) {
-    return <div></div>;
+    return <div>This Hypercert has not yet been listed for sale.</div>;
   }
 
   const classes = cn({
