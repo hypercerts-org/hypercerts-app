@@ -18,9 +18,6 @@ export const useHypercertExchangeClient = () => {
         // @ts-expect-error - wagmi and viem have different typing
         provider,
         signer,
-        {
-          apiEndpoint: process.env.NEXT_PUBLIC_HYPERCERT_API_ENDPOINT,
-        },
       ),
     [walletClient, chainId, provider, signer],
   );

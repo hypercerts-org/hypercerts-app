@@ -264,10 +264,7 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
       if (!provider) {
         return null;
       }
-      const apiClient = new ApiClient(
-        apiEnvironment,
-        process.env.NEXT_PUBLIC_HYPERCERT_API_ENDPOINT,
-      );
+      const apiClient = new ApiClient(apiEnvironment);
       let { data: orders } = await apiClient.fetchOrdersByHypercertId({
         hypercertId,
       });
