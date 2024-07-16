@@ -10,8 +10,9 @@ import { Suspense } from "react";
 import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import { formatEther } from "viem";
 import { Separator } from "@/components/ui/separator";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { getPricePerPercent } from "@/marketplace/utils";
 
 export const defaultDescription =
   "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
@@ -67,7 +68,15 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
             </Button>
           </div>
           <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
-            {hypercerts?.data.map((hypercert, index) => {
+            {hypercerts?.data.map((hypercert) => {
+              const percentAvailable = calculateBigIntPercentage(
+                hypercert.orders?.totalUnitsForSale,
+                hypercert.units,
+              );
+              const lowestPrice = getPricePerPercent(
+                hypercert.orders?.lowestAvailablePrice || "0",
+                BigInt(hypercert?.units || "0"),
+              );
               const props: HypercertMiniDisplayProps = {
                 hypercertId: hypercert.hypercert_id as string,
                 name: hypercert.metadata?.name as string,
@@ -75,8 +84,8 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
                   hypercert.contract?.chain_id,
                 ) as SupportedChainIdType,
                 attestations: hypercert.attestations,
-                lowestPrice: formatEther(BigInt(1_000_000_000)),
-                percentAvailable: 20,
+                lowestPrice,
+                percentAvailable,
               };
               return (
                 <HypercertWindow {...props} key={hypercert.hypercert_id} />

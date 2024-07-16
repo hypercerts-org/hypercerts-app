@@ -20,10 +20,10 @@ export const HypercertListFragment = graphql(`
       chain_id
     }
     units
-    #    orders {
-    #      lowestAvailablePrice
-    #      totalUnitsForSale
-    #    }
+    orders {
+      lowestAvailablePrice
+      totalUnitsForSale
+    }
   }
 `);
 export type HypercertListFragment = ResultOf<typeof HypercertListFragment>;

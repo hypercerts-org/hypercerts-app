@@ -4,9 +4,7 @@ import {
   isClaimsFilter,
   isClaimsOrderBy,
 } from "@/hypercerts/getAllHypercerts";
-import HypercertMiniDisplay, {
-  HypercertMiniDisplayProps,
-} from "@/components/hypercert/hypercert-mini-display";
+import { HypercertMiniDisplayProps } from "@/components/hypercert/hypercert-mini-display";
 
 import ExploreListSkeleton from "./explore-list-skeleton";
 import ExplorePagination from "./explore-pagination";
@@ -14,9 +12,9 @@ import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import { InfoSection } from "@/app/profile/[address]/sections";
 import { Suspense } from "react";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { formatEther } from "viem";
 import { type SupportedChainIdType } from "@/lib/constants";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
+import { getPricePerPercent } from "@/marketplace/utils";
 
 function HypercertsListNoResults() {
   return "No results found";
@@ -71,15 +69,14 @@ async function ExploreListInner({
       )}
       <div className="flex flex-row flex-wrap gap-4 justify-center md:justify-between">
         {hypercerts?.data?.map((hypercert) => {
-          // TODO fix when orders are available again
-          // const percentAvailable = calculateBigIntPercentage(
-          //   hypercert.orders?.totalUnitsForSale,
-          //   hypercert.units,
-          // );
-          const unitsPerPercent = BigInt(hypercert.units || 0) / BigInt(100);
-          // const lowestPricePerPercent =
-          //   unitsPerPercent *
-          //   BigInt(hypercert.orders?.lowestAvailablePrice || 0);
+          const percentAvailable = calculateBigIntPercentage(
+            hypercert.orders?.totalUnitsForSale,
+            hypercert.units,
+          );
+          const lowestPrice = getPricePerPercent(
+            hypercert.orders?.lowestAvailablePrice || "0",
+            BigInt(hypercert?.units || "0"),
+          );
           const props: HypercertMiniDisplayProps = {
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
@@ -87,8 +84,8 @@ async function ExploreListInner({
               hypercert.contract?.chain_id,
             ) as SupportedChainIdType,
             attestations: hypercert.attestations,
-            lowestPrice: formatEther(BigInt(1_000_000_000)),
-            percentAvailable: 20,
+            lowestPrice,
+            percentAvailable,
           };
           return <HypercertWindow {...props} key={hypercert.hypercert_id} />;
         })}
