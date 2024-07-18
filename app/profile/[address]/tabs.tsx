@@ -15,7 +15,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { getPricePerPercent } from "@/marketplace/utils";
-import { formatEther } from "viem";
 
 const subTabs = [
   { key: "hypercerts-created", triggerLabel: "Created by me" },
@@ -136,7 +135,7 @@ const HypercertsTabContentInner = async ({
       {activeTab === "hypercerts-created" &&
         (showCreatedHypercerts ? (
           <div className="flex flex-wrap gap-3 justify-center lg:justify-start pt-3">
-            {createdHypercerts?.data.map((hypercert, index) => {
+            {createdHypercerts?.data.map((hypercert) => {
               const percentAvailable = calculateBigIntPercentage(
                 hypercert.orders?.totalUnitsForSale,
                 hypercert.units,

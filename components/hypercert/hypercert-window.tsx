@@ -75,7 +75,9 @@ const HypercertWindow = ({
             <section>
               <h6 className="text-end opacity-70">lowest per %</h6>
               <p className="font-medium">
-                {lowestPrice ? lowestPrice : "--"} ETH
+                {lowestPrice && lowestPrice !== "0"
+                  ? `${lowestPrice} ETH`
+                  : "--"}
               </p>
             </section>
           </section>
