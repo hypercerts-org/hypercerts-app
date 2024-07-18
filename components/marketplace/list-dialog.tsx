@@ -19,6 +19,7 @@ import { useState } from "react";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
 import { getCurrencyByAddress } from "@/marketplace/utils";
+import { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
 
 type State = {
   fractionId: string;
@@ -30,19 +31,20 @@ type State = {
   formIsValid: boolean;
 };
 
-export default function ListDialog({
+function ListDialogInner({
   hypercert,
   setIsOpen,
+  client,
 }: {
   hypercert: HypercertFull;
   setIsOpen: (isOpen: boolean) => void;
+  client: HypercertExchangeClient;
 }) {
   const { address } = useAccount();
   const { mutateAsync: createFractionalMakerAsk, isPending } =
     useCreateFractionalMakerAsk({
       hypercertId: hypercert.hypercert_id || "",
     });
-  const { client } = useHypercertExchangeClient();
 
   const units = BigInt(hypercert.units || "0");
   const fractions = hypercert.fractions?.data || [];
@@ -226,5 +228,24 @@ export default function ListDialog({
         </Button>
       </div>
     </DialogContent>
+  );
+}
+
+export default function ListDialog({
+  hypercert,
+  setIsOpen,
+}: {
+  hypercert: HypercertFull;
+  setIsOpen: (isOpen: boolean) => void;
+}) {
+  const { client } = useHypercertExchangeClient();
+  if (!client) return null;
+
+  return (
+    <ListDialogInner
+      hypercert={hypercert}
+      setIsOpen={setIsOpen}
+      client={client}
+    />
   );
 }

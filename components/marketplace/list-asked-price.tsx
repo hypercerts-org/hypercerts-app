@@ -21,6 +21,8 @@ export function ListAskedPrice({
   setCurrency: (currency: string) => void;
 }) {
   const { client } = useHypercertExchangeClient();
+  if (!client) return null;
+
   return (
     <div className="flex gap-2 w-full">
       <Input
