@@ -1,11 +1,11 @@
 import {
   CollectionsTabContent,
   HypercertsTabContent,
+  ProfileSubTabKey,
   ProfileTabSection,
 } from "@/app/profile/[address]/tabs";
 
 import EthAddress from "@/components/eth-address";
-import { Separator } from "@/components/ui/separator";
 
 export default function ProfilePage({
   params,
@@ -15,7 +15,8 @@ export default function ProfilePage({
   searchParams: Record<string, string>;
 }) {
   const address = params.address;
-  const tab = searchParams?.tab;
+  const tab = searchParams?.tab || "hypercerts-created";
+  const mainTab = tab?.split("-")[0] ?? "hypercerts";
 
   return (
     <section className="flex flex-col gap-2">
@@ -25,15 +26,17 @@ export default function ProfilePage({
         </h1>
         <EthAddress address={address} />
       </section>
-      <Separator />
-      <section className="flex space-x-2">
-        <ProfileTabSection address={address} active={tab} />
-      </section>
+      <ProfileTabSection address={address} active={tab} />
       <section className="flex flex-col gap-2">
-        {(tab === undefined || tab === "hypercerts") && (
-          <HypercertsTabContent address={address} />
+        {(tab === undefined || mainTab === "hypercerts") && (
+          <HypercertsTabContent
+            address={address}
+            activeTab={tab as ProfileSubTabKey}
+          />
         )}
-        {tab === "collections" && <CollectionsTabContent address={address} />}
+        {mainTab === "collections" && (
+          <CollectionsTabContent address={address} />
+        )}
       </section>
     </section>
   );

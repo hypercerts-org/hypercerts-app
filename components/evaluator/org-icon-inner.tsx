@@ -15,7 +15,7 @@ export default function OrgIconInner({ org }: { org: AttestorOrganisation }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <Avatar>
+          <Avatar className="h-8 w-8">
             <AvatarImage src={org.logo_url} alt={org.name} />
             <AvatarFallback>{org.name[0].toUpperCase()}</AvatarFallback>
           </Avatar>

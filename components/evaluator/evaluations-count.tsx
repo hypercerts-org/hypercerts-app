@@ -1,4 +1,5 @@
-import { getEvaluatorAttestationsCount } from "../../attestations/getEvaluatorAttestationsCount";
+import { getEvaluatorAttestationsCount } from "@/attestations/getEvaluatorAttestationsCount";
+import CountBadge from "@/components/count-badge";
 
 export default async function EvaluationsCount({
   address,
@@ -7,7 +8,5 @@ export default async function EvaluationsCount({
 }) {
   const count = await getEvaluatorAttestationsCount(address);
 
-  if (!count) return <div>0</div>;
-
-  return <div>{count}</div>;
+  return <CountBadge count={count} />;
 }

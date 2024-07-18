@@ -18,8 +18,8 @@ export default async function ExplorePagination({
   };
 
   return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center justify-start gap-2 w-[250px]">
+    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full">
+      <div className="flex items-center justify-start gap-2">
         {currentPage > 1 && (
           <PaginationButton arrow="left" href={href(1)}>
             First
@@ -37,7 +37,7 @@ export default async function ExplorePagination({
         {currentPage} of {totalPages}
       </div>
 
-      <div className="flex items-center justify-end gap-2 w-[250px]">
+      <div className="flex items-center justify-end gap-2">
         {currentPage < totalPages && (
           <PaginationButton arrow="right" href={href(currentPage + 1)}>
             Next

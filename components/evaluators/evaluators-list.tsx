@@ -14,25 +14,27 @@ async function EvaluatorsListInner({
   const currentPage = Number(searchParams?.p) || 1;
 
   return (
-    <div className="flex flex-col gap-5 w-full">
-      {attestors
-        .slice(
-          (currentPage - 1) * ATTESTORS_PER_PAGE,
-          currentPage * ATTESTORS_PER_PAGE
-        )
-        .map((attestor, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-2 text-sm text-gray-700 font-medium"
-          >
-            <EvaluatorsListRow attestor={attestor} />{" "}
-          </div>
-        ))}
+    <section className="h-full flex flex-col space-y-8">
+      <section>
+        {attestors
+          .slice(
+            (currentPage - 1) * ATTESTORS_PER_PAGE,
+            currentPage * ATTESTORS_PER_PAGE,
+          )
+          .map((attestor, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 text-sm text-gray-700 font-medium"
+            >
+              <EvaluatorsListRow attestor={attestor} />{" "}
+            </div>
+          ))}
+      </section>
       <EvaluatorsPagination
         searchParams={searchParams}
         attestorsCount={attestors.length}
       />
-    </div>
+    </section>
   );
 }
 

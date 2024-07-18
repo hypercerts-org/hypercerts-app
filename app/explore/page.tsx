@@ -21,17 +21,15 @@ export default async function ExplorePageInner({
       <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
         Explore
       </h1>
-      <section className="flex flex-col gap-4 justify-between">
+      <section className="flex flex-col lg:flex-row gap-4 justify-between max-w-screen">
+        <ExploreSearchBar />
         <div className="flex space-x-2">
-          <ExploreSearchBar />
           <ExploreChainFilterSelect />
           <ExploreEvaluationsFilterSelect />
           <ExploreOrderBySelect />
         </div>
       </section>
-      <div className="max-w-screen-xl">
-        <ExploreList {...{ searchParams }} />
-      </div>
+      <ExploreList {...{ searchParams }} />
     </main>
   );
 }

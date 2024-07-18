@@ -35,13 +35,13 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="flex gap-2">
-      <div className="relative">
+    <div className="flex gap-2 w-full max-w-screen-sm min-w-fit justify-between">
+      <div className="relative w-full">
         <Search className="text-slate-400 absolute top-1/2 left-2 transform -translate-y-1/2" />
 
         <Input
           value={searchInput}
-          className="max-w-lg pl-10 h-10 border-slate-500 bg-slate-50 py-2 text-sm md:text-base font-medium placeholder:text-slate-500/60 ring-offset-white focus-visible:ring-offset-2 focus-visible:ring-black focus-visible:ring-2"
+          className="w-full pl-10 h-10 border-slate-500 bg-slate-50 py-2 text-sm md:text-base font-medium placeholder:text-slate-500/60 ring-offset-white focus-visible:ring-offset-2 focus-visible:ring-black focus-visible:ring-2"
           placeholder="Search hypercerts"
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={keyDownHandler}

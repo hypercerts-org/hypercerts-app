@@ -39,7 +39,7 @@ export default function TimeFrame({
 
   return (
     <div className="space-y-2 w-full">
-      <p className="text-base text-gray-800 font-medium">
+      <p className="text-sm text-gray-600 font-medium">
         {workTimeFrame ?? "--"}
       </p>
     </div>

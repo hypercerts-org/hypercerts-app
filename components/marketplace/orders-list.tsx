@@ -14,6 +14,7 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -190,17 +191,21 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   ];
 
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0, //initial page index
+    pageSize: 10, //default page size
+  });
   const table = useReactTable({
-    data:
-      openOrders?.filter((order) =>
-        order.invalidated ? order.signer === address : false,
-      ) || [],
+    data: openOrders || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination, //update the pagination state when internal APIs mutate the pagination state
     onSortingChange: setSorting,
     state: {
       sorting,
+      pagination,
     },
   });
 

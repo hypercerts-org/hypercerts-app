@@ -14,8 +14,11 @@ export default function EvaluatorsListRow({
   [key: string]: any;
 }) {
   return (
-    <Link href={`/evaluators/${attestor.eth_address}`} className="w-full">
-      <div className="flex gap-2 w-full" {...props}>
+    <Link
+      href={`/evaluators/${attestor.eth_address}`}
+      className="w-full hover:bg-secondary rounded-md transition-colors duration-200"
+    >
+      <div className="flex gap-2 w-full p-2" {...props}>
         <UserIcon address={attestor.eth_address} size="large" />
         <div className="flex flex-col justify-center items-start w-52">
           <EnsName address={attestor.eth_address} />

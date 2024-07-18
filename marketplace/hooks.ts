@@ -256,6 +256,7 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
   const chainId = useChainId();
   const provider = usePublicClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
+  const { address } = useAccount();
   const [checkedValidity, setCheckedValidity] = useState(false);
 
   return useQuery({
@@ -289,7 +290,9 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
           setCheckedValidity(true);
         }
       }
-      return orders as MarketplaceOrder[];
+      return (orders as MarketplaceOrder[]).filter((order: MarketplaceOrder) =>
+        order.invalidated ? order.signer === address : true,
+      );
     },
     enabled: !!chainId,
   });

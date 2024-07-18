@@ -14,7 +14,11 @@ export default function PaginationButton({
 }) {
   return (
     <Link href={href} prefetch={true}>
-      <Button aria-label={children} className="flex items-center gap-2">
+      <Button
+        aria-label={children}
+        className="flex items-center gap-2"
+        size={"sm"}
+      >
         {arrow === "left" && (
           <ChevronLeft style={{ width: "10px", height: "10px" }} />
         )}

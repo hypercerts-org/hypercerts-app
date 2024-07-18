@@ -15,7 +15,7 @@ const footerLinks = [
 ];
 
 const Footer = () => (
-  <footer className="flex flex-col space-y-2 justify-center items-center py-5 px-3 border-t-[1.5px] border-black pb-24 md:pb-5 bg-slate-50">
+  <footer className="flex flex-col space-y-2 justify-center items-center py-5 px-3 border-t-[1.5px] border-black pb-24 md:pb-5 bg-slate-50 mt-auto">
     <Link className="relative" href={"/"} title="Hypercerts">
       <Image
         src={"/hypercerts-logo.png"}
@@ -34,7 +34,7 @@ const Footer = () => (
     </ul>
 
     <p className="flex space-x-1 items-center text-sm">
-      <span>Copyright</span> <Copyright size={12} /> <span>2024</span>
+      <span>Copyright</span> <Copyright size={12} /> <span>{new Date().getFullYear()}</span>
       <span>Hypercerts Foundation</span>
     </p>
   </footer>

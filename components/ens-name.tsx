@@ -16,5 +16,5 @@ export default function EnsName({
 
   if (!address || !ensName) return null;
 
-  return <div {...props}>{ensName}</div>;
+  return <p {...props}>{ensName}</p>;
 }

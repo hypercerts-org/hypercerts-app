@@ -31,7 +31,9 @@ export default async function UnclaimedHypercertListItem({
         />
 
         <div className="flex flex-col justify-center">
-          <p>{hypercert?.metadata?.name || "Untitled"}</p>
+          <h6 className="text-lg font-semibold">
+            {hypercert?.metadata?.name || "Untitled"}
+          </h6>
           <TimeFrame
             from={hypercert?.metadata?.work_timeframe_from}
             to={hypercert?.metadata?.work_timeframe_to}

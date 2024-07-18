@@ -41,16 +41,14 @@ const HypercertWindow = ({
   return (
     <Link href={`/hypercerts/${hypercertId}`}>
       <article className="transition-transform duration-300 hover:-translate-y-2 relative group bg-black/10 rounded-lg overflow-hidden">
-        <div className="h-[320px] min-w-[300px] max-w-[320px]">
-          <div className="relative w-full h-full">
-            <Image
-              src={`/api/hypercerts/${hypercertId}/image`}
-              alt={name || "Untitled"}
-              fill
-              sizes="300px"
-              className="object-contain object-center p-4"
-            />
-          </div>
+        <div className="h-[320px] w-full relative p-1">
+          <Image
+            src={`/api/hypercerts/${hypercertId}/image`}
+            alt={name || "Untitled"}
+            fill
+            sizes="300px"
+            className="object-contain object-center w-full h-full"
+          />
         </div>
         <section className="absolute top-4 left-4 flex space-x-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out">
           <div className="rounded-md px-2 py-0.5 bg-black border border-white/60 text-white text-xs shadow-sm">
@@ -60,7 +58,7 @@ const HypercertWindow = ({
             {evaluationStatus}
           </div>
         </section>
-        <section className="bg-gray-200/80 backdrop-blur-md absolute bottom-0 w-full p-4 text-black space-y-2">
+        <section className="bg-gray-200/80 backdrop-blur-md bottom-0 w-full p-4 text-black space-y-2">
           <p
             className={`flex-1 text-sm font-semibold line-clamp-2 text-ellipsis ${
               name ? "text-black" : "text-gray-700"
