@@ -2,7 +2,7 @@
 import { HypercertClient } from "@hypercerts-org/sdk";
 import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
-import { apiEnvironment } from "@/lib/constants";
+import { apiEnvironment, supportedChains } from "@/lib/constants";
 
 export const useHypercertClient = () => {
   const { data: walletClient } = useWalletClient();
@@ -10,7 +10,13 @@ export const useHypercertClient = () => {
   const [client, setClient] = useState<HypercertClient>();
 
   useEffect(() => {
-    if (!walletClient || !isConnected) return;
+    if (!walletClient || !isConnected) {
+      return;
+    }
+
+    if (!supportedChains.find((chain) => chain.id === walletClient.chain.id)) {
+      return;
+    }
     setClient(
       new HypercertClient({
         environment: apiEnvironment,
