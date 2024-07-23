@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import React, { Suspense, useState } from "react";
 import {
   SortingState,
@@ -25,21 +19,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ArrowUpDown, InfoIcon, RefreshCwIcon } from "lucide-react";
+import {
+  ArrowUpDown,
+  ExternalLink,
+  InfoIcon,
+  RefreshCwIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
-import EthAddress from "@/components/eth-address";
 import { MarketplaceOrder } from "@/marketplace/types";
-import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { cn } from "@/lib/utils";
-import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   decodeFractionalOrderParams,
   getPricePerPercent,
 } from "@/marketplace/utils";
-import { useAccount, useChainId } from "wagmi";
+import { useChainId } from "wagmi";
 import {
   Tooltip,
   TooltipContent,
@@ -47,24 +41,34 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
+import { OrderFragment } from "@/marketplace/fragments/order.fragment";
+import Link from "next/link";
+import { FormattedUnits } from "@/components/formatted-units";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
+import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
+import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
-function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
-  const { hypercert_id: hypercertId } = hypercert;
+function UserOrdersListInner({
+  address,
+  orders,
+}: {
+  address: string;
+  orders: OrderFragment[];
+}) {
   const chainId = useChainId();
-  const { address } = useAccount();
-  const { data: openOrders, refetch } = useFetchMarketplaceOrdersForHypercert(
-    hypercertId!,
-  );
+
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
-  const hypercertOnConnectedChain = client?.isClaimOrFractionOnConnectedChain(
-    hypercertId!,
-  );
+  const columnHelper = createColumnHelper<OrderFragment>();
 
-  const columnHelper = createColumnHelper<MarketplaceOrder>();
-
-  const hasInvalidatedOrdersForCurrentUser = (openOrders || []).some(
+  const hasInvalidatedOrdersForCurrentUser = (orders || []).some(
     (order) => order.invalidated && order.signer === address,
   );
 
@@ -83,17 +87,23 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
       [BigInt(tokenId)],
       chainId,
     );
-    await refetch();
   };
 
   const columns = [
-    columnHelper.accessor("signer", {
-      cell: (row) => (
-        <div>
-          <EthAddress address={row.getValue()} />
-        </div>
-      ),
-      header: "Seller",
+    columnHelper.accessor("hypercert", {
+      cell: (row) => {
+        const hypercert = row.getValue();
+        const name = hypercert?.metadata?.name || "Hypercert";
+        return (
+          <Link href={`/hypercerts/${hypercert?.hypercert_id}`}>
+            <div className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-max text-sm">
+              <div>{name}</div>
+              <ExternalLink className="w-4 h-4" />
+            </div>
+          </Link>
+        );
+      },
+      header: "Hypercert",
     }),
     columnHelper.accessor("price", {
       header: ({ column }) => {
@@ -107,15 +117,15 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
           </Button>
         );
       },
-      cell: (row) => (
-        <div>
-          {getPricePerPercent(
-            row.getValue(),
-            BigInt(hypercert.units || BigInt(0)),
-          )}{" "}
-          ETH
-        </div>
-      ),
+      cell: (row) => {
+        const hypercert = row.row.original.hypercert;
+        return (
+          <div>
+            {getPricePerPercent(row.getValue(), BigInt(hypercert?.units || 0))}{" "}
+            ETH
+          </div>
+        );
+      },
       sortingFn: (rowA, rowB) =>
         BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
           ? 1
@@ -129,7 +139,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
         const { minUnitAmount } = decodeFractionalOrderParams(
           params as `0x{string}`,
         );
-        return <div>{minUnitAmount.toString()}</div>;
+        return <FormattedUnits>{minUnitAmount.toString()}</FormattedUnits>;
       },
     }),
     columnHelper.accessor("additionalParameters", {
@@ -140,7 +150,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
         const { maxUnitAmount } = decodeFractionalOrderParams(
           params as `0x{string}`,
         );
-        return <div>{maxUnitAmount.toString()}</div>;
+        return <FormattedUnits>{maxUnitAmount.toString()}</FormattedUnits>;
       },
     }),
     ...(hasInvalidatedOrdersForCurrentUser
@@ -150,7 +160,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
             header: "Invalidated",
             cell: (row) => {
               const order = row.row.original;
-              if (order.signer !== address) {
+              if (order.signer !== address || !row.row.original.invalidated) {
                 return <div></div>;
               }
               return (
@@ -195,7 +205,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
     pageSize: 10, //default page size
   });
   const table = useReactTable({
-    data: openOrders || [],
+    data: orders,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -208,21 +218,22 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
     },
   });
 
-  const [selectedOrder, setSelectedOrder] = useState<MarketplaceOrder | null>(
+  const [selectedOrder, setSelectedOrder] = useState<OrderFragment | null>(
     null,
   );
-  const onRowClick = (row: MarketplaceOrder) => {
+  const onRowClick = (row: OrderFragment) => {
     setSelectedOrder((current) => (current === row ? null : row));
   };
 
-  if (!openOrders?.length) {
+  if (!orders?.length) {
     return <div>This Hypercert has not yet been listed for sale.</div>;
   }
 
-  const classes = cn({
-    "cursor-pointer": hypercertOnConnectedChain,
-    "opacity-50": !hypercertOnConnectedChain,
-  });
+  const classes = (onConnectedChain: boolean) =>
+    cn({
+      "cursor-pointer": onConnectedChain,
+      "opacity-50": !onConnectedChain,
+    });
 
   return (
     <div className="w-full">
@@ -255,15 +266,24 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => {
                       if (
-                        hypercertOnConnectedChain &&
+                        client?.isClaimOrFractionOnConnectedChain(
+                          row.original?.hypercert?.hypercert_id as string,
+                        ) &&
                         !row.original.invalidated
                       ) {
                         onRowClick(row.original);
                       }
                     }}
-                    className={cn(classes, {
-                      "bg-red-100": row.original.invalidated,
-                    })}
+                    className={cn(
+                      classes(
+                        !!client?.isClaimOrFractionOnConnectedChain(
+                          row.original?.hypercert?.hypercert_id as string,
+                        ),
+                      ),
+                      {
+                        "bg-red-100": row.original.invalidated,
+                      },
+                    )}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -326,8 +346,8 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
             </DialogHeader>
             <StepProcessDialogProvider>
               <BuyFractionalOrderForm
-                order={selectedOrder}
-                hypercert={hypercert}
+                order={orderFragmentToMarketplaceOrder(selectedOrder)}
+                hypercert={orderFragmentToHypercert(selectedOrder)}
               />
             </StepProcessDialogProvider>
           </DialogContent>
@@ -337,14 +357,52 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   );
 }
 
-export default function OrdersList({
-  hypercert,
+const orderFragmentToMarketplaceOrder = (
+  order: OrderFragment,
+): MarketplaceOrder => {
+  if (!order.chainId) {
+    throw new Error("Order does not have a chain ID");
+  }
+  return {
+    signer: order.signer,
+    price: order.price,
+    itemIds: order.itemIds,
+    strategyId: order.strategyId,
+    chainId: parseInt(order.chainId, 10),
+    additionalParameters: order.additionalParameters,
+    invalidated: order.invalidated,
+    currency: order.currency,
+    amounts: order.amounts,
+    id: order.id,
+    collectionType: order.collectionType,
+    collection: order.collection,
+    createdAt: order.createdAt,
+    endTime: order.endTime,
+    orderNonce: order.orderNonce,
+    subsetNonce: order.subsetNonce,
+    startTime: order.startTime,
+    globalNonce: order.globalNonce,
+    quoteType: order.quoteType,
+    signature: order.signature,
+    validator_codes:
+      order.validator_codes?.map((code) => parseInt(code, 10)) || null,
+  };
+};
+
+const orderFragmentToHypercert = (order: OrderFragment): HypercertFull => {
+  return order.hypercert as unknown as HypercertFull;
+};
+
+export default function UserOrdersList({
+  address,
+  orders,
 }: {
-  hypercert: HypercertFull;
+  address: string;
+  orders: OrderFragment[];
 }) {
   return (
     <Suspense>
-      <OrdersListInner hypercert={hypercert} />
+      <UserOrdersListInner address={address} orders={orders} />
     </Suspense>
   );
 }

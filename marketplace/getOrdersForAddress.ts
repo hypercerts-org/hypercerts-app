@@ -5,11 +5,10 @@ import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
 import request from "graphql-request";
 
-const ordersQuery = graphql(
+const query = graphql(
   `
-    query OrdersQuery($chainId: BigInt, $signer: String) {
-      orders(where: { chainId: { eq: $chainId }, signer: { eq: $signer } }) {
-        count
+    query GetOrdersForAddress($address: String!) {
+      orders(where: { signer: { eq: $address } }) {
         data {
           ...OrderFragment
         }
@@ -19,20 +18,11 @@ const ordersQuery = graphql(
   [OrderFragment],
 );
 
-interface GetOrdersParams {
-  filter: {
-    chainId?: bigint;
-    signer?: `0x${string}`;
-  };
-}
-
-export async function getOrders({ filter }: GetOrdersParams) {
-  const res = await request(HYPERCERTS_API_URL, ordersQuery, {
-    chainId: filter.chainId?.toString(),
-    signer: filter.signer,
+export async function getOrdersForAddress(address: string) {
+  const res = await request(HYPERCERTS_API_URL, query, {
+    address,
   });
 
-  // TODO: Throw error?
   if (!res.orders?.data) {
     return undefined;
   }
@@ -42,7 +32,7 @@ export async function getOrders({ filter }: GetOrdersParams) {
   });
 
   return {
-    count: res.orders.count,
+    count: res.orders.data.length,
     data: processedFragments,
   };
 }

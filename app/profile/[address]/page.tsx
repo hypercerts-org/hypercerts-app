@@ -1,11 +1,12 @@
 import {
-  CollectionsTabContent,
-  HypercertsTabContent,
   ProfileSubTabKey,
   ProfileTabSection,
 } from "@/app/profile/[address]/tabs";
 
 import EthAddress from "@/components/eth-address";
+import { HypercertsTabContent } from "@/app/profile/[address]/hypercerts-tab-content";
+import { CollectionsTabContent } from "@/app/profile/[address]/collections-tab-content";
+import { MarketplaceTabContent } from "@/app/profile/[address]/marketplace-tab-content";
 
 export default function ProfilePage({
   params,
@@ -36,6 +37,9 @@ export default function ProfilePage({
         )}
         {mainTab === "collections" && (
           <CollectionsTabContent address={address} />
+        )}
+        {mainTab === "marketplace" && (
+          <MarketplaceTabContent address={address} />
         )}
       </section>
     </section>
