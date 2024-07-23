@@ -274,6 +274,11 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
       let { data: orders } = await apiClient.fetchOrdersByHypercertId({
         hypercertId,
       });
+
+      if (!orders) {
+        return null;
+      }
+
       if (!checkedValidity) {
         const validityResults =
           await hypercertExchangeClient.checkOrdersValidity(

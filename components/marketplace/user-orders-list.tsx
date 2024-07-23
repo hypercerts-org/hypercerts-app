@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   SortingState,
   createColumnHelper,
@@ -42,7 +42,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
-import Link from "next/link";
 import { FormattedUnits } from "@/components/formatted-units";
 import {
   Dialog,
@@ -53,8 +52,9 @@ import {
 import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { useRouter } from "next/navigation";
 
-function UserOrdersListInner({
+export default function UserOrdersList({
   address,
   orders,
 }: {
@@ -67,10 +67,17 @@ function UserOrdersListInner({
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
   const columnHelper = createColumnHelper<OrderFragment>();
+  const { push } = useRouter();
 
   const hasInvalidatedOrdersForCurrentUser = (orders || []).some(
     (order) => order.invalidated && order.signer === address,
   );
+
+  const ordersVisibleToCurrentUser = useMemo(() => {
+    return orders.filter((order) =>
+      order.invalidated ? order.signer === address : true,
+    );
+  }, []);
 
   const refreshOrderValidity = async (tokenId: string) => {
     if (!hypercertExchangeClient) {
@@ -95,12 +102,17 @@ function UserOrdersListInner({
         const hypercert = row.getValue();
         const name = hypercert?.metadata?.name || "Hypercert";
         return (
-          <Link href={`/hypercerts/${hypercert?.hypercert_id}`}>
-            <div className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-max text-sm">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              push(`/hypercerts/${hypercert?.hypercert_id}`);
+            }}
+          >
+            <a className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-max text-sm">
               <div>{name}</div>
               <ExternalLink className="w-4 h-4" />
-            </div>
-          </Link>
+            </a>
+          </div>
         );
       },
       header: "Hypercert",
@@ -108,13 +120,13 @@ function UserOrdersListInner({
     columnHelper.accessor("price", {
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
+            className="flex items-center cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Price per %
             <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          </div>
         );
       },
       cell: (row) => {
@@ -205,7 +217,7 @@ function UserOrdersListInner({
     pageSize: 10, //default page size
   });
   const table = useReactTable({
-    data: orders,
+    data: ordersVisibleToCurrentUser,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -234,6 +246,10 @@ function UserOrdersListInner({
       "cursor-pointer": onConnectedChain,
       "opacity-50": !onConnectedChain,
     });
+
+  const canGetPreviousPage = table.getCanPreviousPage();
+  const canGetNextPage = table.getCanNextPage();
+  const paginationDisplayed = canGetPreviousPage || canGetNextPage;
 
   return (
     <div className="w-full">
@@ -309,26 +325,28 @@ function UserOrdersListInner({
           </Table>
         </div>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+      {paginationDisplayed && (
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={canGetPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={canGetNextPage}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
       {selectedOrder && (
         <Dialog
           open={!!selectedOrder}
@@ -392,17 +410,3 @@ const orderFragmentToMarketplaceOrder = (
 const orderFragmentToHypercert = (order: OrderFragment): HypercertFull => {
   return order.hypercert as unknown as HypercertFull;
 };
-
-export default function UserOrdersList({
-  address,
-  orders,
-}: {
-  address: string;
-  orders: OrderFragment[];
-}) {
-  return (
-    <Suspense>
-      <UserOrdersListInner address={address} orders={orders} />
-    </Suspense>
-  );
-}
