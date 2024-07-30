@@ -26,14 +26,15 @@ import {
   RefreshCwIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MarketplaceOrder } from "@/marketplace/types";
 import { cn } from "@/lib/utils";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import {
   decodeFractionalOrderParams,
   getPricePerPercent,
+  orderFragmentToHypercert,
+  orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
-import { useChainId } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import {
   Tooltip,
   TooltipContent,
@@ -51,7 +52,6 @@ import {
 } from "@/components/ui/dialog";
 import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { useRouter } from "next/navigation";
 
 export default function UserOrdersList({
@@ -62,6 +62,7 @@ export default function UserOrdersList({
   orders: OrderFragment[];
 }) {
   const chainId = useChainId();
+  const { address: currentUserAddress } = useAccount();
 
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
@@ -75,7 +76,7 @@ export default function UserOrdersList({
 
   const ordersVisibleToCurrentUser = useMemo(() => {
     return orders.filter((order) =>
-      order.invalidated ? order.signer === address : true,
+      order.invalidated ? order.signer === currentUserAddress : true,
     );
   }, []);
 
@@ -148,10 +149,15 @@ export default function UserOrdersList({
       header: "Min units per order",
       cell: (row) => {
         const params = row.getValue();
-        const { minUnitAmount } = decodeFractionalOrderParams(
-          params as `0x{string}`,
-        );
-        return <FormattedUnits>{minUnitAmount.toString()}</FormattedUnits>;
+        try {
+          const { minUnitAmount } = decodeFractionalOrderParams(
+            params as `0x{string}`,
+          );
+          return <FormattedUnits>{minUnitAmount.toString()}</FormattedUnits>;
+        } catch (error) {
+          console.error("Error decoding fractional order params", error);
+          return <div>Invalid</div>;
+        }
       },
     }),
     columnHelper.accessor("additionalParameters", {
@@ -159,10 +165,15 @@ export default function UserOrdersList({
       header: "Max units per order",
       cell: (row) => {
         const params = row.getValue();
-        const { maxUnitAmount } = decodeFractionalOrderParams(
-          params as `0x{string}`,
-        );
-        return <FormattedUnits>{maxUnitAmount.toString()}</FormattedUnits>;
+        try {
+          const { maxUnitAmount } = decodeFractionalOrderParams(
+            params as `0x{string}`,
+          );
+          return <FormattedUnits>{maxUnitAmount.toString()}</FormattedUnits>;
+        } catch (error) {
+          console.error("Error decoding fractional order params", error);
+          return <div>Invalid</div>;
+        }
       },
     }),
     ...(hasInvalidatedOrdersForCurrentUser
@@ -374,39 +385,3 @@ export default function UserOrdersList({
     </div>
   );
 }
-
-const orderFragmentToMarketplaceOrder = (
-  order: OrderFragment,
-): MarketplaceOrder => {
-  if (!order.chainId) {
-    throw new Error("Order does not have a chain ID");
-  }
-  return {
-    signer: order.signer,
-    price: order.price,
-    itemIds: order.itemIds,
-    strategyId: order.strategyId,
-    chainId: parseInt(order.chainId, 10),
-    additionalParameters: order.additionalParameters,
-    invalidated: order.invalidated,
-    currency: order.currency,
-    amounts: order.amounts,
-    id: order.id,
-    collectionType: order.collectionType,
-    collection: order.collection,
-    createdAt: order.createdAt,
-    endTime: order.endTime,
-    orderNonce: order.orderNonce,
-    subsetNonce: order.subsetNonce,
-    startTime: order.startTime,
-    globalNonce: order.globalNonce,
-    quoteType: order.quoteType,
-    signature: order.signature,
-    validator_codes:
-      order.validator_codes?.map((code) => parseInt(code, 10)) || null,
-  };
-};
-
-const orderFragmentToHypercert = (order: OrderFragment): HypercertFull => {
-  return order.hypercert as unknown as HypercertFull;
-};

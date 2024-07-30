@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { Suspense, useState } from "react";
+import React, { useState } from "react";
 import {
   SortingState,
   createColumnHelper,
@@ -29,15 +29,14 @@ import { ArrowUpDown, InfoIcon, RefreshCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import EthAddress from "@/components/eth-address";
-import { MarketplaceOrder } from "@/marketplace/types";
 import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { cn } from "@/lib/utils";
-import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   decodeFractionalOrderParams,
   getPricePerPercent,
+  orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
 import { useAccount, useChainId } from "wagmi";
 import {
@@ -47,24 +46,28 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
+import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 
-function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
-  const { hypercert_id: hypercertId } = hypercert;
+export default function OrdersList({
+  orders,
+  hypercert,
+}: {
+  orders?: OrderFragment[];
+  hypercert: HypercertFull;
+}) {
   const chainId = useChainId();
   const { address } = useAccount();
-  const { data: openOrders, refetch } = useFetchMarketplaceOrdersForHypercert(
-    hypercertId!,
-  );
+
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
-  const hypercertOnConnectedChain = client?.isClaimOrFractionOnConnectedChain(
-    hypercertId!,
-  );
+  const hypercertOnConnectedChain =
+    client?.isClaimOrFractionOnConnectedChain(hypercert?.hypercert_id!) ||
+    false;
 
-  const columnHelper = createColumnHelper<MarketplaceOrder>();
+  const columnHelper = createColumnHelper<OrderFragment>();
 
-  const hasInvalidatedOrdersForCurrentUser = (openOrders || []).some(
+  const hasInvalidatedOrdersForCurrentUser = (orders || []).some(
     (order) => order.invalidated && order.signer === address,
   );
 
@@ -83,7 +86,6 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
       [BigInt(tokenId)],
       chainId,
     );
-    await refetch();
   };
 
   const columns = [
@@ -205,7 +207,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
     pageSize: 10, //default page size
   });
   const table = useReactTable({
-    data: openOrders || [],
+    data: orders || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -218,14 +220,14 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
     },
   });
 
-  const [selectedOrder, setSelectedOrder] = useState<MarketplaceOrder | null>(
+  const [selectedOrder, setSelectedOrder] = useState<OrderFragment | null>(
     null,
   );
-  const onRowClick = (row: MarketplaceOrder) => {
+  const onRowClick = (row: OrderFragment) => {
     setSelectedOrder((current) => (current === row ? null : row));
   };
 
-  if (!openOrders?.length) {
+  if (!orders?.length) {
     return <div>This Hypercert has not yet been listed for sale.</div>;
   }
 
@@ -336,7 +338,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
             </DialogHeader>
             <StepProcessDialogProvider>
               <BuyFractionalOrderForm
-                order={selectedOrder}
+                order={orderFragmentToMarketplaceOrder(selectedOrder)}
                 hypercert={hypercert}
               />
             </StepProcessDialogProvider>
@@ -344,17 +346,5 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
         </Dialog>
       )}
     </div>
-  );
-}
-
-export default function OrdersList({
-  hypercert,
-}: {
-  hypercert: HypercertFull;
-}) {
-  return (
-    <Suspense>
-      <OrdersListInner hypercert={hypercert} />
-    </Suspense>
   );
 }

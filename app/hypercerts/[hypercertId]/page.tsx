@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import TimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
+import { getOrders } from "@/marketplace/getOpenOrders";
 
 type Props = {
   params: { hypercertId: string };
@@ -48,6 +49,7 @@ async function HypercertPageInner({
 }) {
   const { hypercertId } = params;
   const hypercert = await getHypercert(hypercertId);
+  const orders = await getOrders({ filter: {} });
 
   if (!hypercert) {
     throw new Error("Hypercert not found.");
@@ -123,7 +125,7 @@ async function HypercertPageInner({
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
-      <OrdersList hypercert={hypercert} />
+      <OrdersList hypercert={hypercert} orders={orders?.data} />
     </section>
   );
 }
