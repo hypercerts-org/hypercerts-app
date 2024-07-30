@@ -126,11 +126,6 @@ const WalletProfile = ({
               Evaluators
             </DropdownMenuItem>
           </Link>
-          <Link href={`/profile/${address}/settings`}>
-            <DropdownMenuItem className="cursor-pointer">
-              Settings
-            </DropdownMenuItem>
-          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DisconnectDialog

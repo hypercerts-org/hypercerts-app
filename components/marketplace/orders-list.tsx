@@ -126,10 +126,15 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
       header: "Min units per order",
       cell: (row) => {
         const params = row.getValue();
-        const { minUnitAmount } = decodeFractionalOrderParams(
-          params as `0x{string}`,
-        );
-        return <div>{minUnitAmount.toString()}</div>;
+        try {
+          const { minUnitAmount } = decodeFractionalOrderParams(
+            params as `0x{string}`,
+          );
+          return <div>{minUnitAmount.toString()}</div>;
+        } catch (e) {
+          console.error(e);
+          return <div>Invalid</div>;
+        }
       },
     }),
     columnHelper.accessor("additionalParameters", {
@@ -137,10 +142,15 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
       header: "Max units per order",
       cell: (row) => {
         const params = row.getValue();
-        const { maxUnitAmount } = decodeFractionalOrderParams(
-          params as `0x{string}`,
-        );
-        return <div>{maxUnitAmount.toString()}</div>;
+        try {
+          const { maxUnitAmount } = decodeFractionalOrderParams(
+            params as `0x{string}`,
+          );
+          return <div>{maxUnitAmount.toString()}</div>;
+        } catch (e) {
+          console.error(e);
+          return <div>Invalid</div>;
+        }
       },
     }),
     ...(hasInvalidatedOrdersForCurrentUser
