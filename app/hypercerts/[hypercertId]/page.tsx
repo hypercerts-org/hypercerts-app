@@ -49,7 +49,11 @@ async function HypercertPageInner({
 }) {
   const { hypercertId } = params;
   const hypercert = await getHypercert(hypercertId);
-  const orders = await getOrders({ filter: {} });
+  const orders = await getOrders({
+    filter: {
+      hypercertId,
+    },
+  });
 
   if (!hypercert) {
     throw new Error("Hypercert not found.");
