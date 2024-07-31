@@ -33,7 +33,7 @@ interface GetOrdersParams {
   filter: {
     chainId?: bigint;
     signer?: `0x${string}`;
-    hypercertId: string;
+    hypercertId?: string;
   };
 }
 
