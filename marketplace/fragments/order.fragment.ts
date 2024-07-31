@@ -24,6 +24,7 @@ export const OrderFragment = graphql(`
     strategyId
     subsetNonce
     invalidated
+    hypercert_id
     hypercert {
       hypercert_id
       creator_address

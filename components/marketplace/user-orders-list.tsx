@@ -61,6 +61,7 @@ export default function UserOrdersList({
   address: string;
   orders: OrderFragment[];
 }) {
+  console.log("orders", orders);
   const chainId = useChainId();
   const { address: currentUserAddress } = useAccount();
 
@@ -294,7 +295,7 @@ export default function UserOrdersList({
                     onClick={() => {
                       if (
                         client?.isClaimOrFractionOnConnectedChain(
-                          row.original?.hypercert?.hypercert_id as string,
+                          row.original?.hypercert_id as string,
                         ) &&
                         !row.original.invalidated
                       ) {
@@ -304,7 +305,7 @@ export default function UserOrdersList({
                     className={cn(
                       classes(
                         !!client?.isClaimOrFractionOnConnectedChain(
-                          row.original?.hypercert?.hypercert_id as string,
+                          row.original?.hypercert_id as string,
                         ),
                       ),
                       {

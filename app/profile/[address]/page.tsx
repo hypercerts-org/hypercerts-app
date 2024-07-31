@@ -39,7 +39,10 @@ export default function ProfilePage({
           <CollectionsTabContent address={address} />
         )}
         {mainTab === "marketplace" && (
-          <MarketplaceTabContent address={address} />
+          <MarketplaceTabContent
+            address={address}
+            activeTab={tab as ProfileSubTabKey}
+          />
         )}
       </section>
     </section>

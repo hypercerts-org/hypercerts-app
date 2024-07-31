@@ -45,7 +45,9 @@ const HypercertsTabContentInner = async ({
     (tab) => tab.key.split("-")[0] === "hypercerts",
   );
 
-  const tabBadgeCounts = {
+  const tabBadgeCounts: Partial<
+    Record<(typeof subTabs)[number]["key"], number>
+  > = {
     "hypercerts-created": createdHypercerts?.count ?? 0,
     "hypercerts-claimable": unclaimedHypercerts.length,
   };
@@ -64,10 +66,12 @@ const HypercertsTabContentInner = async ({
               )}
             >
               {triggerLabel}
-              <CountBadge
-                count={tabBadgeCounts[key]}
-                variant={key === activeTab ? "default" : "secondary"}
-              />
+              {tabBadgeCounts[key] && (
+                <CountBadge
+                  count={tabBadgeCounts[key]}
+                  variant={key === activeTab ? "default" : "secondary"}
+                />
+              )}
             </button>
           </Link>
         ))}
@@ -75,7 +79,7 @@ const HypercertsTabContentInner = async ({
 
       {activeTab === "hypercerts-created" &&
         (showCreatedHypercerts ? (
-          <div className="flex flex-wrap gap-3 justify-center lg:justify-start pt-3">
+          <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
             {createdHypercerts?.data.map((hypercert) => {
               const percentAvailable = calculateBigIntPercentage(
                 hypercert.orders?.totalUnitsForSale,
@@ -118,6 +122,7 @@ const HypercertsTabContentInner = async ({
     </section>
   );
 };
+
 const HypercertsTabContent = ({
   address,
   activeTab,
