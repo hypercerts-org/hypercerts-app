@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
+import { FormattedUnits } from "@/components/formatted-units";
 
 export default function OrdersList({
   orders,
@@ -132,7 +133,7 @@ export default function OrdersList({
           const { minUnitAmount } = decodeFractionalOrderParams(
             params as `0x{string}`,
           );
-          return <div>{minUnitAmount.toString()}</div>;
+          return <FormattedUnits>{minUnitAmount.toString()}</FormattedUnits>;
         } catch (e) {
           console.error(e);
           return <div>Invalid</div>;
@@ -148,7 +149,7 @@ export default function OrdersList({
           const { maxUnitAmount } = decodeFractionalOrderParams(
             params as `0x{string}`,
           );
-          return <div>{maxUnitAmount.toString()}</div>;
+          return <FormattedUnits>{maxUnitAmount.toString()}</FormattedUnits>;
         } catch (e) {
           console.error(e);
           return <div>Invalid</div>;
