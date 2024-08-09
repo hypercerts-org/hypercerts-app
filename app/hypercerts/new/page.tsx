@@ -16,10 +16,12 @@ import {
 } from "@hypercerts-org/sdk";
 import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 import { parseEther, TransactionReceipt } from "viem";
 import { z } from "zod";
+import { useLocalStorage } from "react-use";
+
 const DEFAULT_NUM_FRACTIONS = parseEther("1");
 
 const formSchema = z.object({
@@ -44,10 +46,10 @@ const formSchema = z.object({
   projectDates: z
     .object(
       {
-        from: z.date().refine((date) => date !== null, {
+        from: z.date({ coerce: true }).refine((date) => date !== null, {
           message: "Please enter a start date",
         }),
-        to: z.date().refine((date) => date !== null, {
+        to: z.date({ coerce: true }).refine((date) => date !== null, {
           message: "Please enter an end date",
         }),
       },
@@ -100,15 +102,41 @@ const formDefaultValues: HypercertFormValues = {
   allowlistURL: "",
 };
 
+const getDefaultFormValues = (value: string): HypercertFormValues => {
+  const parsedValue = JSON.parse(value);
+
+  return {
+    ...parsedValue,
+    projectDates: {
+      from: new Date(parsedValue.projectDates.from),
+      to: new Date(parsedValue.projectDates.to),
+    },
+  };
+};
+
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
   const { dialogSteps, setStep } = useProcessDialog(mintSteps);
+  const [value, setValue] = useLocalStorage<HypercertFormValues>(
+    "user-hypercert-create-form-data",
+    formDefaultValues,
+    {
+      raw: false,
+      serializer: JSON.stringify,
+      deserializer: getDefaultFormValues,
+    },
+  );
+
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: formDefaultValues,
+    defaultValues: value,
     mode: "onChange",
   });
+
+  console.log("value: ", value);
+  console.log("form: ", form.watch());
+
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);
@@ -131,6 +159,19 @@ export default function NewHypercertForm() {
   useEffect(() => {
     setStep(mintStep as StepData["id"]);
   }, [mintStep]);
+
+  const formValues = form.watch();
+
+  const memoizedFormValues = useMemo(() => form.watch(), [form]);
+  useEffect(() => {
+    setValue(formValues);
+  }, []);
+
+  const onReset = () => {
+    setValue(formDefaultValues);
+    form.reset(value);
+    setCurrentStep(1);
+  };
 
   async function onSubmit(values: HypercertFormValues) {
     const metadata: HypercertMetadata = {
@@ -207,6 +248,7 @@ export default function NewHypercertForm() {
                 form={form}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
+                reset={onReset}
                 cardRef={cardRef}
               />
             </form>
@@ -219,14 +261,22 @@ export default function NewHypercertForm() {
             banner={form.getValues().banner || undefined}
             logo={form.getValues().logo || undefined}
             scopes={form.getValues().tags}
-            fromDateDisplay={formatDate(
-              form.getValues().projectDates?.from?.toISOString(),
-              language,
-            )}
-            toDateDisplay={formatDate(
-              form.getValues().projectDates?.to?.toISOString(),
-              language,
-            )}
+            fromDateDisplay={
+              form.getValues().projectDates?.from
+                ? formatDate(
+                    form.getValues().projectDates.from.toISOString(),
+                    language,
+                  )
+                : ""
+            }
+            toDateDisplay={
+              form.getValues().projectDates?.to
+                ? formatDate(
+                    form.getValues().projectDates.to.toISOString(),
+                    language,
+                  )
+                : ""
+            }
             ref={cardRef}
           />
         </div>

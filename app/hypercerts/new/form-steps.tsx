@@ -12,7 +12,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CalendarIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { RefObject, useState } from "react";
 
 import {
@@ -49,6 +54,7 @@ import { FormattedUnits } from "@/components/formatted-units";
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
   currentStep: number;
+  reset: () => void;
   setCurrentStep: (step: number) => void;
   cardRef: RefObject<HTMLDivElement>;
 }
@@ -457,6 +463,7 @@ export const hypercertFormSteps = new Map([
 const FormSteps = ({
   form,
   currentStep,
+  reset,
   setCurrentStep,
   cardRef,
 }: FormStepsProps) => {
@@ -533,6 +540,7 @@ const FormSteps = ({
       {currentStep === 1 && (
         <GeneralInformation
           form={form}
+          reset={reset}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
@@ -541,6 +549,7 @@ const FormSteps = ({
       {currentStep === 2 && (
         <DatesAndPeople
           form={form}
+          reset={reset}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
@@ -549,15 +558,14 @@ const FormSteps = ({
       {currentStep === 3 && (
         <ReviewAndSubmit
           form={form}
+          reset={reset}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
         />
       )}
 
-      <div
-        className={`flex items-center py-3 ${currentStep === 1 ? "justify-end" : "justify-between"}`}
-      >
+      <div className="relative flex items-center py-3 justify-between">
         <Button
           onClick={() => setCurrentStep(currentStep - 1)}
           className={currentStep === 1 ? "hidden" : ""}
@@ -566,6 +574,10 @@ const FormSteps = ({
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           Previous
+        </Button>
+        <Button onClick={reset} type="button">
+          <Trash2Icon className="w-4 h-4 mr-2" />
+          Reset
         </Button>
         {!isLastStep && (
           <Button
