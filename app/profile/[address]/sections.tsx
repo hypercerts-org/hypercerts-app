@@ -8,10 +8,10 @@ const InfoSection = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const EmptySection = () => {
+const EmptySection = ({ children }: { children?: ReactNode }) => {
   return (
     <InfoSection>
-      <p>Nothing here yet...</p>
+      <p>{children || "Nothing here yet..."}</p>
     </InfoSection>
   );
 };

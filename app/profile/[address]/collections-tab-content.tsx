@@ -7,8 +7,18 @@ import { defaultDescription } from "@/app/profile/[address]/tabs";
 const CollectionsTabContentInner = async ({ address }: { address: string }) => {
   const hyperboards = await getCollectionsByAdminAddress(address.toLowerCase());
 
-  if (!hyperboards) {
-    return <EmptySection />;
+  if (!hyperboards?.length) {
+    return (
+      <EmptySection>
+        <p>
+          No collections yet. If you want to create a collection, please reach
+          out to{" "}
+          <a href="mailto:team@hypercerts.org" className="underline">
+            team@hypercerts.org
+          </a>
+        </p>
+      </EmptySection>
+    );
   }
 
   return (
@@ -26,6 +36,7 @@ const CollectionsTabContentInner = async ({ address }: { address: string }) => {
     </div>
   );
 };
+
 const CollectionsTabContent = ({ address }: { address: string }) => {
   return (
     <Suspense fallback={<div>Loading...</div>}>

@@ -341,7 +341,7 @@ export default function HypercertListingsList({
   };
 
   if (!orders?.length) {
-    return <div>This Hypercert has not yet been listed for sale.</div>;
+    return <div>No listings yet.</div>;
   }
 
   const classes = cn({
