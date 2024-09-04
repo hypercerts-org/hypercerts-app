@@ -13,6 +13,7 @@ import { createElement } from "react";
 import type { Chain, TransactionReceipt } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useWalletClient } from "wagmi";
+import { generateBlockExplorerLink } from "@/lib/utils";
 
 const createExtraContent = (
   receipt: TransactionReceipt,
@@ -24,7 +25,7 @@ const createExtraContent = (
     createElement(
       "a",
       {
-        href: `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${receipt.transactionHash}`,
+        href: generateBlockExplorerLink(chain, receipt.transactionHash),
         target: "_blank",
         rel: "noopener noreferrer",
       },

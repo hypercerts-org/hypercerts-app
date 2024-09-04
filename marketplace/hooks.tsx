@@ -3,8 +3,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   addressesByNetwork,
   CreateMakerAskOutput,
+  Currency,
   Maker,
   QuoteType,
+  Taker,
   utils,
   WETHAbi,
 } from "@hypercerts-org/marketplace-sdk";
@@ -24,6 +26,12 @@ import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { generateBlockExplorerLink } from "@/lib/utils";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
+import { useRouter } from "next/navigation";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { ExternalLink } from "lucide-react";
+import React from "react";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -372,10 +380,12 @@ export const useBuyFractionalMakerAsk = () => {
     setDialogStep: setStep,
     setSteps,
     setOpen,
+    setExtraContent,
   } = useStepProcessDialogContext();
   const { data: walletClientData } = useWalletClient();
   const { address } = useAccount();
   const getCurrentERC20Allowance = useGetCurrentERC20Allowance();
+  const router = useRouter();
 
   return useMutation({
     mutationKey: ["buyFractionalMakerAsk"],
@@ -391,10 +401,14 @@ export const useBuyFractionalMakerAsk = () => {
       order,
       unitAmount,
       pricePerUnit,
+      hypercertName,
+      totalUnitsInHypercert,
     }: {
       order: MarketplaceOrder;
       unitAmount: string;
       pricePerUnit: string;
+      hypercertName?: string | null;
+      totalUnitsInHypercert?: bigint;
     }) => {
       if (!hypercertExchangeClient) {
         setOpen(false);
@@ -435,21 +449,39 @@ export const useBuyFractionalMakerAsk = () => {
       ]);
       setOpen(true);
 
-      await setStep("Setting up order execution");
-      const currency = getCurrencyByAddress(order.chainId, order.currency);
+      let currency: Currency | undefined;
+      let takerOrder: Taker;
+      try {
+        await setStep("Setting up order execution");
+        currency = getCurrencyByAddress(order.chainId, order.currency);
+
+        if (!currency) {
+          throw new Error(
+            `Invalid currency ${order.currency} on chain ${order.chainId}`,
+          );
+        }
+
+        takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
+          order,
+          address,
+          unitAmount,
+          pricePerUnit,
+        );
+      } catch (e) {
+        await setStep(
+          "Setting up order execution",
+          "error",
+          e instanceof Error ? e.message : "Error setting up order execution",
+        );
+        console.error(e);
+        throw new Error("Error setting up order execution");
+      }
 
       if (!currency) {
         throw new Error(
           `Invalid currency ${order.currency} on chain ${order.chainId}`,
         );
       }
-
-      const takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
-        order,
-        address,
-        unitAmount,
-        pricePerUnit,
-      );
 
       const totalPrice = BigInt(order.price) * BigInt(unitAmount);
       try {
@@ -469,7 +501,17 @@ export const useBuyFractionalMakerAsk = () => {
             });
           }
         }
+      } catch (e) {
+        await setStep(
+          "ERC20",
+          "error",
+          e instanceof Error ? e.message : "Approval error",
+        );
+        console.error(e);
+        throw new Error("Approval error");
+      }
 
+      try {
         await setStep("Transfer manager");
         const isTransferManagerApproved =
           await hypercertExchangeClient.isTransferManagerApproved();
@@ -482,8 +524,12 @@ export const useBuyFractionalMakerAsk = () => {
           });
         }
       } catch (e) {
+        await setStep(
+          "Transfer manager",
+          "error",
+          e instanceof Error ? e.message : "Error approving transfer manager",
+        );
         console.error(e);
-        setOpen(false);
         throw new Error("Approval error");
       }
 
@@ -504,12 +550,60 @@ export const useBuyFractionalMakerAsk = () => {
         await waitForTransactionReceipt(walletClientData, {
           hash: tx.hash as `0x${string}`,
         });
-      } catch (e) {
-        console.error(e);
+        const chain = SUPPORTED_CHAINS.find((x) => x.id === order.chainId);
+        await setStep("Awaiting confirmation", "completed");
+        const message =
+          hypercertName && totalUnitsInHypercert !== undefined ? (
+            <span>
+              Congratulations, you successfully bought{" "}
+              <b>
+                {calculateBigIntPercentage(
+                  BigInt(unitAmount),
+                  totalUnitsInHypercert,
+                )}
+                %
+              </b>{" "}
+              of <b>{hypercertName}</b>.
+            </span>
+          ) : (
+            "Your transaction was successful"
+          );
 
-        throw new Error(decodeContractError(e, "Error buying listing"));
-      } finally {
-        setOpen(false);
+        setExtraContent(() => (
+          <div className="flex flex-col space-y-2">
+            <p className="text-lg font-medium">Success</p>
+            <p className="text-sm font-medium">{message}</p>
+            <div className="flex space-x-4 py-4 justify-center">
+              <Button
+                onClick={() => {
+                  router.push(`/hypercerts/${order.hypercert_id}`);
+                  window.location.reload();
+                  setOpen(false);
+                }}
+              >
+                View hypercert
+              </Button>
+              <Button asChild>
+                <Link
+                  href={generateBlockExplorerLink(chain, tx.hash)}
+                  target="_blank"
+                >
+                  View transaction <ExternalLink size={14} className="ml-2" />
+                </Link>
+              </Button>
+            </div>
+            <p className="text-sm font-medium">
+              New ownership will not be immediately visible on the Hypercerts
+              page, but will be visible in 5-10 minutes.
+            </p>
+          </div>
+        ));
+      } catch (e) {
+        const decodedMessage = decodeContractError(e, "Error buying listing");
+        await setStep("Awaiting confirmation", "error", decodedMessage);
+
+        console.error(e);
+        throw new Error(decodedMessage);
       }
     },
   });

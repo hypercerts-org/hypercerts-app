@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { TransferRestrictions } from "@hypercerts-org/sdk";
+import { Chain } from "viem";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -41,4 +42,14 @@ export const formatTransferRestriction = (
     case TransferRestrictions.FromCreatorOnly:
       return "From creator only";
   }
+};
+
+export const generateBlockExplorerLink = (
+  chain: Chain | undefined,
+  transactionHash: string,
+) => {
+  if (!chain) {
+    return "";
+  }
+  return `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${transactionHash}`;
 };

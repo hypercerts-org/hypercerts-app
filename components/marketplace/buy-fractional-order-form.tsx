@@ -144,6 +144,8 @@ export const BuyFractionalOrderForm = ({
       order,
       unitAmount,
       pricePerUnit,
+      hypercertName: hypercert?.metadata?.name,
+      totalUnitsInHypercert: hypercertUnits,
     });
     onCompleted?.();
   };
