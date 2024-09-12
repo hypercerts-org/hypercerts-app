@@ -16,10 +16,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { graphql, readFragment } from "@/lib/graphql";
-import { HypercertFullFragment } from "@/hypercerts/fragments/hypercert-full.fragment";
+import {
+  HypercertFull,
+  HypercertFullFragment,
+} from "@/hypercerts/fragments/hypercert-full.fragment";
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import request from "graphql-request";
-import { hypercertIdRegex, isValidHypercertId } from "@/lib/utils";
+import { isValidHypercertId } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 import {
@@ -28,8 +31,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ReactNode } from "react";
-import { InfoIcon } from "lucide-react";
+import React, { ReactNode } from "react";
+import { ExternalLink, InfoIcon, LoaderCircle } from "lucide-react";
+import Link from "next/link";
 
 const formSchema = z
   .object({
@@ -46,17 +50,35 @@ const formSchema = z
     hypercerts: z
       .array(
         z.object({
-          hypercertId: z.string().trim().regex(hypercertIdRegex, {
-            message: "Invalid hypercert ID",
-          }),
+          hypercertId: z
+            .string()
+            .trim()
+            .refine((value) => {
+              if (!value || value === "") {
+                return true;
+              }
+
+              try {
+                return isValidHypercertId(value);
+              } catch (e) {
+                console.error(e);
+                return false;
+              }
+            }, "Invalid hypercert ID"),
           factor: z.number().int().min(1, "Factor must be greater than 0"),
         }),
       )
       .min(1, "At least one hypercert is required")
-      .refine((hypercerts) => {
-        const hypercertIds = hypercerts.map((hc) => hc.hypercertId);
-        return hypercertIds.length === new Set(hypercertIds).size;
-      }),
+      .refine(
+        (hypercerts) => {
+          const hypercertIds = hypercerts.map((hc) => hc.hypercertId);
+          return hypercertIds.length === new Set(hypercertIds).size;
+        },
+        {
+          message: "Hypercerts must be unique",
+          path: ["hypercerts"],
+        },
+      ),
     backgroundImg: z.string().url("Background image URL is not valid"),
     borderColor: z
       .string()
@@ -71,7 +93,12 @@ const formSchema = z
             return true;
           }
 
-          return isValidHypercertId(value);
+          try {
+            return isValidHypercertId(value);
+          } catch (e) {
+            console.error(e);
+            return false;
+          }
         },
         {
           message: "Invalid hypercert ID",
@@ -173,10 +200,8 @@ const useHypercertsByIds = (hypercertIds: string[]) => {
   return useQuery({
     queryKey: ["hypercerts", hypercertIds],
     queryFn: () => {
-      console.log("Fetching hypercerts", hypercertIds);
       return Promise.all(hypercertIds.map((id) => getHypercert(id)));
     },
-    initialData: [],
     enabled: !!hypercertIds.length,
     placeholderData: (prev) => prev,
     select: (data) => {
@@ -201,6 +226,8 @@ export const CollectionCreateForm = ({
   const form = useForm<CollectionCreateFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
+    reValidateMode: "onChange",
+
     mode: "onChange",
   });
 
@@ -229,16 +256,15 @@ export const CollectionCreateForm = ({
     newHypercertId,
   ].filter(isValidHypercertId);
 
-  const { data: fetchedHypercerts, isLoading } =
+  const { data: fetchedHypercerts, isFetching } =
     useHypercertsByIds(allHypercertIds);
   const newHypercert = fetchedHypercerts?.[newHypercertId];
   const canAddHypercert =
     newHypercert && form.formState.errors["newHypercertId"] === undefined;
-  console.log(form.formState.errors["newHypercertId"]);
 
   const canCreateCollection =
     form.formState.isValid &&
-    !isLoading &&
+    !isFetching &&
     (!newHypercertId || newHypercertId === "");
 
   return (
@@ -281,7 +307,7 @@ export const CollectionCreateForm = ({
               const hypercert = fetchedHypercerts?.[field.hypercertId];
               return (
                 <div key={field.id}>
-                  <div className="flex space-x-2 items-end mt-2">
+                  <div className="flex space-x-2 items-end mt-2 mb-2">
                     <FormField
                       control={form.control}
                       name={`hypercerts.${index}.hypercertId`}
@@ -297,9 +323,8 @@ export const CollectionCreateForm = ({
                             </FormLabel>
                           )}
                           <FormControl>
-                            <Input {...field} readOnly />
+                            <Input {...field} disabled />
                           </FormControl>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -323,7 +348,6 @@ export const CollectionCreateForm = ({
                           <FormControl>
                             <Input {...field} type="number" />
                           </FormControl>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -336,11 +360,17 @@ export const CollectionCreateForm = ({
                       Remove
                     </Button>
                   </div>
-                  {hypercert && (
-                    <FormDescription className="mt-2 ml-2">
-                      {hypercert.metadata.name}
-                    </FormDescription>
-                  )}
+                  <HypercertErrorMessages
+                    isFetching={isFetching}
+                    errorMessages={[
+                      form.formState.errors[`hypercerts`]?.[index]?.[
+                        "hypercertId"
+                      ]?.message,
+                      form.formState.errors[`hypercerts`]?.[index]?.["factor"]
+                        ?.message,
+                    ]}
+                    hypercert={hypercert}
+                  />
                 </div>
               );
             })}
@@ -375,27 +405,21 @@ export const CollectionCreateForm = ({
                 onClick={onAddHypercert}
                 disabled={!canAddHypercert}
               >
-                Add
+                {isFetching ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Add"
+                )}
               </Button>
             </div>
-            {newHypercert && (
-              <FormDescription className="mt-2 ml-2">
-                {newHypercert.metadata.name}
-              </FormDescription>
-            )}
-            {!newHypercert && newHypercertId && (
-              <FormMessage>Hypercert not found</FormMessage>
-            )}
-            {form.formState.errors["newHypercertId"] && (
-              <FormMessage>
-                {form.formState.errors["newHypercertId"].message}
-              </FormMessage>
-            )}
-            {form.formState.errors["newFactor"] && (
-              <FormMessage>
-                {form.formState.errors["newFactor"].message}
-              </FormMessage>
-            )}
+            <HypercertErrorMessages
+              errorMessages={[
+                form.formState.errors["newHypercertId"]?.message,
+                form.formState.errors["newFactor"]?.message,
+              ]}
+              hypercert={newHypercert}
+              hideNotFound={!newHypercertId}
+            />
           </div>
 
           <FormField
@@ -434,12 +458,50 @@ export const CollectionCreateForm = ({
             )}
           />
 
-          <Button type="submit" disabled={!form.formState.isValid}>
+          <Button type="submit" disabled={!canCreateCollection}>
             Create collection
           </Button>
         </section>
       </form>
     </Form>
+  );
+};
+
+const HypercertErrorMessages = ({
+  hypercert,
+  errorMessages = [],
+  hideNotFound = false,
+  isFetching = false,
+}: {
+  hypercert?: HypercertFull;
+  errorMessages: (string | boolean | undefined)[];
+  hideNotFound?: boolean;
+  isFetching?: boolean;
+}) => {
+  return (
+    <div className="mt-2">
+      {hypercert?.metadata && (
+        <Link href={`/hypercerts/${hypercert.hypercert_id}`} target="_blank">
+          <div className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-max text-sm ml-2 mb-2">
+            {hypercert.metadata.name}
+            <ExternalLink className="w-4 h-4 bg-transparent focus:opacity-70 focus:scale-90" />
+          </div>
+        </Link>
+      )}
+      {isFetching && !hypercert && (
+        <LoaderCircle className="h-6 w-6 animate-spin opacity-70" />
+      )}
+      {!isFetching && !hideNotFound && !hypercert && (
+        <FormMessage className="ml-2">Hypercert not found</FormMessage>
+      )}
+      {errorMessages
+        .filter((message) => !!message)
+        .map((message, index) => (
+          <FormMessage className="ml-2" key={index}>
+            {message}
+          </FormMessage>
+        ))}
+    </div>
   );
 };
 
