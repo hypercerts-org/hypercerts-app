@@ -3,26 +3,35 @@ import { EmptySection } from "@/app/profile/[address]/sections";
 import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 import { Suspense } from "react";
 import { defaultDescription } from "@/app/profile/[address]/tabs";
+import { CreateCollectionButton } from "@/components/collections/buttons";
 
 const CollectionsTabContentInner = async ({ address }: { address: string }) => {
   const hyperboards = await getCollectionsByAdminAddress(address.toLowerCase());
 
   if (!hyperboards?.length) {
     return (
-      <EmptySection>
-        <p>
-          No collections yet. If you want to create a collection, please reach
-          out to{" "}
-          <a href="mailto:team@hypercerts.org" className="underline">
-            team@hypercerts.org
-          </a>
-        </p>
-      </EmptySection>
+      <div>
+        <div className="flex justify-end">
+          <CreateCollectionButton />
+        </div>
+        <EmptySection>
+          <p>
+            No collections yet. If you want to create a collection, please reach
+            out to{" "}
+            <a href="mailto:team@hypercerts.org" className="underline">
+              team@hypercerts.org
+            </a>
+          </p>
+        </EmptySection>
+      </div>
     );
   }
 
   return (
     <div>
+      <div className="flex justify-end">
+        <CreateCollectionButton />
+      </div>
       <div className="flex flex-col gap-4">
         {hyperboards.map((hyperboard) => (
           <HyperboardRow
