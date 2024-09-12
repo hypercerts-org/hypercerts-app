@@ -150,21 +150,10 @@ const formSchema = z
 export type CollectionCreateFormValues = z.infer<typeof formSchema>;
 
 const formDefaultValues: CollectionCreateFormValues = {
-  title: "This is a title",
-  description: "This is a description",
-  hypercerts: [
-    {
-      hypercertId:
-        "11155111-0xa16DFb32Eb140a6f3F2AC68f41dAd8c7e83C4941-216419585361716862762706250326604582486016",
-      factor: 1,
-    },
-    {
-      hypercertId:
-        "11155111-0xa16DFb32Eb140a6f3F2AC68f41dAd8c7e83C4941-215739020627874985835779501111741046063104",
-      factor: 2,
-    },
-  ],
-  backgroundImg: "https://placekitten.com/200/300",
+  title: "",
+  description: "",
+  hypercerts: [],
+  backgroundImg: "",
   borderColor: "#000000",
   newHypercertId: "",
   newFactor: 1,
@@ -260,7 +249,9 @@ export const CollectionCreateForm = ({
     useHypercertsByIds(allHypercertIds);
   const newHypercert = fetchedHypercerts?.[newHypercertId];
   const canAddHypercert =
-    newHypercert && form.formState.errors["newHypercertId"] === undefined;
+    !isFetching &&
+    newHypercert &&
+    form.formState.errors["newHypercertId"] === undefined;
 
   const canCreateCollection =
     form.formState.isValid &&
@@ -276,7 +267,7 @@ export const CollectionCreateForm = ({
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel>Title*</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -291,7 +282,7 @@ export const CollectionCreateForm = ({
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>Description*</FormLabel>
                 <FormControl>
                   <Textarea {...field} />
                 </FormControl>
@@ -405,11 +396,7 @@ export const CollectionCreateForm = ({
                 onClick={onAddHypercert}
                 disabled={!canAddHypercert}
               >
-                {isFetching ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Add"
-                )}
+                Add
               </Button>
             </div>
             <HypercertErrorMessages
@@ -419,6 +406,7 @@ export const CollectionCreateForm = ({
               ]}
               hypercert={newHypercert}
               hideNotFound={!newHypercertId}
+              isFetching={isFetching}
             />
           </div>
 
@@ -442,7 +430,13 @@ export const CollectionCreateForm = ({
               </FormItem>
             )}
           />
-          {backgroundImg && <img src={backgroundImg} className="max-h-80" />}
+          {backgroundImg && (
+            <img
+              src={backgroundImg}
+              className="max-h-80"
+              alt="Background for hyperboard"
+            />
+          )}
 
           <FormField
             control={form.control}
@@ -491,7 +485,7 @@ const HypercertErrorMessages = ({
       {isFetching && !hypercert && (
         <LoaderCircle className="h-6 w-6 animate-spin opacity-70" />
       )}
-      {!isFetching && !hideNotFound && !hypercert && (
+      {!isFetching && !isFetching && !hideNotFound && !hypercert && (
         <FormMessage className="ml-2">Hypercert not found</FormMessage>
       )}
       {errorMessages
