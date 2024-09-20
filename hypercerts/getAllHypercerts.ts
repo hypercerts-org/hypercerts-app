@@ -96,7 +96,7 @@ function createFilter({
     where.metadata = { name: { contains: search } };
   }
   if (filter === "evaluated") {
-    where.attestations = {};
+    where.attestations_count = { gte: 1 };
   }
   if (chainId) {
     where.contract = {
@@ -105,6 +105,7 @@ function createFilter({
       },
     };
   }
+
   return where;
 }
 

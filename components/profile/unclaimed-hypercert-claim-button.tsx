@@ -1,6 +1,6 @@
 "use client";
 
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddress";
+import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import { Button } from "../ui/button";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { waitForTransactionReceipt } from "viem/actions";

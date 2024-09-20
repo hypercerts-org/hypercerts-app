@@ -24,8 +24,10 @@ export type AllowListRecord = ResultOf<typeof AllowListRecordFragment>;
 
 const query = graphql(
   `
-    query allowlistRecords($address: String) {
-      allowlistRecords(where: { user_address: { eq: $address } }) {
+    query allowlistRecords($address: String, $claimed: Boolean) {
+      allowlistRecords(
+        where: { user_address: { eq: $address }, claimed: { eq: $claimed } }
+      ) {
         count
         data {
           ...AllowListRecordFragment
@@ -36,9 +38,13 @@ const query = graphql(
   [AllowListRecordFragment],
 );
 
-export async function getAllowListRecordsForAddress(address: string) {
+export async function getAllowListRecordsForAddressByClaimed(
+  address: string,
+  claimed: boolean,
+) {
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     address,
+    claimed,
   });
 
   const allowlistRecords = res.allowlistRecords.data;

@@ -1,30 +1,32 @@
 import "./globals.css";
 
-import { Instrument_Serif, Inter } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
 
-import type { Metadata } from "next";
+import Footer from "@/components/global/footer";
 import MobileNav from "@/components/global/mobile-nav";
 import Navbar from "@/components/global/navbar";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { Toaster } from "@/components/ui/toaster";
+import { siteConfig } from "@/configs/site";
+import { config } from "@/configs/wagmi";
 import { Web3ModalProvider } from "@/contexts/wagmi";
 import { cn } from "@/lib/utils";
-import { config } from "@/configs/wagmi";
-import { cookieToInitialState } from "wagmi";
+import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { headers } from "next/headers";
-import { siteConfig } from "@/configs/site";
-import Footer from "@/components/global/footer";
-import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
+import { cookieToInitialState } from "wagmi";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-sans",
-});
 const instrumentSerif = Instrument_Serif({
   weight: "400",
   display: "swap",
   variable: "--font-serif",
   subsets: ["latin"],
+});
+
+const switzer = localFont({
+  src: "./Switzer-Variable.ttf",
+  variable: "--font-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -48,7 +50,7 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased flex flex-col",
-          inter.variable,
+          switzer.variable,
           instrumentSerif.variable,
         )}
       >

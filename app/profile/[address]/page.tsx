@@ -16,7 +16,7 @@ export default function ProfilePage({
   searchParams: Record<string, string>;
 }) {
   const address = params.address;
-  const tab = searchParams?.tab || "hypercerts-created";
+  const tab = searchParams?.tab || "hypercerts-owned";
   const mainTab = tab?.split("-")[0] ?? "hypercerts";
 
   return (

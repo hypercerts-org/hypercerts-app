@@ -31,8 +31,6 @@ export async function getHypercertsByOwner({
       where: { fractions: { owner_address: { eq: getAddress(ownerAddress) } } },
     });
 
-    console.log(Object.keys(queryRes));
-
     if (!queryRes.hypercerts?.data) return undefined;
 
     return {

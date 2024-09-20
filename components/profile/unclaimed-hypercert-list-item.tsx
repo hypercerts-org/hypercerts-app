@@ -1,4 +1,4 @@
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddress";
+import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import Image from "next/image";
 import UnclaimedHypercertClaimButton from "./unclaimed-hypercert-claim-button";
 import TimeFrame from "../hypercert/time-frame";

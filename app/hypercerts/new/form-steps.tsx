@@ -12,7 +12,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CalendarIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { RefObject, useState } from "react";
 
 import {
@@ -51,6 +56,7 @@ interface FormStepsProps {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   cardRef: RefObject<HTMLDivElement>;
+  reset: () => void;
 }
 
 const GeneralInformation = ({ form }: FormStepsProps) => {
@@ -134,42 +140,6 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
-      <FormField
-        control={form.control}
-        name="tags"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Work scope</FormLabel>
-            <FormControl>
-              <Textarea
-                {...field}
-                className="resize-none h-4"
-                placeholder="Separate tags with commas"
-                onChange={(e) => {
-                  const tags = e.target.value
-                    .split(",")
-                    .map((tag) => tag.toLowerCase());
-                  field.onChange(tags.length > 0 ? tags : []);
-                }}
-              />
-            </FormControl>
-            <FormMessage />
-            <FormDescription>
-              Tags are used to categorize your project.
-            </FormDescription>
-            {field.value &&
-              field.value.filter((tag: string) => tag !== "").length > 0 && (
-                <div className="flex flex-wrap gap-0.5">
-                  {field?.value?.map((tag: string) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-          </FormItem>
-        )}
-      />
     </section>
   );
 };
@@ -235,6 +205,43 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             <FormDescription>
               The start and end date of the work represented by the hypercert
             </FormDescription>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="tags"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Work scope</FormLabel>
+            <FormControl>
+              <Textarea
+                {...field}
+                className="resize-none h-4"
+                placeholder="Separate tags with commas"
+                onChange={(e) => {
+                  const tags = e.target.value
+                    .split(",")
+                    .map((tag) => tag.toLowerCase());
+                  field.onChange(tags.length > 0 ? tags : []);
+                }}
+              />
+            </FormControl>
+            <FormMessage />
+            <FormDescription>
+              Tags are used to categorize your project.
+            </FormDescription>
+            {field.value &&
+              field.value.filter((tag: string) => tag !== "").length > 0 && (
+                <div className="flex flex-wrap gap-0.5">
+                  {field?.value?.map((tag: string) => (
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
           </FormItem>
         )}
       />
@@ -441,14 +448,14 @@ export const hypercertFormSteps = new Map([
     1,
     {
       title: "General",
-      fields: ["title", "banner", "description", "logo", "tags"],
+      fields: ["title", "banner", "description", "logo"],
     } as FormStep,
   ],
   [
     2,
     {
       title: "Who did what & when",
-      fields: ["contributors", "confirmContributorsPermission"],
+      fields: ["contributors", "confirmContributorsPermission", "tags"],
     } as FormStep,
   ],
   [3, { title: "Mint", fields: ["acceptTerms"] } as FormStep],
@@ -459,6 +466,7 @@ const FormSteps = ({
   currentStep,
   setCurrentStep,
   cardRef,
+  reset,
 }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const { address } = useAccount();
@@ -536,6 +544,7 @@ const FormSteps = ({
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
+          reset={reset}
         />
       )}
       {currentStep === 2 && (
@@ -544,6 +553,7 @@ const FormSteps = ({
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
+          reset={reset}
         />
       )}
       {currentStep === 3 && (
@@ -552,12 +562,11 @@ const FormSteps = ({
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
+          reset={reset}
         />
       )}
 
-      <div
-        className={`flex items-center py-3 ${currentStep === 1 ? "justify-end" : "justify-between"}`}
-      >
+      <div className="relative flex items-center py-3 justify-between">
         <Button
           onClick={() => setCurrentStep(currentStep - 1)}
           className={currentStep === 1 ? "hidden" : ""}
@@ -566,6 +575,10 @@ const FormSteps = ({
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           Previous
+        </Button>
+        <Button onClick={reset} type="button">
+          <Trash2Icon className="w-4 h-4 mr-2" />
+          Reset
         </Button>
         {!isLastStep && (
           <Button

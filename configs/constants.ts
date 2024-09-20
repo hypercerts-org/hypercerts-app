@@ -1,4 +1,5 @@
 import {
+  arbitrum,
   arbitrumSepolia,
   base,
   baseSepolia,
@@ -13,7 +14,7 @@ export const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
 export const ENVIRONMENT = process.env.NEXT_PUBLIC_ENVIRONMENT as Environment;
 
 export const testNetChains = [sepolia, arbitrumSepolia, baseSepolia] as const;
-export const prodNetChains = [optimism, celo, base] as const;
+export const prodNetChains = [optimism, celo, base, arbitrum] as const;
 
 export const SUPPORTED_CHAINS = (
   ENVIRONMENT === "production" ? prodNetChains : testNetChains

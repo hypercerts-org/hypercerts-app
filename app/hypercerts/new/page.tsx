@@ -17,6 +17,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { useLocalStorage } from "react-use";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),
@@ -40,10 +41,10 @@ const formSchema = z.object({
   projectDates: z
     .object(
       {
-        from: z.date().refine((date) => date !== null, {
+        from: z.date({ coerce: true }).refine((date) => date !== null, {
           message: "Please enter a start date",
         }),
-        to: z.date().refine((date) => date !== null, {
+        to: z.date({ coerce: true }).refine((date) => date !== null, {
           message: "Please enter an end date",
         }),
       },
@@ -103,6 +104,18 @@ const formDefaultValues: HypercertFormValues = {
   allowlistURL: "",
 };
 
+const getDefaultFormValues = (value: string): HypercertFormValues => {
+  const parsedValue = JSON.parse(value);
+
+  return {
+    ...parsedValue,
+    projectDates: {
+      from: new Date(parsedValue.projectDates.from),
+      to: new Date(parsedValue.projectDates.to),
+    },
+  };
+};
+
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
@@ -113,10 +126,19 @@ export default function NewHypercertForm() {
   } = useIsWriteable();
 
   const { mutateAsync: mintHypercert } = useMintHypercert();
+  const [value, setValue] = useLocalStorage<HypercertFormValues>(
+    "user-hypercert-create-form-data",
+    formDefaultValues,
+    {
+      raw: false,
+      serializer: JSON.stringify,
+      deserializer: getDefaultFormValues,
+    },
+  );
 
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: formDefaultValues,
+    defaultValues: value,
     mode: "onBlur",
   });
 
@@ -137,6 +159,17 @@ export default function NewHypercertForm() {
   useEffect(() => {
     setLanguage(window.navigator.language);
   }, []);
+
+  const onBlur = () => {
+    console.log("blur");
+    setValue(form.getValues());
+  };
+
+  const onReset = () => {
+    setValue(formDefaultValues);
+    form.reset(formDefaultValues);
+    setCurrentStep(1);
+  };
 
   async function onSubmit(values: HypercertFormValues) {
     const errors = Object.entries(writeableErrors).filter(
@@ -228,7 +261,7 @@ export default function NewHypercertForm() {
   };
 
   return (
-    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
+    <main className="flex flex-col p-8 md:px-16 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
       <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
         New hypercert
       </h1>
@@ -236,12 +269,16 @@ export default function NewHypercertForm() {
       <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
         <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, onSubmitInvalid)}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit, onSubmitInvalid)}
+              onBlur={onBlur}
+            >
               <FormSteps
                 form={form}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
                 cardRef={cardRef}
+                reset={onReset}
               />
             </form>
           </Form>
@@ -252,14 +289,22 @@ export default function NewHypercertForm() {
             banner={cardPreviewData.banner}
             logo={cardPreviewData.logo}
             scopes={cardPreviewData.tags}
-            fromDateDisplay={formatDate(
-              cardPreviewData.projectDates?.from?.toISOString(),
-              language,
-            )}
-            toDateDisplay={formatDate(
-              cardPreviewData.projectDates?.to?.toISOString(),
-              language,
-            )}
+            fromDateDisplay={
+              form.getValues().projectDates?.from
+                ? formatDate(
+                    form.getValues().projectDates.from.toISOString(),
+                    language,
+                  )
+                : ""
+            }
+            toDateDisplay={
+              form.getValues().projectDates?.to
+                ? formatDate(
+                    form.getValues().projectDates.to.toISOString(),
+                    language,
+                  )
+                : ""
+            }
             ref={cardRef}
           />
         </div>

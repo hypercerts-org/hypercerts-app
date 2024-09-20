@@ -53,8 +53,8 @@ type Attestation {
   """Encoded data of the attestation"""
   data: JSON
 
-  """List of hypercerts related to the attestation"""
-  hypercerts: [Hypercert!]
+  """Hypercert related to the attestation"""
+  hypercert: HypercertBaseType
 }
 
 """Handles uint256 bigint values stored in DB"""
@@ -65,10 +65,7 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
-"""
-Hypercert with metadata, contract, orders, sales and fraction information
-"""
-type Hypercert {
+type HypercertBaseType {
   id: ID!
 
   """The UUID of the contract as stored in the database"""
@@ -98,20 +95,11 @@ type Hypercert {
   last_update_block_number: EthBigInt
   last_update_block_timestamp: EthBigInt
 
-  """The contract that the hypercert is associated with"""
-  contract: Contract
+  """Count of attestations referencing this hypercert"""
+  attestations_count: Int
 
-  """Transferable fractions representing partial ownership of the hypercert"""
-  fractions: GetFractionsResponse
-
-  """Attestations for the hypercert or parts of its data"""
-  attestations: GetAttestationsResponse
-
-  """Marketplace orders related to this hypercert"""
-  orders: GetOrdersForHypercertResponse
-
-  """Sales related to this hypercert"""
-  sales: GetSalesResponse
+  """Count of sales of fractions that belong to this hypercert"""
+  sales_count: Int
 }
 
 """
@@ -166,65 +154,122 @@ type Metadata {
   work_timeframe_to: EthBigInt
 }
 
-"""Pointer to a contract deployed on a chain"""
-type Contract {
-  id: ID!
-
-  """The ID of the chain on which the contract is deployed"""
-  chain_id: EthBigInt
-
-  """The address of the contract"""
-  contract_address: String
-
-  """The block number at which the contract was deployed"""
-  start_block: EthBigInt
+input AttestationWhereInput {
+  id: IdSearchOptions
+  uid: StringSearchOptions
+  supported_schemas_id: StringSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  creation_block_number: BigIntSearchOptions
+  last_update_block_number: BigIntSearchOptions
+  last_update_block_timestamp: BigIntSearchOptions
+  attester: StringSearchOptions
+  recipient: StringSearchOptions
+  resolver: StringSearchOptions
+  schema: StringSearchOptions
+  attestation: StringSearchOptions
+  chain_id: BigIntSearchOptions
+  contract_address: StringSearchOptions
+  token_id: StringSearchOptions
+  hypercerts: BasicHypercertWhereArgs
+  metadata: BasicMetadataWhereInput
 }
 
-type GetFractionsResponse {
-  data: [Fraction!]
-  count: Int
+input IdSearchOptions {
+  eq: UUID
 }
 
-"""Fraction of an hypercert"""
-type Fraction {
-  id: ID!
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
-  """Address of the owner of the fractions"""
-  owner_address: String
+input StringSearchOptions {
+  eq: String
+  contains: String
+  startsWith: String
+  endsWith: String
+}
 
-  """Units held by the fraction"""
-  units: EthBigInt
+input BigIntSearchOptions {
+  eq: BigInt
+  gt: BigInt
+  gte: BigInt
+  lt: BigInt
+  lte: BigInt
+}
 
-  """
-  The ID of the fraction concatenated from the chain ID, contract address, and ID of the hypercert claim
-  """
-  hypercert_id: ID
+"""
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+"""
+scalar BigInt
 
-  """
-  The ID of the fraction concatenated from the chain ID, contract address, and token ID of the fraction
-  """
-  fraction_id: ID
+input BasicHypercertWhereArgs {
+  id: IdSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  creation_block_number: BigIntSearchOptions
+  last_update_block_number: BigIntSearchOptions
+  last_update_block_timestamp: BigIntSearchOptions
+  token_id: BigIntSearchOptions
+  creator_address: StringSearchOptions
+  uri: StringSearchOptions
+  hypercert_id: StringSearchOptions
 
-  """Marketplace orders related to this fraction"""
-  orders: GetOrdersResponse
+  """Count of attestations referencing this hypercert"""
+  attestations_count: NumberSearchOptions
+  sales_count: NumberSearchOptions
+}
 
-  """The metadata for the fraction"""
-  metadata: Metadata
+input NumberSearchOptions {
+  eq: Int
+  gt: Int
+  gte: Int
+  lt: Int
+  lte: Int
+}
 
-  """Sales related to this fraction"""
-  sales: GetSalesResponse
+input BasicMetadataWhereInput {
+  id: IdSearchOptions
+  name: StringSearchOptions
+  description: StringSearchOptions
+  uri: StringSearchOptions
+  contributors: StringArraySearchOptions
+  work_scope: StringArraySearchOptions
+  impact_scope: StringArraySearchOptions
+  rights: StringArraySearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  last_block_update_timestamp: BigIntSearchOptions
+  work_timeframe_from: BigIntSearchOptions
+  work_timeframe_to: BigIntSearchOptions
+  impact_timeframe_from: BigIntSearchOptions
+  impact_timeframe_to: BigIntSearchOptions
+}
 
-  """Block number of the creation of the fraction"""
-  creation_block_number: EthBigInt
+input StringArraySearchOptions {
+  contains: [String!]
+}
 
-  """Timestamp of the block of the creation of the fraction"""
-  creation_block_timestamp: EthBigInt
+input AttestationFetchInput {
+  by: AttestationSortOptions
+}
 
-  """Block number of the last update of the fraction"""
-  last_update_block_number: EthBigInt
+input AttestationSortOptions {
+  attestation_uid: SortOrder
+  creation_block_timestamp: SortOrder
+  creation_block_number: SortOrder
+  last_update_block_number: SortOrder
+  last_update_block_timestamp: SortOrder
+  attester_address: SortOrder
+  recipient_address: SortOrder
+  schema: SortOrder
+}
 
-  """Timestamp of the block of the last update of the fraction"""
-  last_update_block_timestamp: EthBigInt
+"""The direction to sort the query results"""
+enum SortOrder {
+  """Ascending order"""
+  ascending
+
+  """Descending order"""
+  descending
 }
 
 type GetOrdersResponse {
@@ -262,35 +307,34 @@ type Order {
   hypercert: HypercertBaseType
 }
 
-type HypercertBaseType {
-  id: ID!
+input OrderWhereInput {
+  id: IdSearchOptions
+  chainId: BigIntSearchOptions
+  signer: StringSearchOptions
+  hypercert_id: StringSearchOptions
+}
 
-  """The UUID of the contract as stored in the database"""
-  contracts_id: ID
+input OrderFetchInput {
+  by: OrderSortOptions
+}
 
-  """
-  Concatenation of [chainID]-[contractAddress]-[tokenID] to discern hypercerts across chains
-  """
-  hypercert_id: ID
-
-  """The address of the creator of the hypercert"""
-  creator_address: String
-
-  """The token ID of the hypercert"""
-  token_id: EthBigInt
-
-  """The total units held by the hypercert"""
-  units: EthBigInt
-
-  """References the metadata for this claim"""
-  uri: String
-
-  """The metadata for the hypercert as referenced by the uri"""
-  metadata: Metadata
-  creation_block_number: EthBigInt
-  creation_block_timestamp: EthBigInt
-  last_update_block_number: EthBigInt
-  last_update_block_timestamp: EthBigInt
+input OrderSortOptions {
+  amounts: SortOrder
+  chainId: SortOrder
+  collection: SortOrder
+  collectionType: SortOrder
+  createdAt: SortOrder
+  currency: SortOrder
+  endTime: SortOrder
+  globalNonce: SortOrder
+  hypercert_id: SortOrder
+  invalidated: SortOrder
+  orderNonce: SortOrder
+  price: SortOrder
+  quoteType: SortOrder
+  signer: SortOrder
+  startTime: SortOrder
+  strategyId: SortOrder
 }
 
 type GetSalesResponse {
@@ -338,149 +382,6 @@ type Sale {
   hypercert: HypercertBaseType
 }
 
-type GetOrdersForHypercertResponse {
-  data: [Order!]
-  count: Int
-  cheapestOrder: Order
-  totalUnitsForSale: BigInt
-}
-
-"""
-The `BigInt` scalar type represents non-fractional signed whole numeric values.
-"""
-scalar BigInt
-
-input AttestationWhereInput {
-  id: IdSearchOptions
-  uid: StringSearchOptions
-  supported_schemas_id: StringSearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  creation_block_number: NumberSearchOptions
-  last_update_block_number: NumberSearchOptions
-  last_update_block_timestamp: NumberSearchOptions
-  attester: StringSearchOptions
-  recipient: StringSearchOptions
-  resolver: StringSearchOptions
-  schema: StringSearchOptions
-  attestation: StringSearchOptions
-  chain_id: NumberSearchOptions
-  contract_address: StringSearchOptions
-  token_id: StringSearchOptions
-  hypercerts: BasicHypercertWhereArgs
-  metadata: BasicMetadataWhereInput
-}
-
-input IdSearchOptions {
-  eq: UUID
-}
-
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
-
-input StringSearchOptions {
-  eq: String
-  contains: String
-  startsWith: String
-  endsWith: String
-}
-
-input NumberSearchOptions {
-  eq: BigInt
-  gt: BigInt
-  gte: BigInt
-  lt: BigInt
-  lte: BigInt
-}
-
-input BasicHypercertWhereArgs {
-  id: IdSearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  creation_block_number: NumberSearchOptions
-  last_update_block_number: NumberSearchOptions
-  last_update_block_timestamp: NumberSearchOptions
-  token_id: NumberSearchOptions
-  creator_address: StringSearchOptions
-  uri: StringSearchOptions
-  hypercert_id: StringSearchOptions
-}
-
-input BasicMetadataWhereInput {
-  id: IdSearchOptions
-  name: StringSearchOptions
-  description: StringSearchOptions
-  uri: StringSearchOptions
-  contributors: StringArraySearchOptions
-  work_scope: StringArraySearchOptions
-  impact_scope: StringArraySearchOptions
-  rights: StringArraySearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  last_block_update_timestamp: NumberSearchOptions
-  work_timeframe_from: NumberSearchOptions
-  work_timeframe_to: NumberSearchOptions
-  impact_timeframe_from: NumberSearchOptions
-  impact_timeframe_to: NumberSearchOptions
-}
-
-input StringArraySearchOptions {
-  contains: [String!]
-}
-
-input AttestationFetchInput {
-  by: AttestationSortOptions
-}
-
-input AttestationSortOptions {
-  attestation_uid: SortOrder
-  creation_block_timestamp: SortOrder
-  creation_block_number: SortOrder
-  last_update_block_number: SortOrder
-  last_update_block_timestamp: SortOrder
-  attester_address: SortOrder
-  recipient_address: SortOrder
-  schema: SortOrder
-}
-
-"""The direction to sort the query results"""
-enum SortOrder {
-  """Ascending order"""
-  ascending
-
-  """Descending order"""
-  descending
-}
-
-input OrderWhereInput {
-  id: IdSearchOptions
-  chainId: NumberSearchOptions
-  signer: StringSearchOptions
-  hypercert_id: StringSearchOptions
-}
-
-input OrderFetchInput {
-  by: OrderSortOptions
-}
-
-input OrderSortOptions {
-  amounts: SortOrder
-  chainId: SortOrder
-  collection: SortOrder
-  collectionType: SortOrder
-  createdAt: SortOrder
-  currency: SortOrder
-  endTime: SortOrder
-  globalNonce: SortOrder
-  hypercert_id: SortOrder
-  invalidated: SortOrder
-  orderNonce: SortOrder
-  price: SortOrder
-  quoteType: SortOrder
-  signer: SortOrder
-  startTime: SortOrder
-  strategyId: SortOrder
-}
-
 input SaleWhereInput {
   transaction_hash: IdSearchOptions
   hypercert_id: StringSearchOptions
@@ -489,9 +390,9 @@ input SaleWhereInput {
   collection: StringSearchOptions
   buyer: StringSearchOptions
   seller: StringSearchOptions
-  strategy_id: NumberSearchOptions
-  creation_block_number: NumberSearchOptions
-  creation_block_timestamp: NumberSearchOptions
+  strategy_id: BigIntSearchOptions
+  creation_block_number: BigIntSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
   amounts: NumberArraySearchOptions
 }
 
@@ -516,16 +417,64 @@ input SaleSortOptions {
   transactionHash: SortOrder
 }
 
+"""Fraction of an hypercert"""
+type GetFractionsResponse {
+  data: [Fraction!]
+  count: Int
+}
+
+"""Fraction of an hypercert"""
+type Fraction {
+  id: ID!
+
+  """Address of the owner of the fractions"""
+  owner_address: String
+
+  """Units held by the fraction"""
+  units: EthBigInt
+
+  """
+  The ID of the fraction concatenated from the chain ID, contract address, and ID of the hypercert claim
+  """
+  hypercert_id: ID
+
+  """
+  The ID of the fraction concatenated from the chain ID, contract address, and token ID of the fraction
+  """
+  fraction_id: ID
+
+  """Marketplace orders related to this fraction"""
+  orders: GetOrdersResponse
+
+  """The metadata for the fraction"""
+  metadata: Metadata
+
+  """Sales related to this fraction"""
+  sales: GetSalesResponse
+
+  """Block number of the creation of the fraction"""
+  creation_block_number: EthBigInt
+
+  """Timestamp of the block of the creation of the fraction"""
+  creation_block_timestamp: EthBigInt
+
+  """Block number of the last update of the fraction"""
+  last_update_block_number: EthBigInt
+
+  """Timestamp of the block of the last update of the fraction"""
+  last_update_block_timestamp: EthBigInt
+}
+
 input FractionWhereInput {
   id: IdSearchOptions
   hypercert_id: StringSearchOptions
   fraction_id: StringSearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  creation_block_number: NumberSearchOptions
-  last_update_block_number: NumberSearchOptions
-  last_update_block_timestamp: NumberSearchOptions
-  token_id: NumberSearchOptions
-  units: NumberSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  creation_block_number: BigIntSearchOptions
+  last_update_block_number: BigIntSearchOptions
+  last_update_block_timestamp: BigIntSearchOptions
+  token_id: BigIntSearchOptions
+  units: BigIntSearchOptions
   owner_address: StringSearchOptions
   hypercerts: BasicHypercertWhereArgs
 }
@@ -544,22 +493,105 @@ input FractionSortOptions {
   owner_address: SortOrder
 }
 
+"""
+Hypercert with metadata, contract, orders, sales and fraction information
+"""
 type GetHypercertsResponse {
   data: [Hypercert!]
   count: Int
 }
 
+"""
+Hypercert with metadata, contract, orders, sales and fraction information
+"""
+type Hypercert {
+  id: ID!
+
+  """The UUID of the contract as stored in the database"""
+  contracts_id: ID
+
+  """
+  Concatenation of [chainID]-[contractAddress]-[tokenID] to discern hypercerts across chains
+  """
+  hypercert_id: ID
+
+  """The address of the creator of the hypercert"""
+  creator_address: String
+
+  """The token ID of the hypercert"""
+  token_id: EthBigInt
+
+  """The total units held by the hypercert"""
+  units: EthBigInt
+
+  """References the metadata for this claim"""
+  uri: String
+
+  """The metadata for the hypercert as referenced by the uri"""
+  metadata: Metadata
+  creation_block_number: EthBigInt
+  creation_block_timestamp: EthBigInt
+  last_update_block_number: EthBigInt
+  last_update_block_timestamp: EthBigInt
+
+  """Count of attestations referencing this hypercert"""
+  attestations_count: Int
+
+  """Count of sales of fractions that belong to this hypercert"""
+  sales_count: Int
+
+  """The contract that the hypercert is associated with"""
+  contract: Contract
+
+  """Transferable fractions representing partial ownership of the hypercert"""
+  fractions: GetFractionsResponse
+
+  """Attestations for the hypercert or parts of its data"""
+  attestations: GetAttestationsResponse
+
+  """Marketplace orders related to this hypercert"""
+  orders: GetOrdersForHypercertResponse
+
+  """Sales related to this hypercert"""
+  sales: GetSalesResponse
+}
+
+"""Pointer to a contract deployed on a chain"""
+type Contract {
+  id: ID!
+
+  """The ID of the chain on which the contract is deployed"""
+  chain_id: EthBigInt
+
+  """The address of the contract"""
+  contract_address: String
+
+  """The block number at which the contract was deployed"""
+  start_block: EthBigInt
+}
+
+type GetOrdersForHypercertResponse {
+  data: [Order!]
+  count: Int
+  cheapestOrder: Order
+  totalUnitsForSale: BigInt
+}
+
 """Arguments for filtering hypercerts"""
 input HypercertsWhereArgs {
   id: IdSearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  creation_block_number: NumberSearchOptions
-  last_update_block_number: NumberSearchOptions
-  last_update_block_timestamp: NumberSearchOptions
-  token_id: NumberSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  creation_block_number: BigIntSearchOptions
+  last_update_block_number: BigIntSearchOptions
+  last_update_block_timestamp: BigIntSearchOptions
+  token_id: BigIntSearchOptions
   creator_address: StringSearchOptions
   uri: StringSearchOptions
   hypercert_id: StringSearchOptions
+
+  """Count of attestations referencing this hypercert"""
+  attestations_count: NumberSearchOptions
+  sales_count: NumberSearchOptions
   contract: BasicContractWhereInput
   metadata: BasicMetadataWhereInput
   attestations: BasicAttestationWhereInput
@@ -569,23 +601,23 @@ input HypercertsWhereArgs {
 input BasicContractWhereInput {
   id: IdSearchOptions
   contract_address: StringSearchOptions
-  chain_id: NumberSearchOptions
+  chain_id: BigIntSearchOptions
 }
 
 input BasicAttestationWhereInput {
   id: IdSearchOptions
   uid: StringSearchOptions
   supported_schemas_id: StringSearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  creation_block_number: NumberSearchOptions
-  last_update_block_number: NumberSearchOptions
-  last_update_block_timestamp: NumberSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  creation_block_number: BigIntSearchOptions
+  last_update_block_number: BigIntSearchOptions
+  last_update_block_timestamp: BigIntSearchOptions
   attester: StringSearchOptions
   recipient: StringSearchOptions
   resolver: StringSearchOptions
   schema: StringSearchOptions
   attestation: StringSearchOptions
-  chain_id: NumberSearchOptions
+  chain_id: BigIntSearchOptions
   contract_address: StringSearchOptions
   token_id: StringSearchOptions
 }
@@ -594,12 +626,12 @@ input BasicFractionWhereInput {
   id: IdSearchOptions
   hypercert_id: StringSearchOptions
   fraction_id: StringSearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  creation_block_number: NumberSearchOptions
-  last_update_block_number: NumberSearchOptions
-  last_update_block_timestamp: NumberSearchOptions
-  token_id: NumberSearchOptions
-  units: NumberSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  creation_block_number: BigIntSearchOptions
+  last_update_block_number: BigIntSearchOptions
+  last_update_block_timestamp: BigIntSearchOptions
+  token_id: BigIntSearchOptions
+  units: BigIntSearchOptions
   owner_address: StringSearchOptions
 }
 
@@ -636,12 +668,12 @@ input MetadataWhereInput {
   work_scope: StringArraySearchOptions
   impact_scope: StringArraySearchOptions
   rights: StringArraySearchOptions
-  creation_block_timestamp: NumberSearchOptions
-  last_block_update_timestamp: NumberSearchOptions
-  work_timeframe_from: NumberSearchOptions
-  work_timeframe_to: NumberSearchOptions
-  impact_timeframe_from: NumberSearchOptions
-  impact_timeframe_to: NumberSearchOptions
+  creation_block_timestamp: BigIntSearchOptions
+  last_block_update_timestamp: BigIntSearchOptions
+  work_timeframe_from: BigIntSearchOptions
+  work_timeframe_to: BigIntSearchOptions
+  impact_timeframe_from: BigIntSearchOptions
+  impact_timeframe_to: BigIntSearchOptions
   hypercerts: BasicHypercertWhereArgs
 }
 
@@ -658,6 +690,7 @@ input MetadataSortOptions {
   allow_list_uri: SortOrder
 }
 
+"""Pointer to a contract deployed on a chain"""
 type GetContractsResponse {
   data: [Contract!]
   count: Int
@@ -666,7 +699,7 @@ type GetContractsResponse {
 input ContractWhereInput {
   id: IdSearchOptions
   contract_address: StringSearchOptions
-  chain_id: NumberSearchOptions
+  chain_id: BigIntSearchOptions
 }
 
 input ContractFetchInput {
@@ -737,7 +770,7 @@ type Collection {
 
 input CollectionWhereInput {
   id: IdSearchOptions
-  chain_id: NumberSearchOptions
+  chain_id: BigIntSearchOptions
   admin_id: StringSearchOptions
 }
 
@@ -793,14 +826,14 @@ type AllowlistRecord {
 
 input AllowlistRecordWhereInput {
   hypercert_id: StringSearchOptions
-  token_id: NumberSearchOptions
+  token_id: BigIntSearchOptions
   leaf: StringSearchOptions
-  entry: NumberSearchOptions
+  entry: BigIntSearchOptions
   user_address: StringSearchOptions
   claimed: BooleanSearchOptions
   proof: StringArraySearchOptions
-  units: NumberSearchOptions
-  total_units: NumberSearchOptions
+  units: BigIntSearchOptions
+  total_units: BigIntSearchOptions
   root: StringSearchOptions
 }
 

@@ -23,7 +23,7 @@ const supportedChainsWithMainnetForEnsLookup = [
 export const config = createConfig({
   chains: supportedChainsWithMainnetForEnsLookup,
   connectors: [
-    walletConnect({ projectId: process.env.NEXT_PUBLIC_ENVIRONMENT! }),
+    walletConnect({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID! }),
   ],
   pollingInterval: 2_000,
   ssr: true,

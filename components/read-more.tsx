@@ -1,5 +1,8 @@
 "use client";
 
+import ReactMarkdown from "react-markdown";
+
+import { containsMarkdown } from "@/lib/utils";
 import {
   Collapsible,
   CollapsibleContent,
@@ -19,6 +22,10 @@ export default function ReadMore({
 
   if (!text) {
     return null;
+  }
+
+  if (containsMarkdown(text)) {
+    return <ReactMarkdown>{text}</ReactMarkdown>;
   }
 
   if (text.length <= length) {

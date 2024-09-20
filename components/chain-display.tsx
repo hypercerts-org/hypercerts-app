@@ -19,26 +19,19 @@ const chainIcon = (chain: Chain) => {
   let icon;
   switch (chain?.id) {
     case 10:
-      icon = "/chain_icons/optimism.png";
-      break;
+      return "/chain-icons/optimism.png";
     case 8453:
-      icon = "/chain_icons/base.png";
-      break;
+      return "/chain-icons/base.png";
     case 84532:
-      icon = "/chain_icons/base_sepolia.png";
-      break;
+      return "/chain-icons/base_sepolia.png";
     case 42161:
-      icon = "/chain_icons/arbitrum.png";
-      break;
+      return "/chain-icons/arbitrum.png";
     case 421614:
-      icon = "/chain_icons/arbitrum_sepolia.png";
-      break;
+      return "/chain-icons/arbitrum_sepolia.png";
     case 42220:
-      icon = "/chain_icons/celo.png";
-      break;
+      return "/chain-icons/celo.png";
     case 11155111:
-      icon = "/chain_icons/ethereum_sepolia.png";
-      break;
+      return "/chain-icons/ethereum_sepolia.png";
     default:
       icon = "";
   }
