@@ -79,7 +79,10 @@ const formSchema = z
           path: ["hypercerts"],
         },
       ),
-    backgroundImg: z.string().url("Background image URL is not valid"),
+    backgroundImg: z
+      .string()
+      .url("Background image URL is not valid")
+      .optional(),
     borderColor: z
       .string()
       .regex(/^#(?:[0-9a-f]{3}){1,2}$/i, "Must be a color hex code")
@@ -104,7 +107,11 @@ const formSchema = z
           message: "Invalid hypercert ID",
         },
       ),
-    newFactor: z.number().int().min(1, "Factor must be greater than 0"),
+    newFactor: z
+      .number()
+      .int()
+      .min(1, "Factor must be greater than 0")
+      .refine((x) => Number.isNaN(x), "Expected a number"),
   })
 
   .refine(
@@ -153,7 +160,7 @@ const formDefaultValues: CollectionCreateFormValues = {
   title: "",
   description: "",
   hypercerts: [],
-  backgroundImg: "",
+  backgroundImg: undefined,
   borderColor: "#000000",
   newHypercertId: "",
   newFactor: 1,
@@ -215,8 +222,6 @@ export const CollectionCreateForm = ({
   const form = useForm<CollectionCreateFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
-    reValidateMode: "onChange",
-
     mode: "onChange",
   });
 
@@ -257,6 +262,8 @@ export const CollectionCreateForm = ({
     form.formState.isValid &&
     !isFetching &&
     (!newHypercertId || newHypercertId === "");
+
+  console.log(form.formState.errors, form.getValues());
 
   return (
     <Form {...form}>
@@ -370,10 +377,18 @@ export const CollectionCreateForm = ({
                 control={form.control}
                 name={"newHypercertId"}
                 render={({ field }) => (
-                  <FormItem>
-                    {!fields.length && <FormLabel>Hypercert ID</FormLabel>}
+                  <FormItem className="w-full">
+                    {!fields.length && (
+                      <FormLabel>
+                        Hypercert ID{" "}
+                        <InfoTooltip>
+                          You can find the Hypercert ID on the view page of the
+                          hypercert.
+                        </InfoTooltip>
+                      </FormLabel>
+                    )}
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} className="grow w-full" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -383,10 +398,29 @@ export const CollectionCreateForm = ({
                 control={form.control}
                 name={"newFactor"}
                 render={({ field }) => (
-                  <FormItem>
-                    {!fields.length && <FormLabel>Factor</FormLabel>}
+                  <FormItem className="w-20">
+                    {!fields.length && (
+                      <FormLabel>
+                        Factor{" "}
+                        <InfoTooltip>
+                          You can adjust the relative importance of a hypercert
+                          within this collection, which will be visually
+                          represented on the hyperboard. The default is 1 for
+                          each hypercert.
+                        </InfoTooltip>
+                      </FormLabel>
+                    )}
                     <FormControl>
-                      <Input {...field} type="number" />
+                      <Input
+                        {...field}
+                        type="number"
+                        className="w-20"
+                        onChange={(e) => {
+                          field.onChange({
+                            target: { value: e.target.valueAsNumber },
+                          });
+                        }}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
