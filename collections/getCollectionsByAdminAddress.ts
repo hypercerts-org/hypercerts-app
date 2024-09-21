@@ -9,7 +9,7 @@ import request from "graphql-request";
 const query = graphql(
   `
     query Collection($admin_address: String!) {
-      collections(where: { admin_id: { eq: $admin_address } }) {
+      hyperboards(where: { admin_id: { eq: $admin_address } }) {
         data {
           ...HyperboardFragment
         }
@@ -24,7 +24,7 @@ export async function getCollectionsByAdminAddress(adminAddress: string) {
     admin_address: adminAddress,
   });
 
-  const collectionsFragment = res.collections?.data;
+  const collectionsFragment = res.hyperboards?.data;
   if (!collectionsFragment) {
     return undefined;
   }
