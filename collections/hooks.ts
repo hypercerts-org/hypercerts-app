@@ -3,6 +3,8 @@ import { CollectionCreateFormValues } from "@/components/collections/collection-
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { useAccount, useSignMessage } from "wagmi";
 import revalidatePathServerAction from "@/app/actions";
+import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
+import { useRouter } from "next/navigation";
 
 interface HyperboardCreateRequest {
   chainId: number;
@@ -24,6 +26,12 @@ interface HyperboardCreateRequest {
 export const useCreateHyperboard = () => {
   const { chainId, address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { push } = useRouter();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+  } = useStepProcessDialogContext();
   return useMutation({
     mutationKey: ["hyperboard", "create"],
     mutationFn: async (data: CollectionCreateFormValues) => {
@@ -35,6 +43,19 @@ export const useCreateHyperboard = () => {
         throw new Error("Address not found");
       }
 
+      setSteps([
+        {
+          id: "Awaiting signature",
+          description: "Awaiting signature",
+        },
+        {
+          id: "Creating Hyperboard",
+          description: "Creating Hyperboard",
+        },
+      ]);
+
+      setOpen(true);
+      await setStep("Awaiting signature", "active");
       const signature = await signMessageAsync({
         message: "Create hyperboard",
       });
@@ -58,6 +79,8 @@ export const useCreateHyperboard = () => {
         adminAddress: address,
         signature: signature,
       };
+
+      await setStep("Creating Hyperboard");
       const response = await fetch(`${HYPERCERTS_API_URL_REST}/hyperboards`, {
         method: "POST",
         body: JSON.stringify(body),
@@ -65,8 +88,15 @@ export const useCreateHyperboard = () => {
           "Content-Type": "application/json",
         },
       });
+      const json = await response.json();
+      const hyperboardId = json.data?.id;
       await revalidatePathServerAction(["/collections", `/profile/${address}`]);
-      return response;
+      if (!hyperboardId) {
+        throw new Error("Hyperboard ID not found");
+      }
+      await setStep("Creating Hyperboard", "completed");
+      push(`/collections/${hyperboardId}`);
+      setOpen(false);
     },
   });
 };
@@ -94,6 +124,12 @@ interface HyperboardUpdateRequest {
 export const useUpdateHyperboard = () => {
   const { chainId, address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { push } = useRouter();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+  } = useStepProcessDialogContext();
   return useMutation({
     mutationKey: ["hyperboard", "update"],
     mutationFn: async (data: CollectionCreateFormValues) => {
@@ -113,6 +149,19 @@ export const useUpdateHyperboard = () => {
         throw new Error("Collection ID not found");
       }
 
+      setSteps([
+        {
+          id: "Awaiting signature",
+          description: "Awaiting signature",
+        },
+        {
+          id: "Updating Hyperboard",
+          description: "Updating Hyperboard",
+        },
+      ]);
+
+      setOpen(true);
+      await setStep("Awaiting signature", "active");
       const signature = await signMessageAsync({
         message: "Update hyperboard",
       });
@@ -145,6 +194,8 @@ export const useUpdateHyperboard = () => {
         adminAddress: address,
         signature: signature,
       };
+
+      await setStep("Updating Hyperboard");
       const response = await fetch(
         `${HYPERCERTS_API_URL_REST}/hyperboards/${data.id}`,
         {
@@ -155,8 +206,12 @@ export const useUpdateHyperboard = () => {
           },
         },
       );
+      await setStep("Updating Hyperboard", "completed");
+      const json = await response.json();
+      const hyperboardId = json.data?.id;
       await revalidatePathServerAction(["/collections", `/profile/${address}`]);
-      return response;
+      setOpen(false);
+      push(`/collections/${hyperboardId}`);
     },
   });
 };
@@ -164,14 +219,33 @@ export const useUpdateHyperboard = () => {
 export const useDeleteCollection = () => {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+  } = useStepProcessDialogContext();
 
   return useMutation({
     mutationKey: ["collection", "delete"],
     mutationFn: async (hyperboardId: string) => {
+      setSteps([
+        {
+          id: "Awaiting signature",
+          description: "Awaiting signature",
+        },
+        {
+          id: "Deleting Hyperboard",
+          description: "Deleting Hyperboard",
+        },
+      ]);
+
+      setOpen(true);
+      await setStep("Awaiting signature", "active");
       const signature = await signMessageAsync({
         message: "Delete hyperboard",
       });
-      const response = await fetch(
+      await setStep("Deleting Hyperboard");
+      await fetch(
         `${HYPERCERTS_API_URL_REST}/hyperboards/${hyperboardId}?adminAddress=${address}&signature=${signature}`,
         {
           method: "DELETE",
@@ -179,7 +253,9 @@ export const useDeleteCollection = () => {
         },
       );
       await revalidatePathServerAction(["/collections", `/profile/${address}`]);
-      return response;
+      await setStep("Deleting Hyperboard", "completed");
+      setOpen(false);
+      window.location.reload();
     },
   });
 };
