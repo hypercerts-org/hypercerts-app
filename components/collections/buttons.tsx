@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import React from "react";
+import { useDeleteCollection } from "@/collections/hooks";
 
 export const CreateCollectionButton = () => {
   return (
@@ -46,6 +47,7 @@ export const DeleteCollectionButton = ({
 }: {
   collectionId: string;
 }) => {
+  const { mutateAsync: deleteCollection } = useDeleteCollection();
   return (
     <AlertDialog>
       <AlertDialogTrigger>
@@ -68,7 +70,7 @@ export const DeleteCollectionButton = ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             className="bg-red-500 text-white"
-            onClick={() => console.log("Deleting collection", collectionId)}
+            onClick={() => deleteCollection(collectionId)}
           >
             Delete
           </AlertDialogAction>

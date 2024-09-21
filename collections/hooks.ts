@@ -67,3 +67,24 @@ export const useCreateCollection = () => {
     },
   });
 };
+
+export const useDeleteCollection = () => {
+  const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+
+  return useMutation({
+    mutationKey: ["collection", "delete"],
+    mutationFn: async (hyperboardId: string) => {
+      const signature = await signMessageAsync({
+        message: "Delete hyperboard",
+      });
+      return await fetch(
+        `${HYPERCERTS_API_URL_REST}/hyperboards/${hyperboardId}?adminAddress=${address}&signature=${signature}`,
+        {
+          method: "DELETE",
+          body: JSON.stringify({ signature, adminAddress: address }),
+        },
+      );
+    },
+  });
+};
