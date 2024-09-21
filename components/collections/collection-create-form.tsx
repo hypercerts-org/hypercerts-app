@@ -34,6 +34,7 @@ import {
 import React, { ReactNode } from "react";
 import { ExternalLink, InfoIcon, LoaderCircle } from "lucide-react";
 import Link from "next/link";
+import { useCreateCollection } from "@/collections/hooks";
 
 const formSchema = z
   .object({
@@ -107,11 +108,8 @@ const formSchema = z
           message: "Invalid hypercert ID",
         },
       ),
-    newFactor: z
-      .number()
-      .int()
-      .min(1, "Factor must be greater than 0")
-      .refine((x) => Number.isNaN(x), "Expected a number"),
+    newFactor: z.number().int().min(1, "Factor must be greater than 0"),
+    // .refine((x) => Number.isNaN(x), "Expected a number"),
   })
 
   .refine(
@@ -224,6 +222,7 @@ export const CollectionCreateForm = ({
     defaultValues: formDefaultValues,
     mode: "onChange",
   });
+  const { mutateAsync: createCollection } = useCreateCollection();
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -241,8 +240,8 @@ export const CollectionCreateForm = ({
     form.setValue("newFactor", formDefaultValues.newFactor);
   };
 
-  const onSubmit = (values: CollectionCreateFormValues) => {
-    console.log(values, collectionId);
+  const onSubmit = async (values: CollectionCreateFormValues) => {
+    await createCollection(values);
   };
 
   const allHypercertIds = [
