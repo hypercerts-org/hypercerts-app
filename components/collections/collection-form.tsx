@@ -158,21 +158,10 @@ const formSchema = z
 export type CollectionCreateFormValues = z.infer<typeof formSchema>;
 
 const formDefaultValues: CollectionCreateFormValues = {
-  title: "Test api endpoint",
-  description: "Test api endpoint description",
-  hypercerts: [
-    {
-      hypercertId:
-        "11155111-0xa16DFb32Eb140a6f3F2AC68f41dAd8c7e83C4941-206211114354088708858805012103651536142336",
-      factor: 1,
-    },
-    {
-      hypercertId:
-        "11155111-0xa16DFb32Eb140a6f3F2AC68f41dAd8c7e83C4941-220843256131689062787730120223217569234944",
-      factor: 1,
-    },
-  ],
-  backgroundImg: "https://placecats.com/300/200",
+  title: "",
+  description: "",
+  hypercerts: [],
+  backgroundImg: "",
   borderColor: "#000000",
   newHypercertId: "",
   newFactor: 1,
