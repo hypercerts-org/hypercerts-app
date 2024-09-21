@@ -1,4 +1,4 @@
-import { CollectionCreateForm } from "@/components/collections/collection-create-form";
+import { CollectionForm } from "@/components/collections/collection-form";
 
 const CreateCollectionPage = async () => {
   return (
@@ -7,7 +7,7 @@ const CreateCollectionPage = async () => {
         <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full mb-3">
           New collection
         </h1>
-        <CollectionCreateForm />
+        <CollectionForm />
       </div>
     </main>
   );

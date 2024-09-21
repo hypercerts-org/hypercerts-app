@@ -34,10 +34,11 @@ import {
 import React, { ReactNode } from "react";
 import { ExternalLink, InfoIcon, LoaderCircle } from "lucide-react";
 import Link from "next/link";
-import { useCreateCollection } from "@/collections/hooks";
+import { useCreateHyperboard, useUpdateHyperboard } from "@/collections/hooks";
 
 const formSchema = z
   .object({
+    id: z.string().uuid().optional(),
     title: z
       .string()
       .trim()
@@ -48,9 +49,11 @@ const formSchema = z
       .trim()
       .min(10, "Use at least 10 characters")
       .max(500, "Use at most 500 characters"),
+    collectionId: z.string().uuid().optional(),
     hypercerts: z
       .array(
         z.object({
+          id: z.string().uuid().optional(),
           hypercertId: z
             .string()
             .trim()
@@ -155,10 +158,21 @@ const formSchema = z
 export type CollectionCreateFormValues = z.infer<typeof formSchema>;
 
 const formDefaultValues: CollectionCreateFormValues = {
-  title: "",
-  description: "",
-  hypercerts: [],
-  backgroundImg: undefined,
+  title: "Test api endpoint",
+  description: "Test api endpoint description",
+  hypercerts: [
+    {
+      hypercertId:
+        "11155111-0xa16DFb32Eb140a6f3F2AC68f41dAd8c7e83C4941-206211114354088708858805012103651536142336",
+      factor: 1,
+    },
+    {
+      hypercertId:
+        "11155111-0xa16DFb32Eb140a6f3F2AC68f41dAd8c7e83C4941-220843256131689062787730120223217569234944",
+      factor: 1,
+    },
+  ],
+  backgroundImg: "https://placecats.com/300/200",
   borderColor: "#000000",
   newHypercertId: "",
   newFactor: 1,
@@ -212,17 +226,19 @@ const useHypercertsByIds = (hypercertIds: string[]) => {
   });
 };
 
-export const CollectionCreateForm = ({
-  collectionId,
+export const CollectionForm = ({
+  presetValues,
 }: {
-  collectionId?: string;
+  presetValues?: CollectionCreateFormValues;
 }) => {
   const form = useForm<CollectionCreateFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: formDefaultValues,
+    defaultValues: presetValues || formDefaultValues,
     mode: "onChange",
+    reValidateMode: "onChange",
   });
-  const { mutateAsync: createCollection } = useCreateCollection();
+  const { mutateAsync: createHyperboard } = useCreateHyperboard();
+  const { mutateAsync: updateHyperboard } = useUpdateHyperboard();
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -241,7 +257,11 @@ export const CollectionCreateForm = ({
   };
 
   const onSubmit = async (values: CollectionCreateFormValues) => {
-    await createCollection(values);
+    if (values.id) {
+      await updateHyperboard(values);
+    } else {
+      await createHyperboard(values);
+    }
   };
 
   const allHypercertIds = [
@@ -262,7 +282,9 @@ export const CollectionCreateForm = ({
     !isFetching &&
     (!newHypercertId || newHypercertId === "");
 
-  console.log(form.formState.errors, form.getValues());
+  const buttonText = form.watch("id")
+    ? "Update collection"
+    : "Create collection";
 
   return (
     <Form {...form}>
@@ -343,7 +365,15 @@ export const CollectionCreateForm = ({
                             </FormLabel>
                           )}
                           <FormControl>
-                            <Input {...field} type="number" />
+                            <Input
+                              {...field}
+                              onChange={(e) => {
+                                field.onChange({
+                                  target: { value: e.target.valueAsNumber },
+                                });
+                              }}
+                              type="number"
+                            />
                           </FormControl>
                         </FormItem>
                       )}
@@ -486,7 +516,7 @@ export const CollectionCreateForm = ({
           />
 
           <Button type="submit" disabled={!canCreateCollection}>
-            Create collection
+            {buttonText}
           </Button>
         </section>
       </form>

@@ -3,7 +3,7 @@ import "server-only";
 import { graphql, readFragment } from "@/lib/graphql";
 
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
-import { CollectionFragment } from "./collection.fragment";
+import { HyperboardFragment } from "./hyperboardFragment";
 import request from "graphql-request";
 
 const query = graphql(
@@ -11,12 +11,12 @@ const query = graphql(
     query Collection($admin_address: String!) {
       collections(where: { admin_id: { eq: $admin_address } }) {
         data {
-          ...CollectionFragment
+          ...HyperboardFragment
         }
       }
     }
   `,
-  [CollectionFragment],
+  [HyperboardFragment],
 );
 
 export async function getCollectionsByAdminAddress(adminAddress: string) {
@@ -29,5 +29,5 @@ export async function getCollectionsByAdminAddress(adminAddress: string) {
     return undefined;
   }
 
-  return readFragment(CollectionFragment, collectionsFragment);
+  return readFragment(HyperboardFragment, collectionsFragment);
 }

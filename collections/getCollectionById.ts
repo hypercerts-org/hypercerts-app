@@ -2,21 +2,21 @@ import "server-only";
 
 import { graphql, readFragment } from "@/lib/graphql";
 
-import { CollectionFragment } from "./collection.fragment";
+import { HyperboardFragment } from "./hyperboardFragment";
 import request from "graphql-request";
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 
 const query = graphql(
   `
-    query Collection($id: UUID!) {
-      collections(where: { id: { eq: $id } }) {
+    query Hyperboard($id: UUID!) {
+      hyperboards(where: { id: { eq: $id } }) {
         data {
-          ...CollectionFragment
+          ...HyperboardFragment
         }
       }
     }
   `,
-  [CollectionFragment],
+  [HyperboardFragment],
 );
 
 export async function getCollectionById(collectionId: string) {
@@ -24,10 +24,10 @@ export async function getCollectionById(collectionId: string) {
     id: collectionId,
   });
 
-  const collectionsFragment = res.collections?.data?.[0];
-  if (!collectionsFragment) {
+  const hyperboardFragment = res.hyperboards?.data?.[0];
+  if (!hyperboardFragment) {
     return undefined;
   }
 
-  return readFragment(CollectionFragment, collectionsFragment);
+  return readFragment(HyperboardFragment, hyperboardFragment);
 }
