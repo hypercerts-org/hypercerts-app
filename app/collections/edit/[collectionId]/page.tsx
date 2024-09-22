@@ -9,9 +9,7 @@ const EditCollectionPage = async ({
 }: {
   params: { collectionId: string };
 }) => {
-  console.log("collectionId", collectionId);
   const data = await getCollectionById(collectionId);
-  console.log("data", data);
 
   if (!data) {
     return null;
