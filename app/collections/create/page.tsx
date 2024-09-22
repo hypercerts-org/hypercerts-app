@@ -7,7 +7,7 @@ const CreateCollectionPage = async () => {
         <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full mb-1">
           New collection
         </h1>
-        <h4 className="mb-3 italic opacity-50">
+        <h4 className="mb-3 opacity-50">
           All fields and settings can be edited afterwards
         </h4>
         <CollectionForm />
