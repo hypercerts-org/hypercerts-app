@@ -273,7 +273,7 @@ export const CollectionForm = ({
     : "Create collection";
 
   return (
-    <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
+    <section className="flex flex-col-reverse md:flex-row space-x-4 items-stretch md:justify-start">
       <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -511,7 +511,7 @@ export const CollectionForm = ({
           </form>
         </Form>
       </section>
-      <div className="flex flex-col p-6 items-center w-[336px] gap-y-4 italic opacity-50 sm:hidden">
+      <div className="hidden flex-col p-6 items-center w-[336px] gap-y-4 italic opacity-50 md:flex">
         <p>
           A collection can, for instance, represent a project with multiple
           hypercerts or a funding program comprising various projects.
