@@ -83,10 +83,7 @@ const formSchema = z
           path: ["hypercerts"],
         },
       ),
-    backgroundImg: z
-      .string()
-      .url("Background image URL is not valid")
-      .optional(),
+    backgroundImg: z.union([z.literal(""), z.string().trim().url()]).optional(),
     borderColor: z
       .string()
       .regex(/^#(?:[0-9a-f]{3}){1,2}$/i, "Must be a color hex code")
@@ -276,240 +273,263 @@ export const CollectionForm = ({
     : "Create collection";
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <section className="space-y-8">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title*</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-                <FormDescription>Max. 100 characters</FormDescription>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description*</FormLabel>
-                <FormControl>
-                  <Textarea {...field} />
-                </FormControl>
-                <FormMessage />
-
-                <FormDescription>Max. 500 characters</FormDescription>
-              </FormItem>
-            )}
-          />
-
-          <div className="flex-col space-y-2">
-            {fields.map((field, index) => {
-              const hypercert = fetchedHypercerts?.[field.hypercertId];
-              return (
-                <div key={field.id}>
-                  <div className="flex space-x-2 items-end mt-2 mb-2">
-                    <FormField
-                      control={form.control}
-                      name={`hypercerts.${index}.hypercertId`}
-                      render={({ field }) => (
-                        <FormItem>
-                          {index === 0 && (
-                            <FormLabel>
-                              Hypercert ID{" "}
-                              <InfoTooltip>
-                                You can find the Hypercert ID on the view page
-                                of the hypercert.
-                              </InfoTooltip>
-                            </FormLabel>
-                          )}
-                          <FormControl>
-                            <Input {...field} disabled />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name={`hypercerts.${index}.factor`}
-                      render={({ field }) => (
-                        <FormItem>
-                          {index === 0 && (
-                            <FormLabel>
-                              Factor{" "}
-                              <InfoTooltip>
-                                You can adjust the relative importance of a
-                                hypercert within this collection, which will be
-                                visually represented on the hyperboard. The
-                                default is 1 for each hypercert.
-                              </InfoTooltip>
-                            </FormLabel>
-                          )}
-                          <FormControl>
-                            <Input
-                              {...field}
-                              onChange={(e) => {
-                                field.onChange({
-                                  target: { value: e.target.valueAsNumber },
-                                });
-                              }}
-                              type="number"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button
-                      type="button"
-                      onClick={() => remove(index)}
-                      variant="destructive"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                  <HypercertErrorMessages
-                    isFetching={isFetching}
-                    errorMessages={[
-                      form.formState.errors[`hypercerts`]?.[index]?.[
-                        "hypercertId"
-                      ]?.message,
-                      form.formState.errors[`hypercerts`]?.[index]?.["factor"]
-                        ?.message,
-                    ]}
-                    hypercert={hypercert}
-                  />
-                </div>
-              );
-            })}
-            <div className="flex space-x-2 items-end mt-2">
+    <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
+      <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <section className="space-y-8">
               <FormField
                 control={form.control}
-                name={"newHypercertId"}
+                name="title"
                 render={({ field }) => (
-                  <FormItem className="w-full">
-                    {!fields.length && (
-                      <FormLabel>
-                        Hypercert ID{" "}
-                        <InfoTooltip>
-                          You can find the Hypercert ID on the view page of the
-                          hypercert.
-                        </InfoTooltip>
-                      </FormLabel>
-                    )}
+                  <FormItem>
+                    <FormLabel>Title*</FormLabel>
                     <FormControl>
-                      <Input {...field} className="grow w-full" />
+                      <Input {...field} />
                     </FormControl>
+                    <FormMessage />
+                    <FormDescription>Max. 100 characters</FormDescription>
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name={"newFactor"}
+                name="description"
                 render={({ field }) => (
-                  <FormItem className="w-20">
-                    {!fields.length && (
-                      <FormLabel>
-                        Factor{" "}
-                        <InfoTooltip>
-                          You can adjust the relative importance of a hypercert
-                          within this collection, which will be visually
-                          represented on the hyperboard. The default is 1 for
-                          each hypercert.
-                        </InfoTooltip>
-                      </FormLabel>
-                    )}
+                  <FormItem>
+                    <FormLabel>Description*</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        className="w-20"
-                        onChange={(e) => {
-                          field.onChange({
-                            target: { value: e.target.valueAsNumber },
-                          });
-                        }}
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+
+                    <FormDescription>Max. 500 characters</FormDescription>
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex-col space-y-2">
+                {fields.map((field, index) => {
+                  const hypercert = fetchedHypercerts?.[field.hypercertId];
+                  return (
+                    <div key={field.id}>
+                      <div className="flex space-x-2 items-end mt-2 mb-2">
+                        <FormField
+                          control={form.control}
+                          name={`hypercerts.${index}.hypercertId`}
+                          render={({ field }) => (
+                            <FormItem>
+                              {index === 0 && (
+                                <FormLabel>
+                                  Hypercert ID{" "}
+                                  <InfoTooltip>
+                                    You can find the Hypercert ID on the view
+                                    page of the hypercert.
+                                  </InfoTooltip>
+                                </FormLabel>
+                              )}
+                              <FormControl>
+                                <Input {...field} disabled />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`hypercerts.${index}.factor`}
+                          render={({ field }) => (
+                            <FormItem>
+                              {index === 0 && (
+                                <FormLabel>
+                                  Factor{" "}
+                                  <InfoTooltip>
+                                    You can adjust the relative importance of a
+                                    hypercert within this collection, which will
+                                    be visually represented on the hyperboard.
+                                    The default is 1 for each hypercert.
+                                  </InfoTooltip>
+                                </FormLabel>
+                              )}
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  onChange={(e) => {
+                                    field.onChange({
+                                      target: { value: e.target.valueAsNumber },
+                                    });
+                                  }}
+                                  type="number"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <Button
+                          type="button"
+                          onClick={() => remove(index)}
+                          variant="destructive"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                      <HypercertErrorMessages
+                        isFetching={isFetching}
+                        errorMessages={[
+                          form.formState.errors[`hypercerts`]?.[index]?.[
+                            "hypercertId"
+                          ]?.message,
+                          form.formState.errors[`hypercerts`]?.[index]?.[
+                            "factor"
+                          ]?.message,
+                        ]}
+                        hypercert={hypercert}
                       />
+                    </div>
+                  );
+                })}
+                <div className="flex space-x-2 items-end mt-2">
+                  <FormField
+                    control={form.control}
+                    name={"newHypercertId"}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        {!fields.length && (
+                          <FormLabel>
+                            Hypercert ID{" "}
+                            <InfoTooltip>
+                              You can find the Hypercert ID on the view page of
+                              the hypercert.
+                            </InfoTooltip>
+                          </FormLabel>
+                        )}
+                        <FormControl>
+                          <Input {...field} className="grow w-full" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={"newFactor"}
+                    render={({ field }) => (
+                      <FormItem className="w-20">
+                        {!fields.length && (
+                          <FormLabel>
+                            Factor{" "}
+                            <InfoTooltip>
+                              You can adjust the relative importance of a
+                              hypercert within this collection, which will be
+                              visually represented on the hyperboard. The
+                              default is 1 for each hypercert.
+                            </InfoTooltip>
+                          </FormLabel>
+                        )}
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            className="w-20"
+                            onChange={(e) => {
+                              field.onChange({
+                                target: { value: e.target.valueAsNumber },
+                              });
+                            }}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    onClick={onAddHypercert}
+                    disabled={!canAddHypercert}
+                  >
+                    Add
+                  </Button>
+                </div>
+                <HypercertErrorMessages
+                  errorMessages={[
+                    form.formState.errors["newHypercertId"]?.message,
+                    form.formState.errors["newFactor"]?.message,
+                  ]}
+                  hypercert={newHypercert}
+                  hideNotFound={!newHypercertId}
+                  isFetching={isFetching}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="backgroundImg"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Background image URL{" "}
+                      <InfoTooltip>
+                        For best results use an aspect ratio of 16:9. The best
+                        resolution depends on where it will be shown; we
+                        recommend at least 1600x900 px.
+                      </InfoTooltip>
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button
-                type="button"
-                onClick={onAddHypercert}
-                disabled={!canAddHypercert}
-              >
-                Add
+              {backgroundImg && (
+                <img
+                  src={backgroundImg}
+                  className="max-h-80"
+                  alt="Background for hyperboard"
+                />
+              )}
+
+              <FormField
+                control={form.control}
+                name="borderColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Border color</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="color" className="max-w-32" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" disabled={!canCreateCollection}>
+                {buttonText}
               </Button>
-            </div>
-            <HypercertErrorMessages
-              errorMessages={[
-                form.formState.errors["newHypercertId"]?.message,
-                form.formState.errors["newFactor"]?.message,
-              ]}
-              hypercert={newHypercert}
-              hideNotFound={!newHypercertId}
-              isFetching={isFetching}
-            />
-          </div>
+            </section>
+          </form>
+        </Form>
+      </section>
+      <div className="flex flex-col p-6 items-center w-[336px] gap-y-4 italic opacity-50 sm:hidden">
+        <p>
+          A collection can, for instance, represent a project with multiple
+          hypercerts or a funding program comprising various projects.
+        </p>
 
-          <FormField
-            control={form.control}
-            name="backgroundImg"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Background image URL{" "}
-                  <InfoTooltip>
-                    For best results use an aspect ratio of 16:9. The best
-                    resolution depends on where it will be shown; we recommend
-                    at least 1600x900 px.
-                  </InfoTooltip>
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {backgroundImg && (
-            <img
-              src={backgroundImg}
-              className="max-h-80"
-              alt="Background for hyperboard"
-            />
-          )}
+        <p>
+          For each collection, a hyperboard is automatically generated, showing
+          owners in proportion to their shares.
+        </p>
 
-          <FormField
-            control={form.control}
-            name="borderColor"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Border color</FormLabel>
-                <FormControl>
-                  <Input {...field} type="color" className="max-w-32" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <p>
+          You can embed the hyperboard on your website or share it on social
+          media to publicly recognize the owners.
+        </p>
 
-          <Button type="submit" disabled={!canCreateCollection}>
-            {buttonText}
-          </Button>
-        </section>
-      </form>
-    </Form>
+        <p>All fields and settings can be edited afterwards.</p>
+      </div>
+    </section>
   );
 };
 
