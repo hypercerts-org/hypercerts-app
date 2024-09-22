@@ -36,7 +36,10 @@ export default function ProfilePage({
           />
         )}
         {mainTab === "collections" && (
-          <CollectionsTabContent address={address} />
+          <CollectionsTabContent
+            address={address}
+            searchParams={searchParams}
+          />
         )}
         {mainTab === "marketplace" && (
           <MarketplaceTabContent
