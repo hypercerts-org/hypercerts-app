@@ -2,7 +2,7 @@ import "server-only";
 
 import { graphql, readFragment } from "@/lib/graphql";
 
-import { HyperboardFragment } from "@/collections/hyperboardFragment";
+import { HyperboardFragment } from "@/collections/hyperboard.fragment";
 import request from "graphql-request";
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 
