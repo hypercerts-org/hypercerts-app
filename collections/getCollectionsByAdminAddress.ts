@@ -3,7 +3,7 @@ import "server-only";
 import { graphql, readFragment } from "@/lib/graphql";
 
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
-import { HyperboardFragment } from "./hyperboardFragment";
+import { HyperboardFragment } from "./hyperboard.fragment";
 import request from "graphql-request";
 import { COLLECTIONS_PER_PAGE } from "@/configs/ui";
 
