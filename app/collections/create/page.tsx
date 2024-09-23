@@ -1,6 +1,6 @@
 import { CollectionForm } from "@/components/collections/collection-form";
 
-const CreateCollectionPage = async () => {
+const CreateCollectionPage = () => {
   return (
     <main className="flex flex-col p-8 md:p-24 pb-24 space-y-4 container max-w-6xl">
       <div className="w-full">
