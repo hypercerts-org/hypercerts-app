@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { CollectionCreateFormValues } from "@/components/collections/collection-form";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage, useSignTypedData } from "wagmi";
 import revalidatePathServerAction from "@/app/actions";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,7 @@ interface HyperboardCreateRequest {
 
 export const useCreateHyperboard = () => {
   const { chainId, address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const { signTypedDataAsync } = useSignTypedData();
   const { push } = useRouter();
   const {
     setDialogStep: setStep,
@@ -56,9 +56,38 @@ export const useCreateHyperboard = () => {
 
       setOpen(true);
       await setStep("Awaiting signature", "active");
-      const signature = await signMessageAsync({
-        message: "Create hyperboard",
-      });
+      let signature: string;
+
+      try {
+        signature = await signTypedDataAsync({
+          account: address,
+          domain: {
+            name: "Hypercerts",
+            version: "1",
+            chainId: chainId,
+          },
+          types: {
+            Hyperboard: [{ name: "title", type: "string" }],
+            CreateRequest: [{ name: "hyperboard", type: "Hyperboard" }],
+          },
+          primaryType: "CreateRequest",
+          message: {
+            hyperboard: {
+              title: data.title,
+            },
+          },
+        });
+        if (!signature) {
+          throw new Error("No signature found");
+        }
+      } catch (error) {
+        await setStep(
+          "Awaiting signature",
+          "error",
+          error instanceof Error ? error.message : "Error signing message",
+        );
+        return;
+      }
       const body: HyperboardCreateRequest = {
         title: data.title,
         collections: [
@@ -81,22 +110,38 @@ export const useCreateHyperboard = () => {
       };
 
       await setStep("Creating Hyperboard");
-      const response = await fetch(`${HYPERCERTS_API_URL_REST}/hyperboards`, {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const json = await response.json();
-      const hyperboardId = json.data?.id;
-      await revalidatePathServerAction(["/collections", `/profile/${address}`]);
-      if (!hyperboardId) {
-        throw new Error("Hyperboard ID not found");
+      try {
+        const response = await fetch(`${HYPERCERTS_API_URL_REST}/hyperboards`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const json = await response.json();
+        if (!response.ok) {
+          throw new Error(json?.data?.message || "Error creating hyperboard");
+        }
+        const hyperboardId = json.data?.id;
+        await revalidatePathServerAction([
+          "/collections",
+          `/profile/${address}`,
+        ]);
+        if (!hyperboardId) {
+          throw new Error("Hyperboard ID not found");
+        }
+        await setStep("Creating Hyperboard", "completed");
+        setTimeout(() => {
+          push(`/collections/${hyperboardId}`);
+          setOpen(false);
+        }, 2000);
+      } catch (error) {
+        await setStep(
+          "Creating Hyperboard",
+          "error",
+          error instanceof Error ? error.message : "Error creating hyperboard",
+        );
       }
-      await setStep("Creating Hyperboard", "completed");
-      push(`/collections/${hyperboardId}`);
-      setOpen(false);
     },
   });
 };
@@ -123,7 +168,7 @@ interface HyperboardUpdateRequest {
 
 export const useUpdateHyperboard = () => {
   const { chainId, address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const { signTypedDataAsync } = useSignTypedData();
   const { push } = useRouter();
   const {
     setDialogStep: setStep,
@@ -162,9 +207,38 @@ export const useUpdateHyperboard = () => {
 
       setOpen(true);
       await setStep("Awaiting signature", "active");
-      const signature = await signMessageAsync({
-        message: "Update hyperboard",
-      });
+      let signature: string;
+
+      try {
+        signature = await signTypedDataAsync({
+          account: address,
+          domain: {
+            name: "Hypercerts",
+            version: "1",
+            chainId: chainId,
+          },
+          types: {
+            Hyperboard: [{ name: "id", type: "string" }],
+            UpdateRequest: [{ name: "hyperboard", type: "Hyperboard" }],
+          },
+          primaryType: "UpdateRequest",
+          message: {
+            hyperboard: {
+              id: data.id,
+            },
+          },
+        });
+        if (!signature) {
+          throw new Error("No signature found");
+        }
+      } catch (error) {
+        await setStep(
+          "Awaiting signature",
+          "error",
+          error instanceof Error ? error.message : "Error signing message",
+        );
+        return;
+      }
       const body: HyperboardUpdateRequest = {
         id: data.id,
         title: data.title,
@@ -196,29 +270,50 @@ export const useUpdateHyperboard = () => {
       };
 
       await setStep("Updating Hyperboard");
-      const response = await fetch(
-        `${HYPERCERTS_API_URL_REST}/hyperboards/${data.id}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(body),
-          headers: {
-            "Content-Type": "application/json",
+      try {
+        const response = await fetch(
+          `${HYPERCERTS_API_URL_REST}/hyperboards/${data.id}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify(body),
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        },
-      );
-      await setStep("Updating Hyperboard", "completed");
-      const json = await response.json();
-      const hyperboardId = json.data?.id;
-      await revalidatePathServerAction(["/collections", `/profile/${address}`]);
-      setOpen(false);
-      push(`/collections/${hyperboardId}`);
+        );
+        await setStep("Updating Hyperboard", "completed");
+
+        const json = await response.json();
+        if (!response.ok) {
+          throw new Error(json?.data?.message || "Error updating hyperboard");
+        }
+        const hyperboardId = json.data?.id;
+        await revalidatePathServerAction([
+          "/collections",
+          `/profile/${address}`,
+        ]);
+        if (!hyperboardId) {
+          throw new Error("Hyperboard ID not found");
+        }
+        await setStep("Updating Hyperboard", "completed");
+        setTimeout(() => {
+          push(`/collections/${hyperboardId}`);
+          setOpen(false);
+        }, 2000);
+      } catch (error) {
+        await setStep(
+          "Updating Hyperboard",
+          "error",
+          error instanceof Error ? error.message : "Error updating hyperboard",
+        );
+      }
     },
   });
 };
 
 export const useDeleteCollection = () => {
-  const { address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const { address, chainId } = useAccount();
+  const { signTypedDataAsync } = useSignTypedData();
   const {
     setDialogStep: setStep,
     setSteps,
@@ -241,21 +336,67 @@ export const useDeleteCollection = () => {
 
       setOpen(true);
       await setStep("Awaiting signature", "active");
-      const signature = await signMessageAsync({
-        message: "Delete hyperboard",
-      });
+      let signature: string;
+
+      try {
+        signature = await signTypedDataAsync({
+          account: address,
+          domain: {
+            name: "Hypercerts",
+            version: "1",
+            chainId: chainId,
+          },
+          types: {
+            Hyperboard: [{ name: "id", type: "string" }],
+            DeleteRequest: [{ name: "hyperboard", type: "Hyperboard" }],
+          },
+          primaryType: "DeleteRequest",
+          message: {
+            hyperboard: {
+              id: hyperboardId,
+            },
+          },
+        });
+        if (!signature) {
+          throw new Error("No signature found");
+        }
+      } catch (error) {
+        await setStep(
+          "Awaiting signature",
+          "error",
+          error instanceof Error ? error.message : "Error signing message",
+        );
+        return;
+      }
       await setStep("Deleting Hyperboard");
-      await fetch(
-        `${HYPERCERTS_API_URL_REST}/hyperboards/${hyperboardId}?adminAddress=${address}&signature=${signature}`,
-        {
-          method: "DELETE",
-          body: JSON.stringify({ signature, adminAddress: address }),
-        },
-      );
-      await revalidatePathServerAction(["/collections", `/profile/${address}`]);
-      await setStep("Deleting Hyperboard", "completed");
-      setOpen(false);
-      window.location.reload();
+      try {
+        const response = await fetch(
+          `${HYPERCERTS_API_URL_REST}/hyperboards/${hyperboardId}?adminAddress=${address}&signature=${signature}`,
+          {
+            method: "DELETE",
+            body: JSON.stringify({ signature, adminAddress: address }),
+          },
+        );
+        const json = await response.json();
+        if (!response.ok) {
+          throw new Error(json?.data?.message || "Error deleting hyperboard");
+        }
+        await revalidatePathServerAction([
+          "/collections",
+          `/profile/${address}`,
+        ]);
+        await setStep("Deleting Hyperboard", "completed");
+        setTimeout(() => {
+          setOpen(false);
+          window.location.reload();
+        }, 2000);
+      } catch (error) {
+        await setStep(
+          "Deleting Hyperboard",
+          "error",
+          error instanceof Error ? error.message : "Error deleting hyperboard",
+        );
+      }
     },
   });
 };

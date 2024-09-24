@@ -19,10 +19,10 @@ import { useDeleteCollection } from "@/collections/hooks";
 export const CreateCollectionButton = () => {
   return (
     <Button
-      className="hover:text-white rounded-sm bg-white text-black border border-gray-300"
+      className="hover:text-white rounded-sm bg-white text-black border border-slate-300"
       asChild
     >
-      <Link href="/collections/create">Create Collection</Link>
+      <Link href="/collections/create">Create collection</Link>
     </Button>
   );
 };

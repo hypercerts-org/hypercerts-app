@@ -30,7 +30,7 @@ const CollectionsTabContentInner = async ({
   if (!hyperboards?.length) {
     return (
       <div>
-        <div className="flex justify-end">
+        <div className="flex justify-end mb-2">
           <CreateCollectionButton />
         </div>
         <EmptySection>
@@ -48,7 +48,7 @@ const CollectionsTabContentInner = async ({
 
   return (
     <div>
-      <div className="flex justify-end">
+      <div className="flex justify-end mb-2">
         <CreateCollectionButton />
       </div>
       <div className="flex flex-col gap-4">
