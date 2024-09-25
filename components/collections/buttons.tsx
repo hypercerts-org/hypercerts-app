@@ -34,7 +34,7 @@ export const EditCollectionButton = ({
 }) => {
   return (
     <Button
-      className="hover:text-white rounded-sm bg-white text-black border border-gray-300"
+      className="hover:text-white rounded-sm bg-white text-black border border-slate-300"
       asChild
     >
       <Link href={`/collections/edit/${collectionId}`}>Edit</Link>
@@ -52,7 +52,7 @@ export const DeleteCollectionButton = ({
     <AlertDialog>
       <AlertDialogTrigger>
         <Button
-          className="hover:text-white rounded-sm bg-white text-black border border-gray-300"
+          className="hover:text-white rounded-sm bg-white text-black border border-slate-300"
           variant="destructive"
         >
           Delete

@@ -69,7 +69,12 @@ const formSchema = z
                 return false;
               }
             }, "Invalid hypercert ID"),
-          factor: z.number().int().min(1, "Factor must be greater than 0"),
+          factor: z.union([
+            z.number().int().min(1, "Factor must be greater than 0"),
+            z.literal("").refine((value) => {
+              return value !== "";
+            }, "Factor is required"),
+          ]),
         }),
       )
       .min(1, "At least one hypercert is required")
@@ -108,8 +113,12 @@ const formSchema = z
           message: "Invalid hypercert ID",
         },
       ),
-    newFactor: z.number().int().min(1, "Factor must be greater than 0"),
-    // .refine((x) => Number.isNaN(x), "Expected a number"),
+    newFactor: z.union([
+      z.number().int().min(1, "Factor must be greater than 0"),
+      z.literal("").refine((value) => {
+        return value !== "";
+      }, "Factor is required"),
+    ]),
   })
 
   .refine(
@@ -261,7 +270,8 @@ export const CollectionForm = ({
   const canAddHypercert =
     !isFetching &&
     newHypercert &&
-    form.formState.errors["newHypercertId"] === undefined;
+    form.formState.errors["newHypercertId"] === undefined &&
+    form.formState.errors["newFactor"] === undefined;
 
   const canCreateCollection =
     form.formState.isValid &&
@@ -319,7 +329,7 @@ export const CollectionForm = ({
                           control={form.control}
                           name={`hypercerts.${index}.hypercertId`}
                           render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="w-full">
                               {index === 0 && (
                                 <FormLabel>
                                   Hypercert ID{" "}
@@ -330,7 +340,11 @@ export const CollectionForm = ({
                                 </FormLabel>
                               )}
                               <FormControl>
-                                <Input {...field} disabled />
+                                <Input
+                                  {...field}
+                                  disabled
+                                  className="grow w-full"
+                                />
                               </FormControl>
                             </FormItem>
                           )}
@@ -355,9 +369,17 @@ export const CollectionForm = ({
                               <FormControl>
                                 <Input
                                   {...field}
+                                  className="w-20"
                                   onChange={(e) => {
+                                    const value = e.target.valueAsNumber;
+                                    if (Number.isNaN(value)) {
+                                      field.onChange({
+                                        target: { value: "" },
+                                      });
+                                      return;
+                                    }
                                     field.onChange({
-                                      target: { value: e.target.valueAsNumber },
+                                      target: { value },
                                     });
                                   }}
                                   type="number"
@@ -371,6 +393,7 @@ export const CollectionForm = ({
                           type="button"
                           onClick={() => remove(index)}
                           variant="destructive"
+                          className="w-28"
                         >
                           Remove
                         </Button>
@@ -398,7 +421,7 @@ export const CollectionForm = ({
                       <FormItem className="w-full">
                         {!fields.length && (
                           <FormLabel>
-                            Hypercert ID{" "}
+                            Hypercert ID*{" "}
                             <InfoTooltip>
                               You can find the Hypercert ID on the view page of
                               the hypercert.
@@ -406,7 +429,7 @@ export const CollectionForm = ({
                           </FormLabel>
                         )}
                         <FormControl>
-                          <Input {...field} className="grow w-full" />
+                          <Input {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -419,7 +442,7 @@ export const CollectionForm = ({
                       <FormItem className="w-20">
                         {!fields.length && (
                           <FormLabel>
-                            Factor{" "}
+                            Factor*{" "}
                             <InfoTooltip>
                               You can adjust the relative importance of a
                               hypercert within this collection, which will be
@@ -434,8 +457,15 @@ export const CollectionForm = ({
                             type="number"
                             className="w-20"
                             onChange={(e) => {
+                              const value = e.target.valueAsNumber;
+                              if (Number.isNaN(value)) {
+                                field.onChange({
+                                  target: { value: "" },
+                                });
+                                return;
+                              }
                               field.onChange({
-                                target: { value: e.target.valueAsNumber },
+                                target: { value },
                               });
                             }}
                           />
@@ -447,6 +477,7 @@ export const CollectionForm = ({
                     type="button"
                     onClick={onAddHypercert}
                     disabled={!canAddHypercert}
+                    className="w-28"
                   >
                     Add
                   </Button>
@@ -511,7 +542,7 @@ export const CollectionForm = ({
           </form>
         </Form>
       </section>
-      <div className="hidden flex-col p-6 items-center w-[336px] gap-y-4 italic opacity-50 md:flex">
+      <div className="hidden md:flex flex-col p-6 items-center w-[336px] gap-y-4 italic opacity-50">
         <p>
           A collection can, for instance, represent a project with multiple
           hypercerts or a funding program comprising various projects.
@@ -548,8 +579,8 @@ const HypercertErrorMessages = ({
     <div className="mt-2">
       {hypercert?.metadata && (
         <Link href={`/hypercerts/${hypercert.hypercert_id}`} target="_blank">
-          <div className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-max text-sm ml-2 mb-2">
-            {hypercert.metadata.name}
+          <div className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-full text-sm ml-2 mb-2">
+            <span className="text-clip">{hypercert.metadata.name}</span>
             <ExternalLink className="w-4 h-4 bg-transparent focus:opacity-70 focus:scale-90" />
           </div>
         </Link>
