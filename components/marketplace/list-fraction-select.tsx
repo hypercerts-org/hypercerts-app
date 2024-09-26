@@ -31,7 +31,7 @@ export default function ListFractionSelect({
     <tr
       onClick={() => setSelected(fraction.fraction_id || "")}
       className={cn(
-        "h-12 border border-gray-200 rounded-2xl hover:bg-gray-100 text-sm",
+        "h-12 border border-slate-200 rounded-2xl hover:bg-slate-100 text-sm",
         selected && "",
       )}
     >

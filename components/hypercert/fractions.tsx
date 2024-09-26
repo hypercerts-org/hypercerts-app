@@ -60,7 +60,7 @@ export default function Fractions({ hypercert }: { hypercert: HypercertFull }) {
 
   return (
     <section className="flex flex-col gap-y-2 w-full max-w-[500px]">
-      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+      <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
         Owners
       </h5>
       <Command className="rounded-lg border-[1.5px] border-slate-200">

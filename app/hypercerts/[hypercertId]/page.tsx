@@ -1,23 +1,23 @@
-import { Fragment, Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
+import { Fragment, Suspense } from "react";
 
+import { CurrencyButtons } from "@/components/currency-buttons";
 import Contributors from "@/components/hypercert/contributors";
 import Creator from "@/components/hypercert/creator";
 import EvaluateButton from "@/components/hypercert/evaluate-button";
 import EvaluationsList from "@/components/hypercert/evaluations-list";
 import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
-import Image from "next/image";
-import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
-import ReadMore from "@/components/read-more";
-import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import TimeFrame from "@/components/hypercert/time-frame";
+import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
+import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+import ReadMore from "@/components/read-more";
+import { Separator } from "@/components/ui/separator";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { getOrders } from "@/marketplace/getOpenOrders";
-import { CurrencyButtons } from "@/components/currency-buttons";
+import Image from "next/image";
 
 type Props = {
   params: { hypercertId: string };
@@ -61,7 +61,9 @@ async function HypercertPageInner({
       <section className="flex flex-col space-y-4">
         <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
           <div className="flex justify-between">
-            <h3 className="uppercase text-sm text-gray-500 font-medium tracking-wider"></h3>
+            <h3 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+              Oops! Something went wrong...
+            </h3>
           </div>
         </section>
         <section className="flex flex-col space-y-4">
@@ -69,9 +71,9 @@ async function HypercertPageInner({
             Hypercert not found.
           </h1>
           <Separator />
-          <h3 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
-            {`ID ${hypercertId}`}
-          </h3>
+          <pre className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+            {`ID: ${hypercertId}`}
+          </pre>
           <p className="md:text-lg">
             If this hypercert was freshly minted try refreshing in 30 seconds.
             Please try again or contact us at{" "}
@@ -86,7 +88,7 @@ async function HypercertPageInner({
     <section className="flex flex-col space-y-4">
       <article className="space-y-4 lg:flex lg:space-y-0 lg:space-x-6">
         <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
-          <div className="relative w-full h-full bg-gray-200 border border-slate-800 rounded-lg overflow-hidden ">
+          <div className="relative w-full h-full bg-accent border border-slate-300 rounded-lg overflow-hidden ">
             <Image
               src={`/api/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
@@ -106,7 +108,7 @@ async function HypercertPageInner({
           {(hypercert?.metadata?.work_timeframe_from as string) && (
             <Fragment>
               <Separator />
-              <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+              <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
                 TIME OF WORK
               </h5>
               <TimeFrame
@@ -136,7 +138,7 @@ async function HypercertPageInner({
       )}
       <Separator />
       <div className="flex justify-between">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Evaluations
         </h5>
         <EvaluateButton hypercert={hypercert} />
@@ -144,7 +146,7 @@ async function HypercertPageInner({
       <EvaluationsList hypercert={hypercert} />
       <Separator />
       <div className="flex justify-between">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Marketplace
         </h5>
 

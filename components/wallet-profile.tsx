@@ -121,6 +121,11 @@ const WalletProfile = ({
               Profile
             </DropdownMenuItem>
           </Link>
+          {/*<Link href={siteConfig.links.settings}>*/}
+          {/*  <DropdownMenuItem className="cursor-pointer">*/}
+          {/*    Settings*/}
+          {/*  </DropdownMenuItem>*/}
+          {/*</Link>*/}
           <Link href={siteConfig.links.evaluators}>
             <DropdownMenuItem className="cursor-pointer">
               Evaluators

@@ -50,6 +50,7 @@ import {
 import { toPng } from "html-to-image";
 import { FormattedUnits } from "@/components/formatted-units";
 import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+// import Image from "next/image";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -69,12 +70,10 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Title</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} maxLength={100} />
             </FormControl>
             <FormMessage />
-            <FormDescription>
-              Keep it short but descriptive! (max 100 characters)
-            </FormDescription>
+            <FormDescription>Keep it short but descriptive!</FormDescription>
           </FormItem>
         )}
       />
@@ -85,7 +84,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea {...field} maxLength={5000} />
             </FormControl>
             <FormMessage />
             <FormDescription>
@@ -223,14 +222,14 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const tags = e.target.value
                     .split(",")
-                    .map((tag) => tag.toLowerCase());
-                  field.onChange(tags.length > 0 ? tags : []);
+                    .map((tag) => tag.toLowerCase().slice(0, 50));
+                  field.onChange(tags.length > 0 ? tags.slice(0, 20) : []);
                 }}
               />
             </FormControl>
             <FormMessage />
             <FormDescription>
-              Tags are used to categorize your project.
+              Tags are used to categorize your project. (Max: 20)
             </FormDescription>
             {field.value &&
               field.value.filter((tag: string) => tag !== "").length > 0 && (
@@ -260,7 +259,9 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const contributors = e.target.value
                     .split(",")
-                    .map((contributor) => contributor.trim().toLowerCase());
+                    .map((contributor) =>
+                      contributor.trim().toLowerCase().slice(0, 50),
+                    );
                   field.onChange(contributors.length > 0 ? contributors : []);
                 }}
               />
@@ -498,7 +499,8 @@ const FormSteps = ({
   };
 
   const handleNextClick = async () => {
-    if (currentStep === 1) {
+    if (currentStep === 2) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       await takeCardSnapshot();
     }
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
@@ -511,6 +513,19 @@ const FormSteps = ({
 
   return (
     <section className="space-y-5">
+      {/* {form.watch("cardImage") && (
+        <div className="border-2 border-slate-300 rounded-lg p-4 mb-4">
+          <h3 className="text-lg font-semibold mb-2">Card Preview</h3>
+          <div className="relative w-[336px] h-[420px] mx-auto">
+            <Image
+              src={form.watch("cardImage")}
+              alt="Hypercert Card Preview"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+        </div>
+      )} */}
       <div className="space-y-3">
         <Progress value={(currentStep / 3) * 100} className="h-[6px]" />
 

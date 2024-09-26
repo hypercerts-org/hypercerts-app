@@ -64,7 +64,7 @@ async function ExploreListInner({
           Showing search results for: <b>{search}</b>
         </div>
       )}
-      <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
         {hypercerts?.data?.map((hypercert) => {
           return (
             <HypercertWindow

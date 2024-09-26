@@ -28,11 +28,11 @@ export default async function EvaluatorDetails({
       </h1>
       <UserIcon address={attestor.eth_address} size="huge" />
       <EthAddress address={attestor.eth_address} />{" "}
-      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+      <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
         Organisations
       </h5>
       <OrgItems orgs={attestor.orgs} />
-      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+      <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
         Evaluations
       </h5>
       <EvaluatorEvaluationsList address={attestor.eth_address} />

@@ -17,7 +17,7 @@ const CollectionPageInner = async ({
   return (
     <div>
       <h3 className="text-2xl font-medium">{data.name}</h3>
-      <p className="text-sm text-gray-500 pb-2">{defaultDescription}</p>
+      <p className="text-sm text-slate-500 pb-2">{defaultDescription}</p>
 
       <div className="pt-8 justify-center flex w-full">
         <div className="w-full">

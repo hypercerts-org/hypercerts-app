@@ -25,10 +25,7 @@ export default function EvaluateToggle({
         onClick={() => handleClick("valid")}
         variant="ghost"
         size="icon"
-        className={cn(
-          "h-7 w-7",
-          state === "valid" ? "bg-black" : "bg-gray-200"
-        )}
+        className={cn("h-7 w-7", state === "valid" ? "bg-black" : "bg-accent")}
       >
         <Check className="text-white w-5 h-5" strokeWidth={3} />
       </Button>
@@ -38,7 +35,7 @@ export default function EvaluateToggle({
         size="icon"
         className={cn(
           "h-7 w-7",
-          state === "invalid" ? "bg-black" : "bg-gray-200"
+          state === "invalid" ? "bg-black" : "bg-accent",
         )}
       >
         <Ban className="text-white w-5 h-5" strokeWidth={3} />

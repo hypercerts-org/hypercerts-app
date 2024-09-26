@@ -8,14 +8,14 @@ function EvaluationSymbols({ value }: { value: number }) {
       <Check
         className={cn(
           "text-white w-7 h-7 p-1 rounded-sm",
-          value === 1 ? "bg-black" : "bg-gray-200"
+          value === 1 ? "bg-black" : "bg-accent",
         )}
         strokeWidth={3}
       />
       <Ban
         className={cn(
           "text-white w-7 h-7 p-1 rounded-sm",
-          value === 2 ? "bg-black" : "bg-gray-200"
+          value === 2 ? "bg-black" : "bg-accent",
         )}
       />
     </div>

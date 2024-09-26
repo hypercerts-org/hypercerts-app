@@ -27,7 +27,7 @@ const MobileNav = () => {
       <MenubarMenu>
         <MenubarTrigger
           aria-label="Menu"
-          className="focus:bg-slate-200 data-[state=open]:bg-slate-200"
+          className="focus:bg-accent data-[state=open]:bg-accent"
         >
           <Menu size={24} className="mr-1" /> Menu
         </MenubarTrigger>

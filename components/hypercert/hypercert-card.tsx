@@ -1,5 +1,4 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkle } from "lucide-react";
+import { ArrowRight, Sparkle } from "lucide-react";
 import Image from "next/image";
 import { forwardRef } from "react";
 
@@ -7,6 +6,7 @@ import { forwardRef } from "react";
  * HypercertCard component
  * @param {string} name - The name of the hypercert
  * @param {string} banner - The banner image of the hypercert
+ *
  * @param {string} logo - The logo image of the hypercert
  * @param {string} link - The link of the hypercert
  * @param {boolean} displayOnly - Whether the card is just for display (non-interactive) or not
@@ -41,20 +41,25 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     title = title ?? defaultValues.name;
 
     const formattedDateRange =
-      fromDateDisplay && toDateDisplay
-        ? fromDateDisplay === toDateDisplay
-          ? fromDateDisplay
-          : `${fromDateDisplay} — ${toDateDisplay}`
-        : "";
+      fromDateDisplay && toDateDisplay ? (
+        fromDateDisplay === toDateDisplay ? (
+          fromDateDisplay
+        ) : (
+          <span className="flex items-center">
+            {fromDateDisplay} <ArrowRight size={12} className="inline mx-1" />{" "}
+            {toDateDisplay}
+          </span>
+        )
+      ) : null;
 
     const CardContent = () => {
-      const maxVisibleTags = 7;
-      const maxScopeLength = 12;
+      const maxVisibleTags = 6;
+      const maxScopeLength = 14;
 
       const clipScope = (scope: string) =>
-        scope.length > maxScopeLength
-          ? scope.slice(0, maxScopeLength - 3) + "..."
-          : scope;
+        scope.trim().length > maxScopeLength
+          ? scope.trim().slice(0, maxScopeLength - 3) + "..."
+          : scope.trim();
 
       const visibleScopes =
         scopes?.slice(0, maxVisibleTags).map(clipScope) || [];
@@ -75,12 +80,12 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                 unoptimized
               />
             ) : (
-              <div className="flex items-center justify-center bg-slate-200 h-full w-full">
+              <div className="flex items-center justify-center bg-accent h-full w-full">
                 <span className="text-slate-500 text-lg">Your banner here</span>
               </div>
             )}
           </header>
-          <section className="absolute top-4 left-3 border-white border-2 rounded-full overflow-hidden bg-slate-200">
+          <section className="absolute top-4 left-3 border-white border-2 rounded-full overflow-hidden bg-accent">
             <div className="relative w-8 h-8 flex items-center justify-center border border-slate-300 rounded-full overflow-hidden">
               {logo ? (
                 <Image
@@ -97,40 +102,45 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
               )}
             </div>
           </section>
-          <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1px] border-black h-[246px] flex flex-col">
-            <div className="flex items-center mb-2">
-              <span className="text-xs text-slate-600 uppercase">
-                {formattedDateRange}
-              </span>
-            </div>
+          <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1px] border-black h-[246px] flex flex-col justify-between">
             <h5
-              className="text-xl font-bold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-tight mb-2"
+              className="text-[28px] font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-[30px] py-1"
               title={title}
             >
               {title}
             </h5>
-            <div className="h-[60px] mt-auto overflow-hidden">
-              <div className="flex flex-wrap gap-1 justify-start h-full content-end pb-1">
-                {visibleScopes.map((scope) => (
-                  <span
-                    key={scope}
-                    className="text-xs text-slate-600 px-2 py-1 leading-none border border-slate-400 rounded-full flex items-center"
-                    title={
-                      scope.endsWith("...")
-                        ? scopes?.find((s) => s.startsWith(scope.slice(0, -3)))
-                        : scope
-                    }
-                  >
-                    {scope}
-                  </span>
-                ))}
-                {hiddenScopesCount > 0 && (
-                  <span className="text-xs text-slate-900 px-2 py-1 leading-none border border-slate-400 rounded-full flex items-center bg-neutral-100">
-                    +{hiddenScopesCount} more
-                  </span>
-                )}
+            <section className="border-t-[1.5px] border-black">
+              <div className="flex items-center pb-2 pt-1 justify-between">
+                <span className="uppercase text-xs tracking-wide">work</span>
+                <span className="text-xs uppercase font-medium">
+                  {formattedDateRange}
+                </span>
               </div>
-            </div>
+              <div className="h-[62px] mt-auto overflow-hidden w-full">
+                <div className="flex flex-wrap gap-1 justify-start h-full content-end pb-1">
+                  {visibleScopes.map((scope) => (
+                    <span
+                      key={scope}
+                      className="text-base px-2 py-1 leading-none border-[1.5px] border-black rounded-lg flex items-center"
+                      title={
+                        scope.endsWith("...")
+                          ? scopes?.find((s) =>
+                              s.startsWith(scope.slice(0, -3)),
+                            )
+                          : scope
+                      }
+                    >
+                      {scope}
+                    </span>
+                  ))}
+                  {hiddenScopesCount > 0 && (
+                    <div className="text-sm font-medium text-slate-900 px-2 py-1 leading-none border border-black rounded-full flex items-center justify-center bg-neutral-100">
+                      +{hiddenScopesCount}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
           </section>
         </article>
       );

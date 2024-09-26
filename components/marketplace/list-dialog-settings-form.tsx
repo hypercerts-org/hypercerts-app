@@ -158,9 +158,9 @@ export default function ListDialogSettingsForm({
   }, [formIsValid, setFormIsValid]);
 
   return (
-    <div className="border rounded-sm p-5 border-gray-200 flex flex-col gap-5">
+    <div className="border rounded-sm p-5 border-slate-200 flex flex-col gap-5">
       <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Units offered
         </h5>
         <Input
@@ -169,7 +169,7 @@ export default function ListDialogSettingsForm({
           onChange={(e) => setUnitsForSale(e.target.value)}
         />
         {unitsForSaleValidation[0] ? (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-slate-500">
             {unitsForSaleValidation[1]}
           </div>
         ) : (
@@ -180,7 +180,7 @@ export default function ListDialogSettingsForm({
       </div>
 
       <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           MIN UNITS PER ORDER
         </h5>
         <Input
@@ -189,7 +189,7 @@ export default function ListDialogSettingsForm({
           onChange={(e) => setUnitsMinPerOrder(e.target.value)}
         />
         {unitsMinPerOrderValidation[0] ? (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-slate-500">
             {unitsMinPerOrderValidation[1]}
           </div>
         ) : (
@@ -200,7 +200,7 @@ export default function ListDialogSettingsForm({
       </div>
 
       <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           MAX UNITS PER ORDER
         </h5>
         <Input
@@ -209,7 +209,7 @@ export default function ListDialogSettingsForm({
           onChange={(e) => setUnitsMaxPerOrder(e.target.value)}
         />
         {unitsMaxPerOrderValidation[0] ? (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-slate-500">
             {unitsMaxPerOrderValidation[1]}
           </div>
         ) : (

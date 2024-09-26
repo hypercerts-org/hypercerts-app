@@ -297,7 +297,7 @@ function ListDialogInner({
       </table>
 
       <div className="flex flex-col gap-2">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           ASKED SHARE PRICE
         </h5>
         <ListAskedPrice
@@ -307,7 +307,7 @@ function ListDialogInner({
           setCurrency={(currency) => setState({ ...state, currency })}
         />
         {selectedFraction && isPriceValid && (
-          <div className="text-sm text-gray-500 flex align-middle w-full">
+          <div className="text-sm text-slate-500 flex align-middle w-full">
             Creating this listing will offer&nbsp;
             <b>
               <FormattedUnits>{state.unitsForSale}</FormattedUnits>
@@ -345,7 +345,7 @@ function ListDialogInner({
       </div>
 
       <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           SALE STARTING TIME
         </h5>
         <DateTimePicker
@@ -358,7 +358,7 @@ function ListDialogInner({
           value={state.startDateTime}
         />
         {startDateTimeValidation[0] ? (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-slate-500">
             {startDateTimeValidation[1]}
           </div>
         ) : (
@@ -369,7 +369,7 @@ function ListDialogInner({
       </div>
 
       <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           SALE ENDING TIME
         </h5>
         <DateTimePicker
@@ -379,7 +379,7 @@ function ListDialogInner({
           value={state.endDateTime}
         />
         {endDateTimeValidation[0] ? (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-slate-500">
             {endDateTimeValidation[1]}
           </div>
         ) : (
@@ -389,7 +389,7 @@ function ListDialogInner({
       <div className="flex flex-col gap-2">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1" className="data-[state=open]:border-0">
-            <AccordionTrigger className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+            <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
               Advanced settings
             </AccordionTrigger>
             <AccordionContent>

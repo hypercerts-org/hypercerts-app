@@ -1,19 +1,13 @@
 "use client";
 
-import { ArrowUpRight, ChevronDown } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ArrowUpRight } from "lucide-react";
 
 import ChainDisplay from "@/components/chain-display";
+import { buttonVariants } from "@/components/ui/button";
+import { WalletProfile } from "@/components/wallet-profile";
+import { siteConfig } from "@/configs/site";
 import Image from "next/image";
 import Link from "next/link";
-import { WalletProfile } from "@/components/wallet-profile";
-import { buttonVariants } from "@/components/ui/button";
-import { siteConfig } from "@/configs/site";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 
@@ -27,13 +21,13 @@ const Navbar = () => {
         <Link href="/">
           <div className="relative flex space-x-1">
             <Image
-              src="/hypercerts-logo.png"
+              src="/hypercerts-logo.svg"
               width={46}
               height={46}
               alt="Hypercerts mark"
-              className="w-6 h-6"
+              className="w-6 h-6 lg:w-8 lg:h-8"
             />
-            <span className="font-semibold text-base md:text-xl tracking-tight">
+            <span className="font-semibold text-base lg:text-2xl tracking-tight">
               Hypercerts
             </span>
           </div>

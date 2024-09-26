@@ -32,7 +32,7 @@ export default function EvaluatorsPagination({
         )}
       </div>
 
-      <div className="pt-1 text-sm text-gray-500 whitespace-nowrap">
+      <div className="pt-1 text-sm text-slate-500 whitespace-nowrap">
         {currentPage} of {totalPages}
       </div>
 

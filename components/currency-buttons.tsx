@@ -24,7 +24,7 @@ export const CurrencyButtons = ({ className }: { className?: string }) => {
     "hover:text-white first:rounded-r-none last:rounded-l-none",
   );
   const inactiveClass = cn(
-    "bg-white text-black border border-gray-300",
+    "bg-white text-black border border-slate-300",
     sharedClasses,
   );
   const activeClass = cn("bg-black text-white", sharedClasses);

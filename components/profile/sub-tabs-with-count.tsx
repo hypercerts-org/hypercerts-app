@@ -20,14 +20,14 @@ export const SubTabsWithCount = ({
   tabs,
 }: SubTabsWithCountProps) => {
   return (
-    <section className="bg-neutral-100 w-max flex rounded-sm p-1 my-2">
+    <section className="bg-slate-100 w-max flex rounded-sm p-1 my-2">
       {tabs.map(({ key, triggerLabel }) => (
         <Link href={createTabRoute(address, key)} key={key}>
           <button
             className={cn(
               "flex gap-1.5 px-3 py-2 text-sm rounded-md tracking-tight transition duration-300 border-[1.5px] shadow-sm font-semibold",
               key === activeTab
-                ? "bg-white border-neutral-300"
+                ? "bg-white border-slate-300"
                 : "opacity-60 border-transparent",
             )}
           >

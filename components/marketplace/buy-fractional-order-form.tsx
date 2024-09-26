@@ -180,13 +180,13 @@ export const BuyFractionalOrderForm = ({
         name={"percentageAmount"}
         render={() => (
           <FormItem>
-            <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+            <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
               % to buy
             </h5>
             <FormControl>
               <Input {...form.register("percentageAmount")} />
             </FormControl>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-slate-500">
               You will buy{" "}
               <b>
                 <FormattedUnits>{unitsToBuy}</FormattedUnits>
@@ -203,7 +203,7 @@ export const BuyFractionalOrderForm = ({
         name={"pricePerPercent"}
         render={() => (
           <FormItem>
-            <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+            <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
               Price per %
             </h5>
             <FormControl>
@@ -222,7 +222,7 @@ export const BuyFractionalOrderForm = ({
                 }}
               />
             </FormControl>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-slate-500">
               You can voluntarily increase the price. (min:{" "}
               <b>
                 {formattedMinPrice} {currency.symbol}

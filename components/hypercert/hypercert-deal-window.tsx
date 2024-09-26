@@ -58,10 +58,10 @@ const HypercertDealWindow = ({
             {evaluationStatus}
           </div>
         </section>
-        <section className="bg-gray-200/80 backdrop-blur-md bottom-0 w-full p-4 text-black space-y-2">
+        <section className="bg-accent/80 backdrop-blur-md bottom-0 w-full p-4 text-black space-y-2">
           <p
             className={`flex-1 text-sm font-semibold line-clamp-2 text-ellipsis ${
-              name ? "text-black" : "text-gray-700"
+              name ? "text-black" : "text-slate-700"
             }`}
           >
             {name || "[Untitled]"}

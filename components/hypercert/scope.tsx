@@ -12,7 +12,7 @@ export default function WorkScope({ hypercert }: { hypercert: HypercertFull }) {
 
   return (
     <div className="space-y-2 w-full">
-      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+      <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
         Work Scope
       </h5>
       <div className="flex flex-wrap gap-1">
