@@ -53,7 +53,6 @@ const formSchema = z
     hypercerts: z
       .array(
         z.object({
-          id: z.string().uuid().optional(),
           hypercertId: z
             .string()
             .trim()

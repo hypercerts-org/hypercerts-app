@@ -2,27 +2,48 @@ import { ResultOf, graphql } from "@/lib/graphql";
 
 export const HyperboardFragment = graphql(`
   fragment HyperboardFragment on Hyperboard {
-    id
-    name
-    admin_id
-    chain_id
-    background_image
-    grayscale_image
-    tile_border_color
-    collections {
-      id
-      created_at
-      name
-      description
-      admin_id
-      hidden
+    admins {
+      address
       chain_id
-      hypercerts {
-        id
-        hypercert_id
-        display_size
-        admin_id
-        chain_id
+    }
+    name
+    background_image
+    grayscale_images
+    tile_border_color
+    sections {
+      count
+      data {
+        label
+        collection {
+          name
+          admins {
+            address
+            display_name
+          }
+          description
+          id
+        }
+        entries {
+          is_blueprint
+          id
+          percentage_of_section
+          display_size
+          name
+          total_units
+          owners {
+            percentage
+            address
+            units
+            avatar
+            display_name
+          }
+        }
+        owners {
+          percentage_owned
+          address
+          display_name
+          avatar
+        }
       }
     }
   }

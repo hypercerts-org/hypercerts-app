@@ -1,13 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { CollectionCreateFormValues } from "@/components/collections/collection-form";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
-import { useAccount, useSignMessage, useSignTypedData } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
 import revalidatePathServerAction from "@/app/actions";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useRouter } from "next/navigation";
 
-interface HyperboardCreateRequest {
-  chainId: number;
+export interface HyperboardCreateRequest {
+  chainIds: number[];
   title: string;
   collections: {
     title: string;
@@ -68,13 +68,17 @@ export const useCreateHyperboard = () => {
           },
           types: {
             Hyperboard: [{ name: "title", type: "string" }],
-            CreateRequest: [{ name: "hyperboard", type: "Hyperboard" }],
+            HyperboardCreateRequest: [
+              { name: "hyperboard", type: "Hyperboard" },
+              { name: "chainId", type: "uint256" },
+            ],
           },
-          primaryType: "CreateRequest",
+          primaryType: "HyperboardCreateRequest",
           message: {
             hyperboard: {
               title: data.title,
             },
+            chainId: BigInt(chainId),
           },
         });
         if (!signature) {
@@ -103,7 +107,7 @@ export const useCreateHyperboard = () => {
           },
         ],
         borderColor: data.borderColor,
-        chainId: chainId,
+        chainIds: [chainId],
         backgroundImg: data.backgroundImg,
         adminAddress: address,
         signature: signature,
@@ -146,16 +150,15 @@ export const useCreateHyperboard = () => {
   });
 };
 
-interface HyperboardUpdateRequest {
+export interface HyperboardUpdateRequest {
   id: string;
-  chainId: number;
+  chainIds: number[];
   title: string;
   collections: {
-    id: string;
+    id?: string;
     title: string;
     description: string;
     hypercerts: {
-      id?: string;
       hypercertId: string;
       factor: number;
     }[];
@@ -219,13 +222,17 @@ export const useUpdateHyperboard = () => {
           },
           types: {
             Hyperboard: [{ name: "id", type: "string" }],
-            UpdateRequest: [{ name: "hyperboard", type: "Hyperboard" }],
+            HyperboardUpdateRequest: [
+              { name: "hyperboard", type: "Hyperboard" },
+              { name: "chainId", type: "uint256" },
+            ],
           },
-          primaryType: "UpdateRequest",
+          primaryType: "HyperboardUpdateRequest",
           message: {
             hyperboard: {
               id: data.id,
             },
+            chainId: BigInt(chainId),
           },
         });
         if (!signature) {
@@ -248,14 +255,7 @@ export const useUpdateHyperboard = () => {
             title: data.title,
             description: data.description,
             hypercerts: data.hypercerts.map((hc) => {
-              if (!hc.id) {
-                return {
-                  hypercertId: hc.hypercertId,
-                  factor: hc.factor,
-                };
-              }
               return {
-                id: hc.id,
                 hypercertId: hc.hypercertId,
                 factor: hc.factor,
               };
@@ -263,7 +263,7 @@ export const useUpdateHyperboard = () => {
           },
         ],
         borderColor: data.borderColor,
-        chainId: chainId,
+        chainIds: [chainId],
         backgroundImg: data.backgroundImg,
         adminAddress: address,
         signature: signature,
@@ -348,9 +348,11 @@ export const useDeleteCollection = () => {
           },
           types: {
             Hyperboard: [{ name: "id", type: "string" }],
-            DeleteRequest: [{ name: "hyperboard", type: "Hyperboard" }],
+            HyperboardDeleteRequest: [
+              { name: "hyperboard", type: "Hyperboard" },
+            ],
           },
-          primaryType: "DeleteRequest",
+          primaryType: "HyperboardDeleteRequest",
           message: {
             hyperboard: {
               id: hyperboardId,
