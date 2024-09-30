@@ -2,6 +2,7 @@ import { ResultOf, graphql } from "@/lib/graphql";
 
 export const HyperboardFragment = graphql(`
   fragment HyperboardFragment on Hyperboard {
+    id
     admins {
       address
       chain_id

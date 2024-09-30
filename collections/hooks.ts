@@ -323,6 +323,10 @@ export const useDeleteCollection = () => {
   return useMutation({
     mutationKey: ["collection", "delete"],
     mutationFn: async (hyperboardId: string) => {
+      if (!chainId) {
+        throw new Error("Chain ID not found");
+      }
+
       setSteps([
         {
           id: "Awaiting signature",
@@ -350,6 +354,7 @@ export const useDeleteCollection = () => {
             Hyperboard: [{ name: "id", type: "string" }],
             HyperboardDeleteRequest: [
               { name: "hyperboard", type: "Hyperboard" },
+              { name: "chainId", type: "uint256" },
             ],
           },
           primaryType: "HyperboardDeleteRequest",
@@ -357,6 +362,7 @@ export const useDeleteCollection = () => {
             hyperboard: {
               id: hyperboardId,
             },
+            chainId: BigInt(chainId),
           },
         });
         if (!signature) {

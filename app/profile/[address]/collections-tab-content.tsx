@@ -16,7 +16,7 @@ const CollectionsTabContentInner = async ({
 }) => {
   const currentPage = Number(searchParams?.p) || 1;
   const result = await getCollectionsByAdminAddress({
-    adminAddress: address.toLowerCase(),
+    adminAddress: address,
     first: COLLECTIONS_PER_PAGE,
     offset: COLLECTIONS_PER_PAGE * (currentPage - 1),
   });
