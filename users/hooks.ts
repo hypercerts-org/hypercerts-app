@@ -59,7 +59,10 @@ export const useAddOrUpdateUser = () => {
               { name: "displayName", type: "string" },
               { name: "avatar", type: "string" },
             ],
-            UserUpdateRequest: [{ name: "user", type: "User" }],
+            UserUpdateRequest: [
+              { name: "user", type: "User" },
+              { name: "chainId", type: "uint256" },
+            ],
           },
           primaryType: "UserUpdateRequest",
           message: {
@@ -67,6 +70,7 @@ export const useAddOrUpdateUser = () => {
               displayName: user.displayName || "",
               avatar: user.avatar || "",
             },
+            chainId: BigInt(chainId),
           },
         });
         if (!signature) {
