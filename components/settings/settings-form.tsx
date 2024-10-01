@@ -118,35 +118,29 @@ export const SettingsForm = () => {
           <FormField
             control={form.control}
             name="displayName"
-            render={({ field }) => {
-              // console.log(field);
-              return (
-                <FormItem>
-                  <FormLabel>Display name</FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isPending} />
-                  </FormControl>
-                  <FormMessage />
-                  <FormDescription>Max. 30 characters</FormDescription>
-                </FormItem>
-              );
-            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Display name</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={isPending} />
+                </FormControl>
+                <FormMessage />
+                <FormDescription>Max. 30 characters</FormDescription>
+              </FormItem>
+            )}
           />
           <FormField
             control={form.control}
             name="avatar"
-            render={({ field }) => {
-              // console.log(field);
-              return (
-                <FormItem>
-                  <FormLabel>Image</FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={isPending} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Image</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={isPending} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
 
           {showAvatar && (
