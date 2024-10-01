@@ -70,7 +70,6 @@ export const useCreateHyperboard = () => {
             Hyperboard: [{ name: "title", type: "string" }],
             HyperboardCreateRequest: [
               { name: "hyperboard", type: "Hyperboard" },
-              { name: "chainId", type: "uint256" },
             ],
           },
           primaryType: "HyperboardCreateRequest",
@@ -78,7 +77,6 @@ export const useCreateHyperboard = () => {
             hyperboard: {
               title: data.title,
             },
-            chainId: BigInt(chainId),
           },
         });
         if (!signature) {
@@ -224,7 +222,6 @@ export const useUpdateHyperboard = () => {
             Hyperboard: [{ name: "id", type: "string" }],
             HyperboardUpdateRequest: [
               { name: "hyperboard", type: "Hyperboard" },
-              { name: "chainId", type: "uint256" },
             ],
           },
           primaryType: "HyperboardUpdateRequest",
@@ -232,7 +229,6 @@ export const useUpdateHyperboard = () => {
             hyperboard: {
               id: data.id,
             },
-            chainId: BigInt(chainId),
           },
         });
         if (!signature) {
@@ -354,7 +350,6 @@ export const useDeleteCollection = () => {
             Hyperboard: [{ name: "id", type: "string" }],
             HyperboardDeleteRequest: [
               { name: "hyperboard", type: "Hyperboard" },
-              { name: "chainId", type: "uint256" },
             ],
           },
           primaryType: "HyperboardDeleteRequest",
@@ -362,7 +357,6 @@ export const useDeleteCollection = () => {
             hyperboard: {
               id: hyperboardId,
             },
-            chainId: BigInt(chainId),
           },
         });
         if (!signature) {
