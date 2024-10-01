@@ -117,16 +117,23 @@ export const useAddOrUpdateUser = () => {
 };
 
 export const useGetUser = ({ address }: { address?: string }) => {
+  const chainId = useAccount().chainId;
   return useQuery({
     queryKey: ["user", address],
     queryFn: async () => {
       if (!address) {
         return null;
       }
+
+      if (!chainId) {
+        return null;
+      }
       const query = graphql(
         `
-          query UserQuery($address: String!) {
-            users(where: { address: { eq: $address } }) {
+          query UserQuery($address: String!, $chainId: BigInt!) {
+            users(
+              where: { address: { eq: $address }, chain_id: { eq: $chainId } }
+            ) {
               count
               data {
                 ...UserFragment
@@ -138,6 +145,7 @@ export const useGetUser = ({ address }: { address?: string }) => {
       );
       const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
         address,
+        chainId: chainId.toString(),
       });
       const userFragment = res.users?.data?.[0];
       if (!userFragment) {

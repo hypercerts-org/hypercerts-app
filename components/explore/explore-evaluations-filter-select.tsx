@@ -32,10 +32,10 @@ export default function ExploreEvaluationsFilterSelect() {
       onValueChange={selectFilter}
       value={selectedValue}
     >
-      <SelectTrigger className="w-[150px]">
+      <SelectTrigger className="w-full">
         <SelectValue placeholder="All chains" />
       </SelectTrigger>
-      <SelectContent className="w-max">
+      <SelectContent className="w-full">
         <SelectItem value="all">All Hypercerts</SelectItem>
         <SelectItem value="evaluated"> Only evaluated</SelectItem>
       </SelectContent>

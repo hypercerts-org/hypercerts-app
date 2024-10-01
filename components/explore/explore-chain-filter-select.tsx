@@ -33,10 +33,10 @@ export default function ChainFilterSelect() {
       onValueChange={selectFilter}
       value={selectedValue}
     >
-      <SelectTrigger className="w-[130px]">
+      <SelectTrigger className="w-full">
         <SelectValue placeholder="All chains" />
       </SelectTrigger>
-      <SelectContent className="w-max">
+      <SelectContent className="w-full">
         <SelectItem value="all">All chains</SelectItem>
         {SUPPORTED_CHAINS.map((chain) => (
           <SelectItem key={chain.id} value={chain.id.toString()}>

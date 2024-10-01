@@ -10,6 +10,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Navbar = () => {
   const currentPath = usePathname();
@@ -56,7 +62,7 @@ const Navbar = () => {
             <span className="hover:underline">Create</span>
           </Link>
 
-          {address && (
+          {address ? (
             <Link
               key={siteConfig.links.profile}
               href={`${siteConfig.links.profile}/${address}`}
@@ -68,6 +74,22 @@ const Navbar = () => {
             >
               <span className="hover:underline">My hypercerts</span>
             </Link>
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className={`${buttonVariants({ variant: "link" })} opacity-50 cursor-help`}
+                  >
+                    My hypercerts
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[300px]">
+                  Click the &quot;Connect Wallet&quot; button and sign in to
+                  access your hypercerts
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           <Link
             href={siteConfig.links.docs}

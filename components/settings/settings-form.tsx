@@ -1,7 +1,7 @@
 "use client";
 
 import z from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import {
@@ -56,14 +56,17 @@ export const SettingsForm = () => {
     isPendingGetEnsName ||
     isPendingGetEnsAvatar;
 
-  const form = useForm({
+  const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
-    disabled: isPending,
-    mode: "onBlur",
+    mode: "all",
+    reValidateMode: "onChange",
   });
 
-  const { displayName, avatar } = form.watch();
+  const [displayName, avatar] = useWatch({
+    control: form.control,
+    name: ["displayName", "avatar"],
+  });
 
   const [updatedUserName, setUpdatedUserName] = useState(false);
   const [updatedUserNameEns, setUpdatedUserNameEns] = useState(false);
@@ -102,18 +105,6 @@ export const SettingsForm = () => {
   const submitDisabled =
     form.formState.isSubmitting || !form.formState.isValid || isPending;
 
-  console.log({
-    displayName,
-    avatar,
-    isPending,
-    isPendingGetUser,
-    isPendingUpdateUser,
-    isPendingGetEnsName,
-    isPendingGetEnsAvatar,
-    updatedUserName,
-    form,
-  });
-
   const showAvatar =
     avatar && !form.formState.isValidating && !form.formState.errors.avatar;
 
@@ -131,7 +122,7 @@ export const SettingsForm = () => {
               <FormItem>
                 <FormLabel>Display name</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
                 <FormDescription>Max. 30 characters</FormDescription>
@@ -145,7 +136,7 @@ export const SettingsForm = () => {
               <FormItem>
                 <FormLabel>Image</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

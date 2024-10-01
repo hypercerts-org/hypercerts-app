@@ -27,4 +27,32 @@ export const EAS_CONFIG: EasConfig[] = [
     explorerUrl: "https://sepolia.easscan.org",
     graphqlUrl: "https://sepolia.easscan.org/graphql",
   },
+  {
+    id: 10,
+    address: "0x4200000000000000000000000000000000000021",
+    registryAddress: "0x4200000000000000000000000000000000000020",
+    explorerUrl: "https://optimism.easscan.org",
+    graphqlUrl: "https://optimism.easscan.org/graphql",
+  },
+  {
+    id: 42220,
+    address: "0x72E1d8ccf5299fb36fEfD8CC4394B8ef7e98Af92",
+    registryAddress: "0x5ece93bE4BDCF293Ed61FA78698B594F2135AF34",
+    explorerUrl: "https://celo.easscan.org",
+    graphqlUrl: "https://celo.easscan.org/graphql",
+  },
+  {
+    id: 42161,
+    address: "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458",
+    registryAddress: "0xA310da9c5B885E7fb3fbA9D66E9Ba6Df512b78eB",
+    explorerUrl: "https://arbitrum.easscan.org",
+    graphqlUrl: "https://arbitrum.easscan.org/graphql",
+  },
+  {
+    id: 8453,
+    address: "0x4200000000000000000000000000000000000021",
+    registryAddress: "0x4200000000000000000000000000000000000020",
+    explorerUrl: "https://base.easscan.org",
+    graphqlUrl: "https://base.easscan.org/graphql",
+  },
 ];
