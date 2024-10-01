@@ -76,7 +76,7 @@ export type introspection_types = {
     'StringSearchOptions': { kind: 'INPUT_OBJECT'; name: 'StringSearchOptions'; isOneOf: false; inputFields: [{ name: 'eq'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; }; defaultValue: null }, { name: 'contains'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; }; defaultValue: null }, { name: 'startsWith'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; }; defaultValue: null }, { name: 'endsWith'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; }; defaultValue: null }]; };
     'UUID': unknown;
     'User': { kind: 'OBJECT'; name: 'User'; fields: { 'address': { name: 'address'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'SCALAR'; name: 'String'; ofType: null; }; } }; 'avatar': { name: 'avatar'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; 'display_name': { name: 'display_name'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; }; };
-    'UserWhereInput': { kind: 'INPUT_OBJECT'; name: 'UserWhereInput'; isOneOf: false; inputFields: [{ name: 'address'; type: { kind: 'INPUT_OBJECT'; name: 'StringSearchOptions'; ofType: null; }; defaultValue: null }]; };
+    'UserWhereInput': { kind: 'INPUT_OBJECT'; name: 'UserWhereInput'; isOneOf: false; inputFields: [{ name: 'address'; type: { kind: 'INPUT_OBJECT'; name: 'StringSearchOptions'; ofType: null; }; defaultValue: null }, { name: 'chain_id'; type: { kind: 'INPUT_OBJECT'; name: 'BigIntSearchOptions'; ofType: null; }; defaultValue: null }]; };
 };
 
 /** An IntrospectionQuery representation of your schema.
