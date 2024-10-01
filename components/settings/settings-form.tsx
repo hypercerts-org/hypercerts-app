@@ -112,6 +112,7 @@ export const SettingsForm = () => {
     isPendingGetEnsAvatar,
     updatedUserName,
     form,
+    test: "test",
   });
 
   const showAvatar =
