@@ -145,7 +145,7 @@ export const useGetUser = ({ address }: { address?: string }) => {
       );
       const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
         address,
-        chainId,
+        chainId: chainId.toString(),
       });
       const userFragment = res.users?.data?.[0];
       if (!userFragment) {
