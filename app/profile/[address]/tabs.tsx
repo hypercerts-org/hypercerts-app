@@ -9,6 +9,9 @@ export const subTabs = [
   { key: "marketplace-listings", triggerLabel: "Listings" },
   { key: "marketplace-bought", triggerLabel: "Bought" },
   { key: "marketplace-sold", triggerLabel: "Sold" },
+  { key: "blueprints-claimable", triggerLabel: "Claimable" },
+  { key: "blueprints-claimed", triggerLabel: "Claimed" },
+  { key: "blueprints-created", triggerLabel: "Created" },
 ] as const;
 
 export type ProfileSubTabKey =
@@ -35,6 +38,11 @@ const mainTabs: {
     prefix: "marketplace",
     triggerLabel: "Marketplace",
     defaultSubTabKey: "marketplace-listings",
+  },
+  {
+    prefix: "blueprints",
+    triggerLabel: "Blueprints",
+    defaultSubTabKey: "blueprints-claimable",
   },
 ];
 
