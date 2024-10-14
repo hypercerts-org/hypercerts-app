@@ -33,6 +33,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.origin),
   title: { default: siteConfig.name, template: "%s | Hypercerts" },
   description: siteConfig.description,
+  openGraph: {
+    type: "website",
+    url: siteConfig.origin,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: ["/hypercerts-opengraph.jpg"],
+  },
   icons: [
     { rel: "icon", url: "/favicon-16x16.png", sizes: "16x16" },
     { rel: "icon", url: "/favicon-32x32.png", sizes: "32x32" },

@@ -3,7 +3,6 @@ import { CONSTANTS } from "@hypercerts-org/sdk";
 import { ENVIRONMENT } from "@/configs/constants";
 
 const HYPERCERT_API_URL =
-  process.env.NEXT_PUBLIC_HYPERCERT_API_ENDPOINT ||
   CONSTANTS.ENDPOINTS[ENVIRONMENT as keyof typeof CONSTANTS.ENDPOINTS];
 
 export const HYPERCERTS_API_URL_REST = `${HYPERCERT_API_URL}/v1`;

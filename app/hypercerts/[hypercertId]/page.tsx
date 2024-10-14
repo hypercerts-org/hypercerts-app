@@ -38,7 +38,11 @@ export async function generateMetadata(
     title: hypercert?.metadata?.name || "Untitled Hypercert",
     description: hypercert?.metadata?.description || "",
     openGraph: {
-      images: [`/api/hypercerts/${hypercertId}/image`, ...previousImages],
+      images: [
+        `/api/hypercerts/${hypercertId}/image`,
+        "/hypercerts-opengraph.jpg",
+        ...previousImages,
+      ],
     },
   };
 }

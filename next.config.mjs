@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "/explore",
+        destination: "/explore?filter=evaluated",
         permanent: false,
       },
     ];
