@@ -22,13 +22,12 @@ const EditCollectionPage = async ({
     description: data.sections.data[0].collection.description,
     borderColor: data.tile_border_color || "#000000",
     backgroundImg: data.background_image || "",
-    hypercerts:
+    entries:
       data.sections.data[0].entries?.map((hc) => ({
-        hypercertId: hc.id,
+        entryId: hc.id,
         factor: hc.display_size,
-        id: hc.id,
       })) || [],
-    newHypercertId: "",
+    newId: "",
     newFactor: 1,
   };
 

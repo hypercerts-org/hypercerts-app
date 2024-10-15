@@ -5,6 +5,8 @@ import { useAccount, useSignTypedData } from "wagmi";
 import revalidatePathServerAction from "@/app/actions";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useRouter } from "next/navigation";
+import { isParseableNumber } from "@/lib/isParseableInteger";
+import { isValidHypercertId } from "@/lib/utils";
 
 export interface HyperboardCreateRequest {
   chainIds: number[];
@@ -14,6 +16,10 @@ export interface HyperboardCreateRequest {
     description: string;
     hypercerts: {
       hypercertId: string;
+      factor: number;
+    }[];
+    blueprints: {
+      blueprintId: number;
       factor: number;
     }[];
   }[];
@@ -58,6 +64,19 @@ export const useCreateHyperboard = () => {
       await setStep("Awaiting signature", "active");
       let signature: string;
 
+      const hypercerts = data.entries
+        .filter((x) => isValidHypercertId(x.entryId))
+        .map((hc) => ({
+          hypercertId: hc.entryId,
+          factor: hc.factor,
+        }));
+      const blueprints = data.entries
+        .filter((x) => isParseableNumber(x.entryId))
+        .map((bp) => ({
+          blueprintId: parseInt(bp.entryId),
+          factor: bp.factor,
+        }));
+
       try {
         signature = await signTypedDataAsync({
           account: address,
@@ -72,7 +91,9 @@ export const useCreateHyperboard = () => {
               { name: "description", type: "string" },
               { name: "borderColor", type: "string" },
               { name: "hypercertIds", type: "string[]" },
-              { name: "factors", type: "uint256[]" },
+              { name: "hypercertFactors", type: "uint256[]" },
+              { name: "blueprintIds", type: "uint256[]" },
+              { name: "blueprintFactors", type: "uint256[]" },
             ],
             HyperboardCreateRequest: [
               { name: "hyperboard", type: "Hyperboard" },
@@ -84,8 +105,10 @@ export const useCreateHyperboard = () => {
               title: data.title,
               description: data.description,
               borderColor: data.borderColor,
-              hypercertIds: data.hypercerts.map((hc) => hc.hypercertId),
-              factors: data.hypercerts.map((hc) => BigInt(hc.factor)),
+              hypercertIds: hypercerts.map((hc) => hc.hypercertId),
+              hypercertFactors: hypercerts.map((hc) => BigInt(hc.factor)),
+              blueprintIds: blueprints.map((bp) => BigInt(bp.blueprintId)),
+              blueprintFactors: blueprints.map((bp) => BigInt(bp.factor)),
             },
           },
         });
@@ -106,12 +129,8 @@ export const useCreateHyperboard = () => {
           {
             title: data.title,
             description: data.description,
-            hypercerts: data.hypercerts.map((hc) => {
-              return {
-                hypercertId: hc.hypercertId,
-                factor: hc.factor,
-              };
-            }),
+            hypercerts,
+            blueprints,
           },
         ],
         borderColor: data.borderColor,
@@ -168,6 +187,10 @@ export interface HyperboardUpdateRequest {
     id?: string;
     title: string;
     description: string;
+    blueprints: {
+      blueprintId: number;
+      factor: number;
+    }[];
     hypercerts: {
       hypercertId: string;
       factor: number;
@@ -222,6 +245,18 @@ export const useUpdateHyperboard = () => {
       await setStep("Awaiting signature", "active");
       let signature: string;
 
+      const hypercerts = data.entries
+        .filter((x) => isValidHypercertId(x.entryId))
+        .map((hc) => ({
+          hypercertId: hc.entryId,
+          factor: hc.factor,
+        }));
+      const blueprints = data.entries
+        .filter((x) => isParseableNumber(x.entryId))
+        .map((bp) => ({
+          blueprintId: parseInt(bp.entryId),
+          factor: bp.factor,
+        }));
       try {
         signature = await signTypedDataAsync({
           account: address,
@@ -237,7 +272,9 @@ export const useUpdateHyperboard = () => {
               { name: "description", type: "string" },
               { name: "borderColor", type: "string" },
               { name: "hypercertIds", type: "string[]" },
-              { name: "factors", type: "uint256[]" },
+              { name: "hypercertFactors", type: "uint256[]" },
+              { name: "blueprintIds", type: "uint256[]" },
+              { name: "blueprintFactors", type: "uint256[]" },
             ],
             HyperboardUpdateRequest: [
               { name: "hyperboard", type: "Hyperboard" },
@@ -250,8 +287,10 @@ export const useUpdateHyperboard = () => {
               title: data.title,
               description: data.description,
               borderColor: data.borderColor,
-              hypercertIds: data.hypercerts.map((hc) => hc.hypercertId),
-              factors: data.hypercerts.map((hc) => BigInt(hc.factor)),
+              hypercertIds: hypercerts.map((hc) => hc.hypercertId),
+              hypercertFactors: hypercerts.map((hc) => BigInt(hc.factor)),
+              blueprintIds: blueprints.map((bp) => BigInt(bp.blueprintId)),
+              blueprintFactors: blueprints.map((bp) => BigInt(bp.factor)),
             },
           },
         });
@@ -274,12 +313,8 @@ export const useUpdateHyperboard = () => {
             id: data.collectionId,
             title: data.title,
             description: data.description,
-            hypercerts: data.hypercerts.map((hc) => {
-              return {
-                hypercertId: hc.hypercertId,
-                factor: hc.factor,
-              };
-            }),
+            hypercerts,
+            blueprints,
           },
         ],
         borderColor: data.borderColor,

@@ -12,6 +12,7 @@ const query = graphql(
     query Blueprint(
       $minter_address: String
       $minted: Boolean
+      $ids: [Int]
       $first: Int
       $offset: Int
     ) {
@@ -19,6 +20,7 @@ const query = graphql(
         where: {
           minter_address: { eq: $minter_address }
           minted: { eq: $minted }
+          id: { in: $ids }
         }
         first: $first
         offset: $offset
@@ -41,6 +43,7 @@ export async function getBlueprints({
   filters: {
     minterAddress?: string;
     minted?: boolean;
+    ids?: number[];
   };
   first?: number;
   offset?: number;
@@ -48,6 +51,7 @@ export async function getBlueprints({
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     minter_address: filters.minterAddress,
     minted: filters.minted,
+    ids: filters.ids,
     first,
     offset,
   });
