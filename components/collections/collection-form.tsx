@@ -419,10 +419,11 @@ export const CollectionForm = ({
                       <FormItem className="w-full">
                         {!fields.length && (
                           <FormLabel>
-                            Hypercert ID*{" "}
+                            Hypercert or blueprint ID*{" "}
                             <InfoTooltip>
-                              You can find the Hypercert ID on the view page of
-                              the hypercert.
+                              You can find the Hypercert or blueprint ID on the
+                              view page of the hypercert or in the profile
+                              blueprints overview.
                             </InfoTooltip>
                           </FormLabel>
                         )}
