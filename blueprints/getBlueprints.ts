@@ -6,6 +6,7 @@ import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { BlueprintFragment } from "./blueprint.fragment";
 import request from "graphql-request";
 import { COLLECTIONS_PER_PAGE } from "@/configs/ui";
+import { HypercertFormValues } from "@/components/hypercert/hypercert-minting-form";
 
 const query = graphql(
   `
@@ -95,8 +96,8 @@ export async function getBlueprintById(id: number) {
     return undefined;
   }
 
-  return readFragment(
-    BlueprintFragment,
-    blueprintsFragment,
-  ) as BlueprintFragment;
+  const result = readFragment(BlueprintFragment, blueprintsFragment);
+  return result as BlueprintFragment & {
+    form_values: HypercertFormValues;
+  };
 }
