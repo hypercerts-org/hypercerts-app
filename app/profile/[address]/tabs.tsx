@@ -49,9 +49,6 @@ const mainTabs: {
 export const createTabRoute = (address: string, tabKey: ProfileSubTabKey) =>
   `/profile/${address}?tab=${tabKey}`;
 
-export const defaultDescription =
-  "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
-
 const ProfileTabSection = ({
   address,
   active = "hypercerts-created",

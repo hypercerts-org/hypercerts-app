@@ -149,7 +149,7 @@ export const SettingsForm = () => {
               <img
                 src={avatar}
                 alt="Preview of the profile image"
-                className="rounded-full w-[100px] h-[100px]"
+                className="object-scale-down max-h-full"
               />
             </>
           )}

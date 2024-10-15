@@ -223,7 +223,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const tags = e.target.value
                     .split(",")
-                    .map((tag) => tag.toLowerCase().slice(0, 50));
+                    .map((tag) => tag.slice(0, 50));
                   field.onChange(tags.length > 0 ? tags.slice(0, 20) : []);
                 }}
               />
@@ -260,9 +260,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const contributors = e.target.value
                     .split(",")
-                    .map((contributor) =>
-                      contributor.trim().toLowerCase().slice(0, 50),
-                    );
+                    .map((contributor) => contributor.slice(0, 50));
                   field.onChange(contributors.length > 0 ? contributors : []);
                 }}
               />
