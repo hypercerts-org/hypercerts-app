@@ -13,7 +13,6 @@ const query = graphql(
     query Blueprint(
       $minter_address: String
       $minted: Boolean
-      $ids: [Int]
       $first: Int
       $offset: Int
     ) {
@@ -21,7 +20,6 @@ const query = graphql(
         where: {
           minter_address: { eq: $minter_address }
           minted: { eq: $minted }
-          id: { in: $ids }
         }
         first: $first
         offset: $offset
