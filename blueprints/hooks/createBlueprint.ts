@@ -77,7 +77,7 @@ export const useCreateBlueprint = () => {
         return null;
       }
 
-      await setStep("Updating blueprint");
+      await setStep("Creating blueprint");
 
       try {
         const { acceptTerms, confirmContributorsPermission, ...form_values } =
@@ -97,19 +97,22 @@ export const useCreateBlueprint = () => {
           },
         }).then((res) => {
           if (!res.ok) {
-            throw new Error("Error updating blueprint");
+            throw new Error("Error creating blueprint");
           }
         });
         await setStep("Updating blueprint", "completed");
-        await revalidatePathServerAction("/blueprints");
+        await revalidatePathServerAction([
+          "/blueprints",
+          `/profile/${address}`,
+        ]);
         setTimeout(() => {
           setOpen(false);
         }, 2000);
       } catch (error) {
         await setStep(
-          "Updating blueprint",
+          "Creating blueprint",
           "error",
-          error instanceof Error ? error.message : "Error updating blueprint",
+          error instanceof Error ? error.message : "Error creating blueprint",
         );
       }
     },
