@@ -15,6 +15,7 @@ import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useWalletClient } from "wagmi";
 import { generateBlockExplorerLink } from "@/lib/utils";
 import { useQueueMintBlueprint } from "@/blueprints/hooks/queueMintBlueprint";
+import revalidatePathServerAction from "@/app/actions";
 
 const createExtraContent = (
   receipt: TransactionReceipt,
@@ -79,7 +80,7 @@ const createExtraContent = (
 export const useMintHypercert = () => {
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
-  const { chain } = useAccount();
+  const { chain, address } = useAccount();
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { mutateAsync: queueMintBlueprint } = useQueueMintBlueprint();
@@ -141,6 +142,7 @@ export const useMintHypercert = () => {
 
       await setDialogStep("done", "completed");
 
+      await revalidatePathServerAction(["/collections", `/profile/${address}`]);
       return { hypercertId, receipt, chain };
     },
     mutationFn: async ({
