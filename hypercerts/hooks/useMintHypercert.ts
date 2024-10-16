@@ -142,7 +142,11 @@ export const useMintHypercert = () => {
 
       await setDialogStep("done", "completed");
 
-      await revalidatePathServerAction(["/collections", `/profile/${address}`]);
+      await revalidatePathServerAction([
+        "/collections",
+        "/collections/edit/[collectionId]",
+        `/profile/${address}`,
+      ]);
       return { hypercertId, receipt, chain };
     },
     mutationFn: async ({
