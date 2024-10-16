@@ -254,16 +254,17 @@ export const CollectionForm = ({
     .filter((x) => typeof x === "string")
     .filter(isValidHypercertId);
 
-  const { data: fetchedHypercerts, isFetching } =
+  const { data: fetchedHypercerts, isFetching: isFetchingHypercerts } =
     useHypercertsByIds(allHypercertIds);
 
   const allBlueprintsIds = [...entries.map((entry) => entry.entryId), newId]
     .filter((x) => isParseableNumber(x))
     .map((x) => parseInt(x, 10));
-  const { data: blueprints } = useBlueprintsByIds(allBlueprintsIds);
-  console.log("the blueprints", blueprints);
+  const { data: blueprints, isFetching: isFetchingBlueprints } =
+    useBlueprintsByIds(allBlueprintsIds);
   const newHypercert = fetchedHypercerts?.[newId];
   const newBlueprint = blueprints?.[parseInt(newId, 10)];
+  const isFetching = isFetchingHypercerts || isFetchingBlueprints;
   const canAddHypercert =
     !isFetching &&
     (newHypercert || newBlueprint) &&
@@ -276,8 +277,6 @@ export const CollectionForm = ({
   const buttonText = form.watch("id")
     ? "Update collection"
     : "Create collection";
-
-  console.log("entries", entries);
 
   return (
     <section className="flex flex-col-reverse md:flex-row space-x-4 items-stretch md:justify-start">
@@ -320,7 +319,6 @@ export const CollectionForm = ({
                 {fields.map((field, index) => {
                   const hypercert = fetchedHypercerts?.[field.entryId];
                   const blueprint = blueprints?.[parseInt(field.entryId, 10)];
-                  console.log("blablabla", blueprint, field);
                   return (
                     <div key={field.id}>
                       <div className="flex space-x-2 items-end mt-2 mb-2">
