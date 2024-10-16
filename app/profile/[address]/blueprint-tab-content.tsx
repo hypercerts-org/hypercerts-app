@@ -4,6 +4,8 @@ import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
 import { getBlueprints } from "@/blueprints/getBlueprints";
 import BlueprintsList from "@/components/blueprints/blueprints-list";
+import { CreateBlueprintButton } from "@/components/blueprints/buttons";
+import { OwnAccountOnly } from "@/components/own-account-only";
 
 const BlueprintTabContentInner = async ({
   address,
@@ -38,6 +40,12 @@ const BlueprintTabContentInner = async ({
         tabBadgeCounts={tabBadgeCounts}
         tabs={marketplaceSubTabs}
       />
+
+      <OwnAccountOnly addressToMatch={address}>
+        <div className="flex justify-end mb-2">
+          <CreateBlueprintButton />
+        </div>
+      </OwnAccountOnly>
       {activeTab === "blueprints-claimable" && (
         <BlueprintsList blueprints={availableBlueprints?.blueprints || []} />
       )}

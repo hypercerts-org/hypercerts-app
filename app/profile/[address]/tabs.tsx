@@ -9,9 +9,9 @@ export const subTabs = [
   { key: "marketplace-listings", triggerLabel: "Listings" },
   { key: "marketplace-bought", triggerLabel: "Bought" },
   { key: "marketplace-sold", triggerLabel: "Sold" },
-  { key: "blueprints-claimable", triggerLabel: "Claimable" },
-  { key: "blueprints-claimed", triggerLabel: "Claimed" },
-  { key: "blueprints-created", triggerLabel: "Created" },
+  { key: "blueprints-claimable", triggerLabel: "To be minted" },
+  { key: "blueprints-claimed", triggerLabel: "Minted" },
+  { key: "blueprints-created", triggerLabel: "Sent" },
 ] as const;
 
 export type ProfileSubTabKey =

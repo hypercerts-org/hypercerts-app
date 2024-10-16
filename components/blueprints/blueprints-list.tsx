@@ -5,12 +5,16 @@ import { HypercertFormValues } from "@/components/hypercert/hypercert-minting-fo
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getUnixTime } from "date-fns";
+import { EmptySection } from "@/app/profile/[address]/sections";
 
 export const BlueprintsList = ({
   blueprints,
 }: {
   blueprints: readonly BlueprintFragment[];
 }) => {
+  if (!blueprints.length) {
+    return <EmptySection />;
+  }
   return (
     <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
       {blueprints.map((blueprint, i) => (
