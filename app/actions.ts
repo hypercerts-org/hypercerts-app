@@ -7,12 +7,12 @@ export default async function revalidatePathServerAction(
 ) {
   if (typeof path === "string") {
     console.log("revalidating path", path);
-    revalidatePath(path);
+    revalidatePath(path, "page");
     return;
   }
 
   for (const p of path) {
     console.log("revalidating path", p);
-    revalidatePath(p);
+    revalidatePath(p, "page");
   }
 }
