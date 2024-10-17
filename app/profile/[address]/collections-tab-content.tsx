@@ -1,7 +1,7 @@
 import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
 import { Suspense } from "react";
 import { COLLECTIONS_PER_PAGE } from "@/configs/ui";
-import CollectionPagination from "@/components/collections/collection-pagination";
+import Pagination from "@/components/pagination";
 import { HyperboardsOverview } from "@/app/profile/[address]/collections-tab-content-inner";
 
 const CollectionsTabContentInner = async ({
@@ -29,7 +29,7 @@ const CollectionsTabContentInner = async ({
       <HyperboardsOverview profileAddress={address} hyperboards={hyperboards} />
 
       <div className="mt-5">
-        <CollectionPagination collectionsCount={count || 0} />
+        <Pagination count={count || 0} />
       </div>
     </div>
   );

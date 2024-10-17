@@ -9,6 +9,7 @@ type Query {
   attestationSchemas(first: Int, offset: Int): GetAttestationsSchemaResponse!
   collections(where: CollectionWhereInput, sort: CollectionFetchInput, first: Int, offset: Int): GetCollectionsResponse!
   allowlistRecords(where: AllowlistRecordWhereInput, sort: AllowlistRecordFetchInput, first: Int, offset: Int): GetAllowlistRecordResponse!
+  blueprints(where: BlueprintsWhereInput, first: Int, offset: Int): GetBlueprintsResponse!
 }
 
 type GetAttestationsResponse {
@@ -856,4 +857,11 @@ input AllowlistRecordSortOptions {
   units: SortOrder
   total_units: SortOrder
   root: SortOrder
+}
+
+input BlueprintsWhereInput {
+  id: NumberSearchOptions
+  admin_address: StringSearchOptions
+  minter_address: StringSearchOptions
+  minted: BooleanSearchOptions
 }

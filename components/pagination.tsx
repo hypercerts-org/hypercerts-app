@@ -2,17 +2,18 @@
 
 import { COLLECTIONS_PER_PAGE } from "@/configs/ui";
 import { usePathname, useSearchParams } from "next/navigation";
+import PaginationButton from "@/components/pagination-button";
 
-import PaginationButton from "../pagination-button";
-
-export default function CollectionPagination({
-  collectionsCount,
+export default function Pagination({
+  count,
+  pageSize = COLLECTIONS_PER_PAGE,
 }: {
-  collectionsCount: number;
+  count: number;
+  pageSize?: number;
 }) {
   const pathName = usePathname();
   const searchParams = useSearchParams();
-  const totalPages = Math.ceil((collectionsCount || 0) / COLLECTIONS_PER_PAGE);
+  const totalPages = Math.ceil((count || 0) / pageSize);
   const currentPage = Number(searchParams.get("p")) || 1;
 
   const urlSearchParams = new URLSearchParams(searchParams);

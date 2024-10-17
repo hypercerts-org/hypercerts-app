@@ -52,6 +52,7 @@ export default function ProfilePage({
           <BlueprintsTabContent
             address={address}
             activeTab={tab as ProfileSubTabKey}
+            searchParams={searchParams}
           />
         )}
       </section>

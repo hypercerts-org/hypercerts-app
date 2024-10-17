@@ -10,20 +10,8 @@ import { HypercertFormValues } from "@/components/hypercert/hypercert-minting-fo
 
 const query = graphql(
   `
-    query Blueprint(
-      $minter_address: String
-      $minted: Boolean
-      $first: Int
-      $offset: Int
-    ) {
-      blueprints(
-        where: {
-          minter_address: { eq: $minter_address }
-          minted: { eq: $minted }
-        }
-        first: $first
-        offset: $offset
-      ) {
+    query Blueprint($where: BlueprintWhereInput, $first: Int, $offset: Int) {
+      blueprints(where: $where, first: $first, offset: $offset) {
         count
         data {
           ...BlueprintFragment
@@ -34,6 +22,27 @@ const query = graphql(
   [BlueprintFragment],
 );
 
+const buildFilters = (filters: {
+  minterAddress?: string;
+  adminAddress?: string;
+  minted?: boolean;
+}) => {
+  const where: Record<string, unknown> = {};
+  if (filters.minterAddress) {
+    where["minter_address"] = { eq: filters.minterAddress };
+  }
+  if (filters.adminAddress) {
+    where["admin_address"] = { eq: filters.adminAddress };
+  }
+  if (filters.minted !== undefined) {
+    where["minted"] = { eq: filters.minted };
+  }
+  if (Object.keys(where).length === 0) {
+    return undefined;
+  }
+  return where;
+};
+
 export async function getBlueprints({
   filters,
   first = COLLECTIONS_PER_PAGE,
@@ -41,6 +50,7 @@ export async function getBlueprints({
 }: {
   filters: {
     minterAddress?: string;
+    adminAddress?: string;
     minted?: boolean;
     ids?: number[];
   };
@@ -48,9 +58,7 @@ export async function getBlueprints({
   offset?: number;
 }) {
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
-    minter_address: filters.minterAddress,
-    minted: filters.minted,
-    ids: filters.ids,
+    where: buildFilters(filters) as any,
     first,
     offset,
   });
