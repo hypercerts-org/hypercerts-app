@@ -78,9 +78,14 @@ const BlueprintTabContentInner = async ({
           count={blueprintsCreated?.count}
         />
       )}
-      <div className="mt-5">
-        <Pagination count={currentCount || 0} pageSize={BLUEPRINTS_PER_PAGE} />
-      </div>
+      {currentCount !== 0 && (
+        <div className="mt-5">
+          <Pagination
+            count={currentCount || 0}
+            pageSize={BLUEPRINTS_PER_PAGE}
+          />
+        </div>
+      )}
     </section>
   );
 };
