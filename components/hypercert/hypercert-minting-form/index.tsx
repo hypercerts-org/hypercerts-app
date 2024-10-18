@@ -129,6 +129,12 @@ const getDefaultFormValues = (value: string): HypercertFormValues => {
 
   return {
     ...parsedValue,
+    allowlistEntries: parsedValue.allowlistEntries?.map(
+      (entry: { address?: string; units: string }) => ({
+        ...entry,
+        units: BigInt(entry.units),
+      }),
+    ),
     projectDates: {
       from: new Date(parsedValue.projectDates.from),
       to: new Date(parsedValue.projectDates.to),
@@ -145,6 +151,7 @@ export function HypercertMintingForm({
   presetValues?: HypercertFormValues;
   blueprintId?: number;
 }) {
+  console.log("presetValues", presetValues);
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
   const {
@@ -171,9 +178,23 @@ export function HypercertMintingForm({
         blueprint_minter_address: true,
       });
 
+  const defaultValues = presetValues
+    ? {
+        ...presetValues,
+        allowlistEntries: presetValues.allowlistEntries?.map((entry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        })),
+        projectDates: {
+          to: new Date(presetValues.projectDates.to),
+          from: new Date(presetValues.projectDates.from),
+        },
+      }
+    : value;
+
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchemaUsed),
-    defaultValues: presetValues ?? value,
+    defaultValues,
     mode: "onBlur",
   });
 

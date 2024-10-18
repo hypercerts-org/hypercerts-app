@@ -83,10 +83,24 @@ export const useCreateBlueprint = () => {
       await setStep("Creating blueprint");
 
       try {
-        const { acceptTerms, confirmContributorsPermission, ...form_values } =
-          formValues;
+        const {
+          acceptTerms,
+          confirmContributorsPermission,
+          allowlistEntries,
+          ...form_values
+        } = formValues;
         const body: BlueprintCreateRequest = {
-          form_values,
+          form_values: {
+            ...form_values,
+            ...(allowlistEntries
+              ? {
+                  allowlistEntries: allowlistEntries?.map((entry) => ({
+                    address: entry.address,
+                    units: entry.units.toString(),
+                  })),
+                }
+              : {}),
+          },
           minter_address: minterAddress as `0x${string}`,
           admin_address: address,
           signature: signature as `0x${string}`,

@@ -19,13 +19,7 @@ export default async function NewHypercertPage({
       return <div>Blueprint not found</div>;
     }
 
-    formValues = {
-      ...fetchedBlueprint.form_values,
-      projectDates: {
-        to: new Date(fetchedBlueprint.form_values.projectDates.to),
-        from: new Date(fetchedBlueprint.form_values.projectDates.from),
-      },
-    };
+    formValues = fetchedBlueprint.form_values as HypercertFormValues;
   }
   return (
     <main className="flex flex-col p-8 md:px-16 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
