@@ -126,6 +126,7 @@ export const useCreateBlueprint = () => {
         await revalidatePathServerAction([
           "/blueprints",
           `/profile/${address}`,
+          { path: `/`, type: "layout" },
         ]);
         setTimeout(() => {
           push(`/profile/${address}?tab=blueprints-created`);

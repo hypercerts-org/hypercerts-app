@@ -146,6 +146,7 @@ export const useMintHypercert = () => {
         "/collections",
         "/collections/edit/[collectionId]",
         `/profile/${address}`,
+        { path: `/`, type: "layout" },
       ]);
       return { hypercertId, receipt, chain };
     },

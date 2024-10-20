@@ -159,6 +159,7 @@ export const useCreateHyperboard = () => {
           `/profile/${address}`,
           `/collections/${hyperboardId}`,
           `/collections/edit/${hyperboardId}`,
+          { path: `/`, type: "layout" },
         ]);
         if (!hyperboardId) {
           throw new Error("Hyperboard ID not found");
@@ -348,6 +349,7 @@ export const useUpdateHyperboard = () => {
           `/profile/${address}`,
           `/collections/edit/${hyperboardId}`,
           `/collections/${hyperboardId}`,
+          { path: `/`, type: "layout" },
         ]);
         if (!hyperboardId) {
           throw new Error("Hyperboard ID not found");
@@ -446,7 +448,7 @@ export const useDeleteCollection = () => {
         }
         await revalidatePathServerAction([
           "/collections",
-          `/profile/${address}`,
+          { path: `/`, type: "layout" },
         ]);
         await setStep("Deleting Hyperboard", "completed");
         setTimeout(() => {
