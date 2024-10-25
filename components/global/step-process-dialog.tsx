@@ -81,6 +81,7 @@ export const StepProcessDialogProvider = ({
     if (!open) {
       setSteps([]);
       setInitialized(false);
+      setExtraContent(null);
     }
   }, [open]);
 
