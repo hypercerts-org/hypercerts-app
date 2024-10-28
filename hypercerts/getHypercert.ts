@@ -1,5 +1,4 @@
-import "server-only";
-
+import { cache } from "react";
 import { graphql, readFragment } from "@/lib/graphql";
 
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
@@ -20,10 +19,7 @@ const query = graphql(
   [HypercertFullFragment],
 );
 
-export async function getHypercert(hypercertId: string) {
-  // hypercertID is a string consisting of chainId-contractAddress-tokenId [bigint, string, bigint]
-  // split it into its parts and getAddress for the contractAddress using viem (mixed case)
-
+export const getHypercert = cache(async (hypercertId: string) => {
   const [chainId, contractAddress, tokenId] = hypercertId.split("-");
 
   if (!chainId || !contractAddress || !tokenId) {
@@ -33,7 +29,6 @@ export async function getHypercert(hypercertId: string) {
 
   const _contractAddress = getAddress(contractAddress);
 
-  // TODO: Throw error?
   if (!isAddress(_contractAddress)) {
     console.error("Invalid address");
     return undefined;
@@ -49,4 +44,4 @@ export async function getHypercert(hypercertId: string) {
   }
 
   return readFragment(HypercertFullFragment, hypercertFullFragment);
-}
+});

@@ -1,13 +1,14 @@
+import { Suspense } from "react";
 import {
   ProfileSubTabKey,
   ProfileTabSection,
 } from "@/app/profile/[address]/tabs";
-
 import EthAddress from "@/components/eth-address";
-import { HypercertsTabContent } from "@/app/profile/[address]/hypercerts-tab-content";
 import { CollectionsTabContent } from "@/app/profile/[address]/collections-tab-content";
 import { MarketplaceTabContent } from "@/app/profile/[address]/marketplace-tab-content";
 import { BlueprintsTabContent } from "@/app/profile/[address]/blueprint-tab-content";
+import TabContentSkeleton from "@/components/tab-content-skeleton";
+import { HypercertsTabContent } from "@/app/profile/[address]/hypercerts-tab-content.server";
 
 export default function ProfilePage({
   params,
@@ -17,8 +18,8 @@ export default function ProfilePage({
   searchParams: Record<string, string>;
 }) {
   const address = params.address;
-  const tab = searchParams?.tab || "hypercerts-owned";
-  const mainTab = tab?.split("-")[0] ?? "hypercerts";
+  const tab = (searchParams?.tab || "hypercerts-owned") as ProfileSubTabKey;
+  const mainTab = tab.split("-")[0];
 
   return (
     <section className="flex flex-col gap-2">
@@ -30,31 +31,27 @@ export default function ProfilePage({
       </section>
       <ProfileTabSection address={address} active={tab} />
       <section className="flex flex-col gap-2">
-        {(tab === undefined || mainTab === "hypercerts") && (
-          <HypercertsTabContent
-            address={address}
-            activeTab={tab as ProfileSubTabKey}
-          />
-        )}
-        {mainTab === "collections" && (
-          <CollectionsTabContent
-            address={address}
-            searchParams={searchParams}
-          />
-        )}
-        {mainTab === "marketplace" && (
-          <MarketplaceTabContent
-            address={address}
-            activeTab={tab as ProfileSubTabKey}
-          />
-        )}
-        {mainTab === "blueprints" && (
-          <BlueprintsTabContent
-            address={address}
-            activeTab={tab as ProfileSubTabKey}
-            searchParams={searchParams}
-          />
-        )}
+        <Suspense fallback={<TabContentSkeleton />}>
+          {mainTab === "hypercerts" && (
+            <HypercertsTabContent address={address} activeTab={tab} />
+          )}
+          {mainTab === "collections" && (
+            <CollectionsTabContent
+              address={address}
+              searchParams={searchParams}
+            />
+          )}
+          {mainTab === "marketplace" && (
+            <MarketplaceTabContent address={address} activeTab={tab} />
+          )}
+          {mainTab === "blueprints" && (
+            <BlueprintsTabContent
+              address={address}
+              activeTab={tab}
+              searchParams={searchParams}
+            />
+          )}
+        </Suspense>
       </section>
     </section>
   );
