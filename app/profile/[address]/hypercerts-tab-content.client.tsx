@@ -4,9 +4,7 @@ import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
 import { EmptySection } from "@/app/profile/[address]/sections";
-import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import UnclaimedHypercertsListContent from "@/components/profile/unclaimed-hypercerts-list-content";
 
 export default function HypercertsTabContentInner({
