@@ -4,11 +4,11 @@ import {
   ProfileTabSection,
 } from "@/app/profile/[address]/tabs";
 import EthAddress from "@/components/eth-address";
-import { CollectionsTabContent } from "@/app/profile/[address]/collections-tab-content";
 import MarketplaceTabContent from "@/app/profile/[address]/marketplace-tab-content.server";
-import { BlueprintsTabContent } from "@/app/profile/[address]/blueprint-tab-content";
+import BlueprintsTabContent from "@/app/profile/[address]/blueprint-tab-content.server";
 import TabContentSkeleton from "@/components/tab-content-skeleton";
 import { HypercertsTabContent } from "@/app/profile/[address]/hypercerts-tab-content.server";
+import CollectionsTabContent from "@/app/profile/[address]/collections-tab-content.server";
 
 export default function ProfilePage({
   params,

@@ -18,12 +18,12 @@ import { useDeleteCollection } from "@/collections/hooks";
 
 export const CreateCollectionButton = () => {
   return (
-    <Button
-      className="hover:text-white rounded-sm bg-white text-black border border-slate-300"
-      asChild
+    <Link
+      href="/collections/create"
+      className="hover:text-white rounded-sm bg-white text-black border border-slate-300 px-4 py-2 inline-block"
     >
-      <Link href="/collections/create">Create collection</Link>
-    </Button>
+      Create collection
+    </Link>
   );
 };
 
@@ -33,12 +33,12 @@ export const EditCollectionButton = ({
   collectionId: string;
 }) => {
   return (
-    <Button
-      className="hover:text-white rounded-sm bg-white text-black border border-slate-300"
-      asChild
+    <Link
+      href={`/collections/edit/${collectionId}`}
+      className="hover:text-white rounded-sm bg-white text-black border border-slate-300 px-4 py-2 inline-block"
     >
-      <Link href={`/collections/edit/${collectionId}`}>Edit</Link>
-    </Button>
+      Edit
+    </Link>
   );
 };
 
@@ -50,13 +50,8 @@ export const DeleteCollectionButton = ({
   const { mutateAsync: deleteCollection } = useDeleteCollection();
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
-        <Button
-          className="hover:text-white rounded-sm bg-white text-black border border-slate-300"
-          variant="destructive"
-        >
-          Delete
-        </Button>
+      <AlertDialogTrigger className="hover:text-white rounded-sm bg-white text-black border border-slate-300 px-4 py-2">
+        Delete
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

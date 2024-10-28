@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { ProfileSubTabKey } from "@/app/profile/[address]/tabs";
-import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import MarketplaceTabContentInner from "./marketplace-tab-content.client";
 import { getOrders } from "@/marketplace/getOpenOrders";
 import { getDealsForAddress } from "@/marketplace/getDealsForAddress";
@@ -13,11 +12,6 @@ export default async function MarketplaceTabContent({
   address: string;
   activeTab: ProfileSubTabKey;
 }) {
-  if (!activeTab || !address) {
-    return null;
-  }
-
-  // Fetch data server-side
   const orders = await getOrders({
     filter: { signer: address as `0x${string}` },
   });
