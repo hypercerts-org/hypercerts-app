@@ -1,7 +1,6 @@
 "use client";
 
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
-import { EmptySection } from "@/app/profile/[address]/sections";
 import {
   createColumnHelper,
   flexRender,
@@ -9,6 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Image from "next/image";
+import Link from "next/link";
 import TimeFrame from "../hypercert/time-frame";
 import UnclaimedHypercertClaimButton from "./unclaimed-hypercert-claim-button";
 
@@ -34,27 +34,34 @@ const columns = [
   columnHelper.accessor("image", {
     header: "Image",
     cell: (info) => (
-      <Image
-        src={info.getValue()}
-        alt={info.row.original.name || "Untitled"}
-        className="object-cover object-top w-[100px] h-[100px]"
-        width={75}
-        height={75}
-      />
+      <Link href={`/hypercerts/${info.row.original.id}`}>
+        <Image
+          src={info.getValue()}
+          alt={info.row.original.name || "Untitled"}
+          className="object-cover object-top w-[100px] h-[100px] cursor-pointer"
+          width={75}
+          height={75}
+        />
+      </Link>
     ),
   }),
   columnHelper.accessor("name", {
     header: "Name",
     cell: (info) => (
-      <div className="flex flex-col justify-center">
-        <h6 className="text-lg font-semibold">
-          {info.getValue() || "Untitled"}
-        </h6>
-        <TimeFrame
-          from={info.row.original.timeFrom}
-          to={info.row.original.timeTo}
-        />
-      </div>
+      <Link
+        href={`/hypercerts/${info.row.original.id}`}
+        className="hover:underline"
+      >
+        <div className="flex flex-col justify-center">
+          <h6 className="text-lg font-semibold">
+            {info.getValue() || "Untitled"}
+          </h6>
+          <TimeFrame
+            from={info.row.original.timeFrom}
+            to={info.row.original.timeTo}
+          />
+        </div>
+      </Link>
     ),
   }),
   columnHelper.accessor("allowListRecord", {
