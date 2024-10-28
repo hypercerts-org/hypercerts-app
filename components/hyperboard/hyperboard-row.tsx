@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
-import { HyperboardWidget } from "@/components/hyperboard/hyperboardWidget";
 import {
   DeleteCollectionButton,
   EditCollectionButton,
 } from "@/components/collections/buttons";
+import { HyperboardWidgetContainer } from "@/components/hyperboard/hyperboard-container";
 
 export const HyperboardRow = ({
   hyperboardId,
@@ -19,9 +21,9 @@ export const HyperboardRow = ({
   return (
     <div className="flex flex-col md:flex-row w-full">
       <div className="w-full md:w-1/2">
-        <HyperboardWidget hyperboardId={hyperboardId} />
+        <HyperboardWidgetContainer hyperboardId={hyperboardId} />
       </div>
-      <div className="flex flex-col h-auto w-full md:w-1/2 justify-start pl-0 md:pl-4 pt-0 md:pt-0">
+      <div className="flex flex-col h-auto w-full md:w-1/2 justify-start pl-0 md:pl-4 pt-0 md:pt-0 text-black">
         <Link href={`/collections/${hyperboardId}`}>
           <h3 className="text-lg font-medium">{name}</h3>
         </Link>

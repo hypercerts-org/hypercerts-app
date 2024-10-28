@@ -19,8 +19,8 @@ export default function UserDealsList({
   return (
     <div className="w-full">
       {deals && deals.length > 0 ? (
-        <div className="flex items-center py-4">
-          <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
+        <div className="flex flex-col gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,_minmax(16.875rem,_18.75rem))] gap-4 py-4">
             {deals.map((deal) => {
               const percentTraded = calculateBigIntPercentage(
                 deal?.amounts?.shift(),

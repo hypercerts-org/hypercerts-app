@@ -1,55 +1,39 @@
-import React, { Suspense } from "react";
+"use client";
+
 import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
-import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
-import { getBlueprints } from "@/blueprints/getBlueprints";
 import BlueprintsList from "@/components/blueprints/blueprints-list";
 import { CreateBlueprintButton } from "@/components/blueprints/buttons";
 import { OwnAccountOnly } from "@/components/own-account-only";
 import { BlueprintsTable } from "@/components/blueprints/blueprints-table";
-import { BLUEPRINTS_PER_PAGE } from "@/configs/ui";
 import Pagination from "@/components/pagination";
+import { BLUEPRINTS_PER_PAGE } from "@/configs/ui";
 
-const BlueprintTabContentInner = async ({
+export default function BlueprintsTabContentInner({
   address,
   activeTab,
   searchParams,
+  availableBlueprints,
+  mintedBlueprints,
+  blueprintsCreated,
 }: {
   address: string;
   activeTab: ProfileSubTabKey;
   searchParams: Record<string, string>;
-}) => {
-  const currentPage = Number(searchParams?.p) || 1;
-
-  const availableBlueprints = await getBlueprints({
-    filters: { minterAddress: address as `0x${string}`, minted: false },
-    first: BLUEPRINTS_PER_PAGE,
-    offset: BLUEPRINTS_PER_PAGE * (currentPage - 1),
-  });
-  const mintedBlueprints = await getBlueprints({
-    filters: { minterAddress: address as `0x${string}`, minted: true },
-    first: BLUEPRINTS_PER_PAGE,
-    offset: BLUEPRINTS_PER_PAGE * (currentPage - 1),
-  });
-  const blueprintsCreated = await getBlueprints({
-    filters: { adminAddress: address as `0x${string}` },
-    first: BLUEPRINTS_PER_PAGE,
-    offset: BLUEPRINTS_PER_PAGE * (currentPage - 1),
-  });
-
+  availableBlueprints: any;
+  mintedBlueprints: any;
+  blueprintsCreated: any;
+}) {
   const marketplaceSubTabs = subTabs.filter(
     (tab) => tab.key.split("-")[0] === "blueprints",
   );
 
-  const tabBadgeCounts: Partial<
-    Record<(typeof subTabs)[number]["key"], number>
-  > = {
+  const tabBadgeCounts = {
     "blueprints-claimable": availableBlueprints?.count ?? 0,
     "blueprints-claimed": mintedBlueprints?.count ?? 0,
     "blueprints-created": blueprintsCreated?.count ?? 0,
   };
-  const currentCount =
-    tabBadgeCounts[activeTab as (typeof subTabs)[number]["key"]];
+
   return (
     <section>
       <SubTabsWithCount
@@ -64,6 +48,7 @@ const BlueprintTabContentInner = async ({
           <CreateBlueprintButton />
         </div>
       </OwnAccountOnly>
+
       {activeTab === "blueprints-claimable" && (
         <BlueprintsList blueprints={availableBlueprints?.blueprints || []} />
       )}
@@ -78,35 +63,19 @@ const BlueprintTabContentInner = async ({
           count={blueprintsCreated?.count}
         />
       )}
-      {currentCount !== 0 && (
+
+      {(availableBlueprints?.count ||
+        mintedBlueprints?.count ||
+        blueprintsCreated?.count) && (
         <div className="mt-5">
           <Pagination
-            count={currentCount || 0}
+            count={
+              tabBadgeCounts[activeTab as keyof typeof tabBadgeCounts] || 0
+            }
             pageSize={BLUEPRINTS_PER_PAGE}
           />
         </div>
       )}
     </section>
   );
-};
-
-const BlueprintsTabContent = ({
-  address,
-  activeTab,
-  searchParams,
-}: {
-  address: string;
-  activeTab: ProfileSubTabKey;
-  searchParams: Record<string, string>;
-}) => {
-  return (
-    <Suspense fallback={<ExploreListSkeleton length={9} />}>
-      <BlueprintTabContentInner
-        address={address}
-        activeTab={activeTab}
-        searchParams={searchParams}
-      />
-    </Suspense>
-  );
-};
-export { BlueprintsTabContent };
+}
