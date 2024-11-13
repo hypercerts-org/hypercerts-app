@@ -83,6 +83,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.0.7
         version: 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@safe-global/api-kit':
+        specifier: ^2.5.4
+        version: 2.5.4(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
       '@tanstack/query-core':
         specifier: ^5.32.0
         version: 5.56.2
@@ -2942,15 +2945,30 @@ packages:
   '@rushstack/eslint-patch@1.10.4':
     resolution: {integrity: sha512-WJgX9nzTqknM393q1QJDJmoW28kUfEnybeTfVNcNAPnIx210RXm2DiXiHzfNPJNIUUb1tJnz/l4QGtJ30PgWmA==}
 
+  '@safe-global/api-kit@2.5.4':
+    resolution: {integrity: sha512-L12qTaEQdQqdlPhsjC+JCpH5qxphyegPptrc98cRFnxsES0Dz3i/2df7kSAIntaYIP4aFEbulpVwOjOgWf+hDQ==}
+
+  '@safe-global/protocol-kit@5.0.4':
+    resolution: {integrity: sha512-e2BhyiS/7jMzJY8oNpkMIHWAViENyL42/SAvFOcFsEc6JBvnh+4GGvLRwLVEiQ8e+54sJinRjo1/iTCrTIoqOQ==}
+
   '@safe-global/safe-apps-provider@0.18.3':
     resolution: {integrity: sha512-f/0cNv3S4v7p8rowAjj0hDCg8Q8P/wBjp5twkNWeBdvd0RDr7BuRBPPk74LCqmjQ82P+1ltLlkmVFSmxTIT7XQ==}
 
   '@safe-global/safe-apps-sdk@9.1.0':
     resolution: {integrity: sha512-N5p/ulfnnA2Pi2M3YeWjULeWbjo7ei22JwU/IXnhoHzKq3pYCN6ynL9mJBOlvDVv892EgLPCWCOwQk/uBT2v0Q==}
 
+  '@safe-global/safe-deployments@1.37.15':
+    resolution: {integrity: sha512-blr4pO/CdQRHbeDdrF0Y3YoIJsiYPnaQ6p2ib2rHV/ktIcxI4jdPimoYye8ltkCI/vujzQ3bH+6Z+D1I7JLpnQ==}
+
   '@safe-global/safe-gateway-typescript-sdk@3.22.2':
     resolution: {integrity: sha512-Y0yAxRaB98LFp2Dm+ACZqBSdAmI3FlpH/LjxOZ94g/ouuDJecSq0iR26XZ5QDuEL8Rf+L4jBJaoDC08CD0KkJw==}
     engines: {node: '>=16'}
+
+  '@safe-global/safe-modules-deployments@2.2.4':
+    resolution: {integrity: sha512-m396ZrBPhZVYkapTTIuizyOOtoZsCKbicl0ztgDFfDbi7KbS6AtDP6cV89AYosQxUQS+v0q4ksQd30/j3L1BtQ==}
+
+  '@safe-global/types-kit@1.0.0':
+    resolution: {integrity: sha512-jZNUeHbWobeVrURbcEvfas4Q1IDasQni5UYm2umUtAR6SBDazp1kGni8IjZPRKq3+8q+fYwu9FmKpX50rUYn3w==}
 
   '@scure/base@1.1.9':
     resolution: {integrity: sha512-8YKhl8GHiNI/pU2VMaofa2Tor7PJRAjwQLBBuilkJ9L5+13yVbC7JO/wS7piioAvPSwR3JKM1IJ/u4xQzbcXKg==}
@@ -11901,6 +11919,34 @@ snapshots:
 
   '@rushstack/eslint-patch@1.10.4': {}
 
+  '@safe-global/api-kit@2.5.4(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)':
+    dependencies:
+      '@safe-global/protocol-kit': 5.0.4(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
+      '@safe-global/types-kit': 1.0.0(typescript@5.6.2)(zod@3.23.8)
+      node-fetch: 2.7.0
+      viem: 2.21.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@safe-global/protocol-kit@5.0.4(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)':
+    dependencies:
+      '@noble/hashes': 1.5.0
+      '@safe-global/safe-deployments': 1.37.15
+      '@safe-global/safe-modules-deployments': 2.2.4
+      '@safe-global/types-kit': 1.0.0(typescript@5.6.2)(zod@3.23.8)
+      abitype: 1.0.5(typescript@5.6.2)(zod@3.23.8)
+      semver: 7.6.3
+      viem: 2.21.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
+
   '@safe-global/safe-apps-provider@0.18.3(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)':
     dependencies:
       '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
@@ -11921,7 +11967,20 @@ snapshots:
       - utf-8-validate
       - zod
 
+  '@safe-global/safe-deployments@1.37.15':
+    dependencies:
+      semver: 7.6.3
+
   '@safe-global/safe-gateway-typescript-sdk@3.22.2': {}
+
+  '@safe-global/safe-modules-deployments@2.2.4': {}
+
+  '@safe-global/types-kit@1.0.0(typescript@5.6.2)(zod@3.23.8)':
+    dependencies:
+      abitype: 1.0.5(typescript@5.6.2)(zod@3.23.8)
+    transitivePeerDependencies:
+      - typescript
+      - zod
 
   '@scure/base@1.1.9': {}
 
