@@ -66,12 +66,13 @@ const WalletProfile = ({
                   className="object-center object-cover"
                 />
               )}
-              <AvatarFallback>
+              <AvatarFallback className="relative h-5 w-5">
                 <Image
                   src="/avatar-default.jpg"
                   alt="Default avatar"
                   fill
-                  className="h-5 w-5 object-cover object-center"
+                  sizes="24px"
+                  className="object-cover object-center"
                 />
               </AvatarFallback>
             </Avatar>
