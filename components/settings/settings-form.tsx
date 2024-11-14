@@ -1,6 +1,8 @@
 "use client";
 
 import z from "zod";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
@@ -17,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import { normalize } from "viem/ens";
 import { Button } from "@/components/ui/button";
 import { mainnet } from "viem/chains";
-import { useEffect, useState } from "react";
 import { useAddOrUpdateUser, useGetUser } from "@/users/hooks";
 
 const formSchema = z.object({
@@ -146,10 +147,12 @@ export const SettingsForm = () => {
           {showAvatar && (
             <>
               <FormLabel>Preview</FormLabel>
-              <img
+              <Image
                 src={avatar}
                 alt="Preview of the profile image"
-                className="object-scale-down max-h-full"
+                width={200}
+                height={200}
+                className="object-scale-down"
               />
             </>
           )}
