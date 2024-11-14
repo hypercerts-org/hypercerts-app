@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import isURL from "validator/lib/isURL";
 import {
   Form,
   FormControl,
@@ -106,8 +107,11 @@ export const SettingsForm = () => {
   const submitDisabled =
     form.formState.isSubmitting || !form.formState.isValid || isPending;
 
-  const showAvatar =
-    avatar && !form.formState.isValidating && !form.formState.errors.avatar;
+  const shouldShowAvatar =
+    avatar &&
+    isURL(avatar) &&
+    !form.formState.isValidating &&
+    !form.formState.errors.avatar;
 
   return (
     <div>
@@ -144,7 +148,7 @@ export const SettingsForm = () => {
             )}
           />
 
-          {showAvatar && (
+          {shouldShowAvatar && (
             <>
               <FormLabel>Preview</FormLabel>
               <Image
