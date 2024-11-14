@@ -11,6 +11,9 @@ import { UserFragment } from "@/users/fragments/user.fragments";
 import request from "graphql-request";
 import revalidatePathServerAction from "@/app/actions";
 
+const STEP_1 = "step1";
+const STEP_2 = "step2";
+
 export const useAddOrUpdateUser = () => {
   const { address, chainId } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
@@ -32,17 +35,17 @@ export const useAddOrUpdateUser = () => {
 
       setSteps([
         {
-          id: "Awaiting signature",
+          id: STEP_1,
           description: "Awaiting signature",
         },
         {
-          id: "Updating user",
+          id: STEP_2,
           description: "Updating user",
         },
       ]);
       setOpen(true);
 
-      await setStep("Awaiting signature");
+      await setStep(STEP_1);
 
       let signature: string;
 
@@ -74,14 +77,14 @@ export const useAddOrUpdateUser = () => {
         }
       } catch (error) {
         await setStep(
-          "Awaiting signature",
+          STEP_1,
           "error",
           error instanceof Error ? error.message : "Error signing message",
         );
         return null;
       }
 
-      await setStep("Updating user");
+      await setStep(STEP_2);
 
       try {
         await fetch(`${HYPERCERTS_API_URL_REST}/users/${address}`, {
@@ -100,14 +103,14 @@ export const useAddOrUpdateUser = () => {
             throw new Error("Error updating user");
           }
         });
-        await setStep("Updating user", "completed");
+        await setStep(STEP_2, "completed");
         await revalidatePathServerAction("/settings");
         setTimeout(() => {
           setOpen(false);
         }, 2000);
       } catch (error) {
         await setStep(
-          "Updating user",
+          STEP_2,
           "error",
           error instanceof Error ? error.message : "Error updating user",
         );
