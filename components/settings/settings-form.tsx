@@ -83,7 +83,7 @@ export const SettingsForm = () => {
       form.setValue("displayName", ensName);
       setUpdatedUserNameEns(true);
     }
-  }, [displayName, ensName, form, user]);
+  }, [displayName, ensName, form, user, updatedUserName, updatedUserNameEns]);
 
   const [updatedAvatar, setUpdatedAvatar] = useState(false);
   const [updatedEnsAvatar, setUpdatedEnsAvatar] = useState(false);
@@ -100,7 +100,7 @@ export const SettingsForm = () => {
       form.setValue("avatar", ensAvatar);
       setUpdatedEnsAvatar(true);
     }
-  }, [ensAvatar, avatar, form, user]);
+  }, [ensAvatar, avatar, form, user, updatedAvatar, updatedEnsAvatar]);
 
   const submitDisabled =
     form.formState.isSubmitting || !form.formState.isValid || isPending;
