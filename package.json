@@ -45,6 +45,7 @@
     "@tanstack/react-table": "^8.17.3",
     "@types/lodash": "^4.17.5",
     "@types/validator": "^13.12.2",
+    "@wagmi/core": "^2.14.6",
     "@yaireo/tagify": "^4.21.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

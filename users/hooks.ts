@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useAccount, useSignTypedData } from "wagmi";
+import { useAccount } from "wagmi";
+import request from "graphql-request";
+
 import { SettingsFormValues } from "@/components/settings/settings-form";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import {
@@ -8,15 +10,15 @@ import {
 } from "@/configs/hypercerts";
 import { graphql, readFragment } from "@/lib/graphql";
 import { UserFragment } from "@/users/fragments/user.fragments";
-import request from "graphql-request";
 import revalidatePathServerAction from "@/app/actions";
+import { useSignAPIMessage } from "@/hooks/useSignAPIMessage";
 
 const STEP_1 = "step1";
 const STEP_2 = "step2";
 
 export const useAddOrUpdateUser = () => {
   const { address, chainId } = useAccount();
-  const { signTypedDataAsync } = useSignTypedData();
+  const { signMessage } = useSignAPIMessage();
   const {
     setDialogStep: setStep,
     setSteps,
@@ -50,13 +52,7 @@ export const useAddOrUpdateUser = () => {
       let signature: string;
 
       try {
-        signature = await signTypedDataAsync({
-          account: address,
-          domain: {
-            name: "Hypercerts",
-            version: "1",
-            chainId: chainId,
-          },
+        signature = await signMessage({
           types: {
             User: [
               { name: "displayName", type: "string" },
@@ -72,9 +68,6 @@ export const useAddOrUpdateUser = () => {
             },
           },
         });
-        if (!signature) {
-          throw new Error("No signature found");
-        }
       } catch (error) {
         await setStep(
           STEP_1,
