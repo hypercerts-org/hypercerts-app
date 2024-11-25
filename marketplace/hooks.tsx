@@ -32,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { ExternalLink } from "lucide-react";
 import React from "react";
+import revalidatePathServerAction from "@/app/actions";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -41,12 +42,14 @@ export const useCreateOrderInSupabase = () => {
     mutationKey: ["createOrderInSupabase"],
     mutationFn: async ({
       order,
+      hypercertId,
       signature,
     }: {
       order: Maker;
       signer: string;
       signature: string;
       quoteType: QuoteType;
+      hypercertId: string;
       // currency: string;
     }) => {
       if (!chainId) {
@@ -57,10 +60,15 @@ export const useCreateOrderInSupabase = () => {
         throw new Error("No client");
       }
 
-      return hypercertExchangeClient.registerOrder({
+      const result = await hypercertExchangeClient.registerOrder({
         order,
         signature,
       });
+      await revalidatePathServerAction([
+        `/hypercerts/${hypercertId}`,
+        `/profile/${order.signer}`,
+      ]);
+      return result;
     },
     throwOnError: true,
   });
@@ -309,6 +317,7 @@ export const useCreateFractionalMakerAsk = ({
           signature: signature,
           signer: address,
           quoteType: QuoteType.Ask,
+          hypercertId,
         });
       } catch (e) {
         console.error(e);
