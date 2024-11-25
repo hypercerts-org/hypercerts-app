@@ -45,7 +45,6 @@ export default function ListDialogSettingsForm({
       return [false, "Must be more than 0."];
     }
 
-    console.log(_unitsForSale, _selectedFractionUnits);
     if (_unitsForSale > _selectedFractionUnits) {
       return [false, "Must be no more than the fraction's total units."];
     }
@@ -101,6 +100,14 @@ export default function ListDialogSettingsForm({
   };
 
   const validateUnitsMaxPerOrder = (): [boolean, React.ReactNode] => {
+    if (!_unitsMaxPerOrder) {
+      return [false, "Must be more than 0."];
+    }
+
+    if (!_unitsMinPerOrder) {
+      return [false, "Min units must be more than 0."];
+    }
+
     if (_unitsMaxPerOrder === BigInt(0)) {
       return [false, "Must be more than 0."];
     }
