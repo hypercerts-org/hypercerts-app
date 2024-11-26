@@ -1,10 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import {
-  getPricePerPercent,
-  getPricePerUnit,
-  getTotalPriceFromPercentage,
-} from "@/marketplace/utils";
+import { getPricePerPercent, getPricePerUnit } from "@/marketplace/utils";
 import { currenciesByNetwork } from "@hypercerts-org/marketplace-sdk";
 import { sepolia } from "viem/chains";
 
@@ -40,25 +36,6 @@ describe("utils", () => {
       //   getAddress("0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"),
       // );
       // expect(getMinimumPrice("1", chainId, usdc.address)).to.eq(1n);
-    });
-  });
-
-  describe("getTotalPriceFromPercentage", () => {
-    it("should return the total price from percentage", () => {
-      expect(getTotalPriceFromPercentage(BigInt(1), 100)).to.eq(BigInt(100));
-      expect(() => getTotalPriceFromPercentage(BigInt(1), 200)).toThrowError();
-
-      expect(getTotalPriceFromPercentage(BigInt(1), 10)).to.eq(BigInt(10));
-      expect(getTotalPriceFromPercentage(BigInt(100), 0.1)).to.eq(BigInt(10));
-      expect(getTotalPriceFromPercentage(BigInt(10 ** 6), 0.00001)).to.eq(
-        BigInt(10),
-      );
-      expect(
-        getTotalPriceFromPercentage(BigInt(10 ** 12), 0.00000000001),
-      ).to.eq(BigInt(10));
-      expect(
-        getTotalPriceFromPercentage(BigInt(10 ** 16), 0.000000000000001),
-      ).to.eq(BigInt(10));
     });
   });
 });

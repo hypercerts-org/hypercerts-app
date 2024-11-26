@@ -144,19 +144,3 @@ export const isTokenDividableBy = (
     (parseUnits(denominator || "1", currency.decimals) || BigInt(1));
   return remainder === BigInt(0);
 };
-
-export const getTotalPriceFromPercentage = (
-  pricePerPercent: bigint,
-  percentageAmount: number,
-) => {
-  if (percentageAmount < 0 || percentageAmount > 100) {
-    throw new Error("Percentage amount must be between 0 and 100");
-  }
-
-  const precision = 10 ** 16;
-
-  return (
-    (pricePerPercent * BigInt(Math.round(percentageAmount * precision))) /
-    BigInt(precision)
-  );
-};
