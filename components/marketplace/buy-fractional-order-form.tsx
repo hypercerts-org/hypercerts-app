@@ -25,6 +25,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseUnits } from "viem";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 const formSchema = z
   .object({
@@ -83,9 +84,10 @@ export const BuyFractionalOrderForm = ({
   const getUnitsToBuy = (percentageAmount: string) => {
     try {
       const hypercertUnits = BigInt(hypercert.units || 0);
-      const percentageAsBigInt = BigInt(Number(percentageAmount) * 100);
+      const percentageAsBigInt = parseUnits(percentageAmount, 8);
       const unitsToBuy =
-        (hypercertUnits * percentageAsBigInt) / BigInt(100 * 100);
+        (hypercertUnits * percentageAsBigInt) /
+        (BigInt(100) * DEFAULT_NUM_FRACTIONS);
       return unitsToBuy.toString();
     } catch (e) {
       console.error(e);
