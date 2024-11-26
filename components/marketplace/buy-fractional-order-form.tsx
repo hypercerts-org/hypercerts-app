@@ -155,11 +155,16 @@ export const BuyFractionalOrderForm = ({
   const percentageAmount = form.watch("percentageAmount");
   const pricePerPercent = form.watch("pricePerPercent");
 
+  const unitsToBuy =
+    BigInt(getUnitsToBuy(percentageAmount)) > BigInt(0)
+      ? getUnitsToBuy(percentageAmount)
+      : "0";
+
   const totalPrice = formatPrice(
     order.chainId,
     getTotalPriceFromPercentage(
       BigInt(pricePerPercent),
-      Number(percentageAmount),
+      unitsToBuy === "0" ? 0 : Number(percentageAmount),
     ),
     currency.address,
     true,
@@ -171,10 +176,7 @@ export const BuyFractionalOrderForm = ({
     currency.address,
   );
 
-  const unitsToBuy =
-    BigInt(getUnitsToBuy(percentageAmount)) > BigInt(0)
-      ? getUnitsToBuy(percentageAmount)
-      : "0";
+  const disabled = !form.formState.isValid || unitsToBuy === "0";
 
   return (
     <Form {...form}>
@@ -240,6 +242,7 @@ export const BuyFractionalOrderForm = ({
         variant={"outline"}
         type="button"
         onClick={form.handleSubmit(onSubmit)}
+        disabled={disabled}
       >
         Execute order
       </Button>
