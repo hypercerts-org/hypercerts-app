@@ -19,13 +19,15 @@ import {
   getCurrencyByAddress,
   getPricePerPercent,
   getPricePerUnit,
-  getTotalPriceFromPercentage,
 } from "@/marketplace/utils";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseUnits } from "viem";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import {
+  DEFAULT_NUM_FRACTIONS,
+  DEFAULT_NUM_FRACTIONS_DECIMALS,
+} from "@/configs/hypercerts";
 
 const formSchema = z
   .object({
@@ -84,7 +86,10 @@ export const BuyFractionalOrderForm = ({
   const getUnitsToBuy = (percentageAmount: string) => {
     try {
       const hypercertUnits = BigInt(hypercert.units || 0);
-      const percentageAsBigInt = parseUnits(percentageAmount, 8);
+      const percentageAsBigInt = parseUnits(
+        percentageAmount,
+        DEFAULT_NUM_FRACTIONS_DECIMALS,
+      );
       const unitsToBuy =
         (hypercertUnits * percentageAsBigInt) /
         (BigInt(100) * DEFAULT_NUM_FRACTIONS);

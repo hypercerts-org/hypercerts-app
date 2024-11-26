@@ -8,6 +8,10 @@ const HYPERCERT_API_URL =
 export const HYPERCERTS_API_URL_REST = `${HYPERCERT_API_URL}/v1`;
 export const HYPERCERTS_API_URL_GRAPH = `${HYPERCERT_API_URL}/v1/graphql`;
 
-export const DEFAULT_NUM_FRACTIONS = parseUnits("1", 8);
+export const DEFAULT_NUM_FRACTIONS_DECIMALS = 8;
+export const DEFAULT_NUM_FRACTIONS = parseUnits(
+  "1",
+  DEFAULT_NUM_FRACTIONS_DECIMALS,
+);
 
 export const DEFAULT_DISPLAY_CURRENCY = "usd";
