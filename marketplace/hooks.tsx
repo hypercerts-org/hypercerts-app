@@ -414,7 +414,7 @@ export const useBuyFractionalMakerAsk = () => {
       totalUnitsInHypercert,
     }: {
       order: MarketplaceOrder;
-      unitAmount: string;
+      unitAmount: bigint;
       pricePerUnit: string;
       hypercertName?: string | null;
       totalUnitsInHypercert?: bigint;
@@ -473,7 +473,7 @@ export const useBuyFractionalMakerAsk = () => {
         takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
           order,
           address,
-          unitAmount,
+          unitAmount.toString(),
           pricePerUnit,
         );
       } catch (e) {
@@ -492,7 +492,7 @@ export const useBuyFractionalMakerAsk = () => {
         );
       }
 
-      const totalPrice = BigInt(order.price) * BigInt(unitAmount);
+      const totalPrice = BigInt(order.price) * unitAmount;
       try {
         await setStep("ERC20");
         if (currency.address !== zeroAddress) {
@@ -566,11 +566,7 @@ export const useBuyFractionalMakerAsk = () => {
             <span>
               Congratulations, you successfully bought{" "}
               <b>
-                {calculateBigIntPercentage(
-                  BigInt(unitAmount),
-                  totalUnitsInHypercert,
-                )}
-                %
+                {calculateBigIntPercentage(unitAmount, totalUnitsInHypercert)}%
               </b>{" "}
               of <b>{hypercertName}</b>.
             </span>

@@ -88,10 +88,10 @@ export const BuyFractionalOrderForm = ({
       const unitsToBuy =
         (hypercertUnits * percentageAsBigInt) /
         (BigInt(100) * DEFAULT_NUM_FRACTIONS);
-      return unitsToBuy.toString();
+      return unitsToBuy < BigInt(0) ? BigInt(0) : unitsToBuy;
     } catch (e) {
       console.error(e);
-      return "0";
+      return BigInt(0);
     }
   };
 
@@ -155,17 +155,15 @@ export const BuyFractionalOrderForm = ({
   const percentageAmount = form.watch("percentageAmount");
   const pricePerPercent = form.watch("pricePerPercent");
 
-  const unitsToBuy =
-    BigInt(getUnitsToBuy(percentageAmount)) > BigInt(0)
-      ? getUnitsToBuy(percentageAmount)
-      : "0";
+  const unitsToBuy = getUnitsToBuy(percentageAmount);
+  const pricePerUnit = getPricePerUnit(
+    pricePerPercent,
+    BigInt(hypercert.units || 0),
+  );
 
   const totalPrice = formatPrice(
     order.chainId,
-    getTotalPriceFromPercentage(
-      BigInt(pricePerPercent),
-      unitsToBuy === "0" ? 0 : Number(percentageAmount),
-    ),
+    unitsToBuy * pricePerUnit,
     currency.address,
     true,
   );
@@ -176,7 +174,7 @@ export const BuyFractionalOrderForm = ({
     currency.address,
   );
 
-  const disabled = !form.formState.isValid || unitsToBuy === "0";
+  const disabled = !form.formState.isValid || unitsToBuy === BigInt(0);
 
   return (
     <Form {...form}>
@@ -193,7 +191,7 @@ export const BuyFractionalOrderForm = ({
             <div className="text-sm text-slate-500">
               You will buy{" "}
               <b>
-                <FormattedUnits>{unitsToBuy}</FormattedUnits>
+                <FormattedUnits>{unitsToBuy.toString()}</FormattedUnits>
               </b>{" "}
               units , for a total of <b>{totalPrice}</b>. (min:{" "}
               {minPercentageAmount}%, max: {maxPercentageAmount}%)
