@@ -13,6 +13,7 @@ type AccountDetails = {
   displayName: string;
   ensName?: string;
   ensAvatar?: string;
+  isLoading: boolean;
 };
 
 export function useAccountDetails(): AccountDetails {
@@ -25,12 +26,12 @@ export function useAccountDetails(): AccountDetails {
 
   // If we have stored ENS data, we can skip the next two hooks. Since hooks must
   // be called on every render we use the ternary operator to avoid unnecessary calls.
-  const { data: ensName } = useEnsName({
+  const { data: ensName, isLoading: isLoadingName } = useEnsName({
     address: !storedEnsData ? (targetAddress as `0x${string}`) : undefined,
     chainId: mainnet.id,
   });
 
-  const { data: ensAvatar } = useEnsAvatar({
+  const { data: ensAvatar, isLoading: isLoadingAvatar } = useEnsAvatar({
     name: ensName ? normalize(ensName) : undefined,
     chainId: mainnet.id,
   });
@@ -51,9 +52,9 @@ export function useAccountDetails(): AccountDetails {
       selectedAccount?.type,
       storedEnsData?.name || ensName,
     ),
-    // Use stored data first to prevent hydration mismatch
     ensName: storedEnsData?.name || ensName || undefined,
     ensAvatar: storedEnsData?.avatar || ensAvatar || undefined,
+    isLoading: storedEnsData ? false : isLoadingName || isLoadingAvatar,
   };
 }
 

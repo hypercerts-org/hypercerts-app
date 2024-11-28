@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import isURL from "validator/lib/isURL";
+import { Loader2 } from "lucide-react";
+
+import { useToast } from "@/components/ui/use-toast";
 import {
   Form,
   FormControl,
@@ -17,10 +19,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { normalize } from "viem/ens";
 import { Button } from "@/components/ui/button";
-import { mainnet } from "viem/chains";
 import { useAddOrUpdateUser, useGetUser } from "@/users/hooks";
+import { useAccountDetails } from "@/hooks/useAccountDetails";
+import { useAccountStore } from "@/lib/account-store";
+import { errorHasMessage } from "@/lib/errorHasMessage";
+import { errorHasReason } from "@/lib/errorHasReason";
 
 const formSchema = z.object({
   displayName: z.string().max(30, "Max. 30 characters").optional(),
@@ -34,29 +38,56 @@ const defaultValues = {
   avatar: "",
 };
 
+const ERROR_TOAST_DURATION = 5000;
+
 export const SettingsForm = () => {
-  const { address } = useAccount();
-  const { data: user, isFetching: isPendingGetUser } = useGetUser({ address });
-  const { data: ensName, isFetching: isPendingGetEnsName } = useEnsName({
-    address: normalize(address || "") as `0x${string}`,
-    chainId: mainnet.id,
-  });
-  const { data: ensAvatar, isFetching: isPendingGetEnsAvatar } = useEnsAvatar({
-    name: ensName || undefined,
-    chainId: mainnet.id,
+  const { selectedAccount } = useAccountStore();
+  const {
+    address,
+    ensName,
+    ensAvatar,
+    isLoading: isLoadingDetails,
+  } = useAccountDetails();
+  const { data: userData, isFetching: isPendingGetUser } = useGetUser({
+    address,
   });
 
   const { mutateAsync: addOrUpdateUser, isPending: isPendingUpdateUser } =
     useAddOrUpdateUser();
+
+  const { toast } = useToast();
+
   const onSubmit = async (data: SettingsFormValues) => {
-    await addOrUpdateUser(data);
+    try {
+      await addOrUpdateUser(data);
+    } catch (error) {
+      if (errorHasReason(error)) {
+        toast({
+          title: "Error",
+          description: error.reason,
+          variant: "destructive",
+          duration: ERROR_TOAST_DURATION,
+        });
+      } else if (errorHasMessage(error)) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+          duration: ERROR_TOAST_DURATION,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update user settings",
+          variant: "destructive",
+          duration: ERROR_TOAST_DURATION,
+        });
+      }
+      return;
+    }
   };
 
-  const isPending =
-    isPendingGetUser ||
-    isPendingUpdateUser ||
-    isPendingGetEnsName ||
-    isPendingGetEnsAvatar;
+  const isPending = isPendingGetUser || isLoadingDetails || isPendingUpdateUser;
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
@@ -73,36 +104,63 @@ export const SettingsForm = () => {
   const [updatedUserName, setUpdatedUserName] = useState(false);
   const [updatedUserNameEns, setUpdatedUserNameEns] = useState(false);
   useEffect(() => {
-    if (!updatedUserName && user?.display_name) {
-      console.log("Setting display name from graphql", user.display_name);
-      form.setValue("displayName", user.display_name);
+    if (updatedUserName || isPending) return;
+
+    if (userData?.display_name) {
+      console.log("Setting display name from graphql", userData.display_name);
+      form.setValue("displayName", userData.display_name);
       setUpdatedUserName(true);
       return;
     }
 
-    if (!updatedUserNameEns && !updatedUserName && ensName) {
+    if (!updatedUserNameEns && ensName) {
       console.log("Setting display name from ENS", ensName);
       form.setValue("displayName", ensName);
       setUpdatedUserNameEns(true);
     }
-  }, [displayName, ensName, form, user, updatedUserName, updatedUserNameEns]);
+  }, [
+    displayName,
+    ensName,
+    form,
+    userData,
+    updatedUserName,
+    updatedUserNameEns,
+    isPending,
+  ]);
 
   const [updatedAvatar, setUpdatedAvatar] = useState(false);
   const [updatedEnsAvatar, setUpdatedEnsAvatar] = useState(false);
   useEffect(() => {
-    if (!updatedAvatar && user?.avatar) {
-      console.log("Setting avatar from graphql", user.avatar);
-      form.setValue("avatar", user.avatar);
+    if (updatedAvatar || isPending) return;
+
+    if (userData?.avatar) {
+      console.log("Setting avatar from graphql", userData?.avatar);
+      form.setValue("avatar", userData?.avatar || "");
       setUpdatedAvatar(true);
       return;
     }
 
-    if (!updatedEnsAvatar && !updatedAvatar && ensAvatar) {
+    if (!updatedEnsAvatar && ensAvatar) {
       console.log("Setting avatar from ENS", ensAvatar);
       form.setValue("avatar", ensAvatar);
       setUpdatedEnsAvatar(true);
     }
-  }, [ensAvatar, avatar, form, user, updatedAvatar, updatedEnsAvatar]);
+  }, [
+    ensAvatar,
+    avatar,
+    form,
+    userData,
+    updatedAvatar,
+    updatedEnsAvatar,
+    isPending,
+  ]);
+
+  // Reset form state when account changes
+  useEffect(() => {
+    form.reset();
+    setUpdatedUserName(false);
+    setUpdatedAvatar(false);
+  }, [selectedAccount, form]);
 
   const submitDisabled =
     form.formState.isSubmitting || !form.formState.isValid || isPending;
@@ -161,7 +219,12 @@ export const SettingsForm = () => {
             </>
           )}
 
-          <Button disabled={submitDisabled}>Save changes</Button>
+          <Button disabled={submitDisabled}>
+            {(form.formState.isSubmitting || isPendingUpdateUser) && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Save changes
+          </Button>
         </form>
       </Form>
     </div>

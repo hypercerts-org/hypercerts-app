@@ -3,111 +3,19 @@ import { useAccount } from "wagmi";
 import request from "graphql-request";
 
 import { SettingsFormValues } from "@/components/settings/settings-form";
-import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
-import {
-  HYPERCERTS_API_URL_GRAPH,
-  HYPERCERTS_API_URL_REST,
-} from "@/configs/hypercerts";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { graphql, readFragment } from "@/lib/graphql";
 import { UserFragment } from "@/users/fragments/user.fragments";
-import revalidatePathServerAction from "@/app/actions";
-import { useSignAPIMessage } from "@/hooks/useSignAPIMessage";
-
-const STEP_1 = "step1";
-const STEP_2 = "step2";
+import { useSettingsSigningStrategy } from "@/hooks/useSettingsSigningStrategy";
 
 export const useAddOrUpdateUser = () => {
-  const { address, chainId } = useAccount();
-  const { signMessage } = useSignAPIMessage();
-  const {
-    setDialogStep: setStep,
-    setSteps,
-    setOpen,
-  } = useStepProcessDialogContext();
+  const { address } = useAccount();
+  const getStrategy = useSettingsSigningStrategy();
+
   return useMutation({
     mutationKey: ["addOrUpdateUser", address],
     mutationFn: async (user: SettingsFormValues) => {
-      if (!address) {
-        throw new Error("No address found");
-      }
-
-      if (!chainId) {
-        throw new Error("No chainId found");
-      }
-
-      setSteps([
-        {
-          id: STEP_1,
-          description: "Awaiting signature",
-        },
-        {
-          id: STEP_2,
-          description: "Updating user",
-        },
-      ]);
-      setOpen(true);
-
-      await setStep(STEP_1);
-
-      let signature: string;
-
-      try {
-        signature = await signMessage({
-          types: {
-            User: [
-              { name: "displayName", type: "string" },
-              { name: "avatar", type: "string" },
-            ],
-            UserUpdateRequest: [{ name: "user", type: "User" }],
-          },
-          primaryType: "UserUpdateRequest",
-          message: {
-            user: {
-              displayName: user.displayName || "",
-              avatar: user.avatar || "",
-            },
-          },
-        });
-      } catch (error) {
-        await setStep(
-          STEP_1,
-          "error",
-          error instanceof Error ? error.message : "Error signing message",
-        );
-        return null;
-      }
-
-      await setStep(STEP_2);
-
-      try {
-        await fetch(`${HYPERCERTS_API_URL_REST}/users/${address}`, {
-          method: "POST",
-          body: JSON.stringify({
-            display_name: user.displayName,
-            avatar: user.avatar,
-            signature,
-            chain_id: chainId,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }).then((res) => {
-          if (!res.ok) {
-            throw new Error("Error updating user");
-          }
-        });
-        await setStep(STEP_2, "completed");
-        await revalidatePathServerAction("/settings");
-        setTimeout(() => {
-          setOpen(false);
-        }, 2000);
-      } catch (error) {
-        await setStep(
-          STEP_2,
-          "error",
-          error instanceof Error ? error.message : "Error updating user",
-        );
-      }
+      await getStrategy().sign(user);
     },
   });
 };
