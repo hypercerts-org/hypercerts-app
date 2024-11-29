@@ -7,6 +7,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import isURL from "validator/lib/isURL";
 import { Loader2 } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -25,6 +26,11 @@ import { useAccountDetails } from "@/hooks/useAccountDetails";
 import { useAccountStore } from "@/lib/account-store";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
+
+import {
+  parsePendingUserUpdate,
+  type PendingUserUpdate,
+} from "@/settings/pending-user-update-parser";
 
 const formSchema = z.object({
   displayName: z.string().max(30, "Max. 30 characters").optional(),
@@ -51,6 +57,7 @@ export const SettingsForm = () => {
   const { data: userData, isFetching: isPendingGetUser } = useGetUser({
     address,
   });
+  const [pendingUpdate, setPendingUpdate] = useState<PendingUserUpdate>();
 
   const { mutateAsync: addOrUpdateUser, isPending: isPendingUpdateUser } =
     useAddOrUpdateUser();
@@ -60,6 +67,19 @@ export const SettingsForm = () => {
   const onSubmit = async (data: SettingsFormValues) => {
     try {
       await addOrUpdateUser(data);
+
+      if (selectedAccount?.type === "safe") {
+        setPendingUpdate({
+          user: {
+            displayName: data.displayName || "",
+            avatar: data.avatar || "",
+          },
+          metadata: {
+            timestamp: new Date().getTime(),
+          },
+        });
+        revalidatePathServerAction("/settings");
+      }
     } catch (error) {
       if (errorHasReason(error)) {
         toast({
@@ -106,9 +126,12 @@ export const SettingsForm = () => {
   useEffect(() => {
     if (updatedUserName || isPending) return;
 
-    if (userData?.display_name) {
-      console.log("Setting display name from graphql", userData.display_name);
-      form.setValue("displayName", userData.display_name);
+    if (userData?.user?.display_name) {
+      console.log(
+        "Setting display name from graphql",
+        userData.user.display_name,
+      );
+      form.setValue("displayName", userData.user.display_name);
       setUpdatedUserName(true);
       return;
     }
@@ -133,9 +156,9 @@ export const SettingsForm = () => {
   useEffect(() => {
     if (updatedAvatar || isPending) return;
 
-    if (userData?.avatar) {
-      console.log("Setting avatar from graphql", userData?.avatar);
-      form.setValue("avatar", userData?.avatar || "");
+    if (userData?.user?.avatar) {
+      console.log("Setting avatar from graphql", userData?.user?.avatar);
+      form.setValue("avatar", userData?.user?.avatar || "");
       setUpdatedAvatar(true);
       return;
     }
@@ -162,8 +185,32 @@ export const SettingsForm = () => {
     setUpdatedAvatar(false);
   }, [selectedAccount, form]);
 
+  useEffect(() => {
+    const checkPendingUpdates = async () => {
+      console.log("checking for pending updates");
+      if (selectedAccount?.type !== "safe" || !selectedAccount?.address) {
+        setPendingUpdate(undefined);
+        return;
+      }
+
+      if (userData?.pendingSignatures.length === 0) {
+        setPendingUpdate(undefined);
+        return;
+      }
+      const pendingMessage = userData?.pendingSignatures[0]?.message;
+      setPendingUpdate(
+        pendingMessage ? parsePendingUserUpdate(pendingMessage) : undefined,
+      );
+    };
+
+    checkPendingUpdates();
+  }, [selectedAccount, userData]);
+
   const submitDisabled =
-    form.formState.isSubmitting || !form.formState.isValid || isPending;
+    form.formState.isSubmitting ||
+    !form.formState.isValid ||
+    isPending ||
+    !!pendingUpdate;
 
   const shouldShowAvatar =
     avatar &&
@@ -185,7 +232,7 @@ export const SettingsForm = () => {
               <FormItem>
                 <FormLabel>Display name</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isPending} />
+                  <Input {...field} disabled={isPending || !!pendingUpdate} />
                 </FormControl>
                 <FormMessage />
                 <FormDescription>Max. 30 characters</FormDescription>
@@ -199,7 +246,7 @@ export const SettingsForm = () => {
               <FormItem>
                 <FormLabel>Image</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isPending} />
+                  <Input {...field} disabled={isPending || !!pendingUpdate} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -225,6 +272,47 @@ export const SettingsForm = () => {
             )}
             Save changes
           </Button>
+
+          {pendingUpdate && (
+            <div className="mt-4 flex flex-col gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm dark:border-yellow-900 dark:bg-yellow-950">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-yellow-800 dark:text-yellow-200">
+                  Pending Update
+                </h3>
+                <span className="rounded-full bg-purple-900 px-2 py-1 text-xs font-medium text-yellow-200">
+                  {formatDistanceToNow(
+                    new Date(pendingUpdate.metadata.timestamp),
+                    { addSuffix: true },
+                  )}
+                </span>
+              </div>
+
+              <div className="space-y-3 py-2">
+                <div className="flex flex-col">
+                  <span className="text-xs text-yellow-700 dark:text-yellow-300">
+                    Display Name
+                  </span>
+                  <span className="font-medium text-yellow-900 dark:text-yellow-100">
+                    {pendingUpdate.user.displayName}
+                  </span>
+                </div>
+
+                <div className="flex flex-col">
+                  <span className="text-xs text-yellow-700 dark:text-yellow-300">
+                    Image URL
+                  </span>
+                  <span className="font-medium text-yellow-900 dark:text-yellow-100 break-all">
+                    {pendingUpdate.user.avatar}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-yellow-800 dark:text-yellow-200">
+                The changes will be applied once all required signatures are
+                collected.
+              </p>
+            </div>
+          )}
         </form>
       </Form>
     </div>

@@ -25,38 +25,42 @@ export const useGetUser = ({ address }: { address?: string }) => {
   return useQuery({
     queryKey: ["user", address],
     queryFn: async () => {
-      if (!address) {
-        return null;
-      }
+      if (!address || !chainId) return null;
 
-      if (!chainId) {
-        return null;
-      }
       const query = graphql(
         `
           query UserQuery($address: String!, $chainId: BigInt!) {
             users(
               where: { address: { eq: $address }, chain_id: { eq: $chainId } }
             ) {
-              count
               data {
                 ...UserFragment
+              }
+            }
+            signatureRequests(
+              where: { safe_address: { eq: $address }, status: { eq: PENDING } }
+            ) {
+              data {
+                message
               }
             }
           }
         `,
         [UserFragment],
       );
+
       const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
         address,
         chainId: chainId.toString(),
       });
-      const userFragment = res.users?.data?.[0];
-      if (!userFragment) {
-        return null;
-      }
 
-      return readFragment(UserFragment, userFragment);
+      const userFragment = res.users?.data?.[0];
+      const pendingSignatures = res.signatureRequests?.data || [];
+
+      return {
+        user: readFragment(UserFragment, userFragment),
+        pendingSignatures,
+      };
     },
     enabled: !!address,
   });
