@@ -41,6 +41,8 @@ export const useGetUser = ({ address }: { address?: string }) => {
               where: { safe_address: { eq: $address }, status: { eq: PENDING } }
             ) {
               data {
+                message_hash
+                safe_address
                 message
               }
             }
