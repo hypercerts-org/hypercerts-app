@@ -75,6 +75,7 @@ const ChainDisplay = () => {
             <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
               <Image
                 fill
+                sizes="24px"
                 style={{ objectFit: "contain" }}
                 src={chainIcon(connectedChain!)}
                 alt={`${connectedChain?.name}`}
@@ -105,8 +106,9 @@ const ChainDisplay = () => {
                 >
                   <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
                     <Image
-                      layout="fill"
-                      objectFit="contain"
+                      fill
+                      sizes="24px"
+                      style={{ objectFit: "contain" }}
                       src={chainIcon(chain)}
                       alt={`${chain?.name}`}
                     />

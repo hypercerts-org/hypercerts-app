@@ -32,8 +32,28 @@ const allChains = [
 
 export type SupportedChainIdType = (typeof allChains)[number];
 
-export const hypercertApiSigningDomain = (chainId: number) => ({
+export type ApiSigningDomain = {
+  name: string;
+  version: string;
+  chainId: number;
+};
+
+export type SafeApiSigningDomain = ApiSigningDomain & {
+  verifyingContract: string;
+};
+
+export const hypercertApiSigningDomain = (
+  chainId: number,
+): ApiSigningDomain => ({
   name: "Hypercerts",
   version: "1",
   chainId,
+});
+
+export const hypercertApiSigningDomainSafe = (
+  chainId: number,
+  verifyingContract: string,
+): SafeApiSigningDomain => ({
+  ...hypercertApiSigningDomain(chainId),
+  verifyingContract,
 });
