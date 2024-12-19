@@ -1,5 +1,5 @@
 import { ATTESTORS_PER_PAGE } from "../../configs/ui";
-import PaginationSkeleton from "../pagination-skeleton";
+import PaginationSkeleton from "../global/pagination/pagination-skeleton";
 
 export default function EvaluatorsListSkeleton() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { truncate } from "lodash";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface CommentsProps {
   comments?: string;
@@ -9,39 +9,37 @@ interface CommentsProps {
 
 export default function Comments({ comments }: CommentsProps) {
   const [showFullComments, setShowFullComments] = useState(false);
+
+  const { truncatedComments, isTruncated } = useMemo(() => {
+    if (!comments) return { truncatedComments: "", isTruncated: false };
+    const truncated = truncate(comments, {
+      length: 150,
+      separator: "...",
+    });
+    return {
+      truncatedComments: truncated,
+      isTruncated: truncated !== comments,
+    };
+  }, [comments]);
+
   if (!comments) return null;
 
-  const truncatedComments = truncate(comments, {
-    length: 200,
-    separator: "...",
-  });
-
-  const showFullCommentsButton = showFullComments ? (
-    <button
-      className="text-xs font-medium text-slate-700"
-      onClick={() => setShowFullComments(false)}
-    >
-      Show less
-    </button>
-  ) : (
-    <button
-      className="text-xs font-medium text-slate-700"
-      onClick={() => setShowFullComments(true)}
-    >
-      Show full comments
-    </button>
-  );
-
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-2">
-        <div className="overflow-hidden text-sm text-slate-700">
-          {showFullComments ? comments : truncatedComments}
-        </div>
+    <div className="flex flex-col h-[160px]">
+      <div
+        className={`text-sm text-slate-700 overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+      >
+        {showFullComments ? comments : truncatedComments}
       </div>
-      <div>
-        <div className="flex justify-center">{showFullCommentsButton}</div>
-      </div>
+      {isTruncated && (
+        <button
+          className="text-xs font-medium text-slate-700 hover:underline mt-2"
+          onClick={() => setShowFullComments(!showFullComments)}
+          aria-expanded={showFullComments}
+        >
+          {showFullComments ? "Show less" : "Show full comments"}
+        </button>
+      )}
     </div>
   );
 }

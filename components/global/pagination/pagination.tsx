@@ -12,12 +12,12 @@ interface PaginationProps {
   currentPage?: number;
 }
 
-export default function NestedPagination({
+export default function Pagination({
   searchParams,
   totalItems,
   itemsPerPage,
-  basePath = "",
   parameterName = "p",
+  basePath = "",
   currentPage = 1,
 }: PaginationProps) {
   const totalPages = Math.ceil((totalItems || 0) / itemsPerPage);
@@ -32,14 +32,10 @@ export default function NestedPagination({
     [searchParams, basePath, parameterName],
   );
 
-  if (pageNumber > totalPages) {
-    return null;
-  }
-
   const renderPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let startPage = Math.max(1, pageNumber - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {
@@ -51,7 +47,7 @@ export default function NestedPagination({
         <PaginationButton
           key={i}
           href={getPageHref(i)}
-          active={i === currentPage}
+          active={i === pageNumber}
         >
           {i}
         </PaginationButton>,
@@ -66,12 +62,12 @@ export default function NestedPagination({
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full mt-4">
       <div className="flex items-center justify-start gap-2">
-        {currentPage > 1 && (
+        {pageNumber > 1 && (
           <>
             <PaginationButton href={getPageHref(1)} arrow="left">
               First
             </PaginationButton>
-            <PaginationButton href={getPageHref(currentPage - 1)} arrow="left">
+            <PaginationButton href={getPageHref(pageNumber - 1)} arrow="left">
               Previous
             </PaginationButton>
           </>
@@ -83,9 +79,9 @@ export default function NestedPagination({
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        {currentPage < totalPages && (
+        {pageNumber < totalPages && (
           <>
-            <PaginationButton href={getPageHref(currentPage + 1)} arrow="right">
+            <PaginationButton href={getPageHref(pageNumber + 1)} arrow="right">
               Next
             </PaginationButton>
             <PaginationButton href={getPageHref(totalPages)} arrow="right">

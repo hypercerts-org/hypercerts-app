@@ -8,7 +8,7 @@ import {
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import { InfoSection } from "@/components/global/sections";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import Pagination from "../pagination";
+import Pagination from "../global/pagination/pagination";
 
 function HypercertsListNoResults() {
   return "No results found";

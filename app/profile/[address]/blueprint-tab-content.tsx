@@ -8,7 +8,7 @@ import { CreateBlueprintButton } from "@/components/blueprints/buttons";
 import { OwnAccountOnly } from "@/components/own-account-only";
 import { BlueprintsTable } from "@/components/blueprints/blueprints-table";
 import { BLUEPRINTS_PER_PAGE } from "@/configs/ui";
-import Pagination from "@/components/pagination";
+import Pagination from "@/components/global/pagination/pagination";
 
 const BlueprintTabContentInner = async ({
   address,

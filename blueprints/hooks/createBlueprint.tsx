@@ -4,7 +4,7 @@ import { useAccount, useSignTypedData } from "wagmi";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { hypercertApiSigningDomain } from "@/configs/constants";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
-import revalidatePathServerAction from "@/app/actions";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useRouter } from "next/navigation";
 
 export interface BlueprintCreateRequest {

@@ -9,7 +9,7 @@ import {
 import { graphql, readFragment } from "@/lib/graphql";
 import { UserFragment } from "@/users/fragments/user.fragments";
 import request from "graphql-request";
-import revalidatePathServerAction from "@/app/actions";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 
 export const useAddOrUpdateUser = () => {
   const { address, chainId } = useAccount();

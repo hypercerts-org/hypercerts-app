@@ -1,8 +1,8 @@
 import { use } from "react";
 import { ATTESTORS_PER_PAGE } from "../../configs/ui";
 import EvaluatorsListRow from "./evaluators-list-row";
-import EvaluatorsPagination from "./evaluators-pagination";
 import { getTrustedAttestors } from "../../github/getTrustedAttestors";
+import Pagination from "../global/pagination/pagination";
 
 // Implement caching and revalidation
 async function getAttestorsData() {
@@ -35,9 +35,13 @@ export default function EvaluatorsList({
           </div>
         ))}
       </section>
-      <EvaluatorsPagination
+      <Pagination
         searchParams={searchParams}
-        attestorsCount={attestors.length}
+        totalItems={attestors.length}
+        itemsPerPage={ATTESTORS_PER_PAGE}
+        basePath="/evaluators"
+        parameterName="evaluators"
+        currentPage={currentPage}
       />
     </section>
   );

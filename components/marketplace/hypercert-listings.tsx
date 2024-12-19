@@ -7,7 +7,7 @@ import {
 } from "@/marketplace/getAllListings";
 import { cache, Suspense } from "react";
 import { InfoSection } from "../global/sections";
-import NestedPagination from "../nested-pagination";
+import Pagination from "../global/pagination/pagination";
 import HypercertListingsTable from "./hypercert-listings-table";
 
 function ListingsListNoResults() {
@@ -67,7 +67,7 @@ export default async function HypercertListings({
           initialHypercert={initialHypercert}
           searchParams={searchParams}
         />
-        <NestedPagination
+        <Pagination
           searchParams={searchParams}
           totalItems={orders.count}
           itemsPerPage={LISTINGS_PER_PAGE}

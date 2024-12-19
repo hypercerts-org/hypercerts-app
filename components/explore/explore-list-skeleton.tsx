@@ -1,4 +1,4 @@
-import PaginationSkeleton from "@/components/pagination-skeleton";
+import PaginationSkeleton from "@/components/global/pagination/pagination-skeleton";
 
 export default function ExploreListSkeleton({ length }: { length: number }) {
   return (

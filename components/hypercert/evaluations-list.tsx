@@ -24,8 +24,8 @@ export default async function EvaluationsList({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {initialEvaluations.data.map((attestation, index) => {
+    <div className="flex flex-wrap justify-start gap-4">
+      {initialEvaluations.data.map((attestation) => {
         if (!attestation) return null;
         const data = attestation.data as EvaluationData;
         const attester = attestation.attester;
@@ -35,7 +35,7 @@ export default async function EvaluationsList({
         return (
           <div
             key={attestation.uid}
-            className="p-5 flex flex-col gap-5 rounded-lg border-[1.5px] border-slate-200 h-[500px] overflow-hidden"
+            className="p-4 flex flex-col gap-3 rounded-lg border border-slate-200 w-[280px]"
           >
             <FormattedDate seconds={attestation.creation_block_timestamp} />
 
@@ -43,15 +43,18 @@ export default async function EvaluationsList({
               href={`/evaluators/${attestation.attester}`}
               className="w-full"
             >
-              <div className="flex gap-2 w-full">
-                <UserIcon address={attester} size="large" />
-                <div className="flex flex-col justify-center items-start w-52">
-                  <EnsName address={attester} />
+              <div className="flex items-center gap-2 w-full">
+                <UserIcon address={attester} size="small" />
+                <div className="flex flex-col justify-center items-start overflow-hidden">
+                  <EnsName
+                    address={attester}
+                    className="text-sm font-semibold truncate"
+                  />
                   <EthAddress address={attester} />
                 </div>
               </div>
             </Link>
-            <div className="flex-grow overflow-y-auto space-y-4">
+            <div className="flex flex-col flex-grow gap-2">
               <Evaluations
                 basic={data.evaluate_basic}
                 work={data.evaluate_work}
@@ -59,7 +62,9 @@ export default async function EvaluationsList({
                 contributors={data.evaluate_contributors}
               />
               <Tags tags={data.tags} />
-              <Comments comments={data.comments} />
+              <div className="flex-grow flex flex-col">
+                <Comments comments={data.comments} />
+              </div>
             </div>
           </div>
         );

@@ -10,6 +10,7 @@ export default function EthAddress({
 }: {
   address?: string | undefined | null;
   showEnsName?: boolean;
+  [key: string]: any;
 }) {
   const { data: ensName } = useEnsName({
     address: address as `0x${string}` | undefined,

@@ -1,7 +1,7 @@
 import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
 import { Suspense } from "react";
 import { COLLECTIONS_PER_PAGE } from "@/configs/ui";
-import Pagination from "@/components/pagination";
+import Pagination from "@/components/global/pagination/pagination";
 import { HyperboardsOverview } from "@/app/profile/[address]/collections-tab-content-inner";
 
 const CollectionsTabContentInner = async ({

@@ -1,12 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidatePathServerAction } from "./revalidatePathServerAction";
 
 export async function clearCacheAfterListing(hypercertId: string | null) {
   if (!hypercertId) {
     return;
   }
 
-  revalidatePath("/explore");
-  revalidatePath(`/hypercerts/${hypercertId}`);
+  revalidatePathServerAction(["/explore", `/hypercerts/${hypercertId}`]);
 }
