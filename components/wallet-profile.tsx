@@ -1,5 +1,11 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import Image from "next/image";
+import Link from "next/link";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -11,53 +17,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { truncateEthereumAddress } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
-
 import ConnectDialog from "@/components/connect-dialog";
 import DisconnectDialog from "@/components/disconnect-dialog";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
-import { mainnet } from "viem/chains";
-import { normalize } from "viem/ens";
 import { siteConfig } from "@/configs/site";
+import AccountSelector from "@/components/accounts/account-selector";
+import { useAccountDetails } from "@/hooks/useAccountDetails";
 
 const WalletProfile = ({
   alignment = "end",
 }: {
   alignment?: "end" | "center" | "start";
 }) => {
-  const { address, isConnecting, isDisconnected } = useAccount();
-  const [ensName, setEnsName] = useState<string | undefined>(undefined);
-  const [ensAvatar, setEnsAvatar] = useState<string | undefined>(undefined);
+  const { isConnecting, isDisconnected } = useAccount();
+  const { address, displayName, ensName, ensAvatar } = useAccountDetails();
+  const [mounted, setMounted] = useState(false);
+
+  // Handle hydration mismatch by only showing content after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [isConnectOpen, setIsConnectOpen] = useState(false);
   const [isDisconnectOpen, setIsDisconnectOpen] = useState(false);
+  const [isAccountSelectorOpen, setIsAccountSelectorOpen] = useState(false);
 
-  const { data: nameData, error: nameError } = useEnsName({
-    chainId: address ? mainnet.id : undefined,
-    address,
-  });
+  if (isConnecting || !mounted) return <Loader2 className="animate-spin" />;
 
-  useEffect(() => {
-    if (!nameError && nameData) {
-      setEnsName(nameData);
-    }
-  }, [nameData, nameError]);
-
-  const { data: avatarData, error: avatarError } = useEnsAvatar({
-    chainId: nameData ? mainnet.id : undefined,
-    name: nameData ? normalize(nameData) : undefined,
-  });
-
-  useEffect(() => {
-    if (!avatarError && avatarData) {
-      setEnsAvatar(avatarData);
-    }
-  }, [avatarData, avatarError]);
-
-  if (isConnecting) return <Loader2 className="animate-spin" />;
   if (isDisconnected)
     return (
       <ConnectDialog isOpen={isConnectOpen} setIsOpen={setIsConnectOpen} />
@@ -80,22 +66,19 @@ const WalletProfile = ({
                   className="object-center object-cover"
                 />
               )}
-              <AvatarFallback>
+              <AvatarFallback className="relative h-5 w-5">
                 <Image
                   src="/avatar-default.jpg"
                   alt="Default avatar"
                   fill
-                  className="h-5 w-5 object-cover object-center"
+                  sizes="24px"
+                  className="object-cover object-center"
                 />
               </AvatarFallback>
             </Avatar>
           </div>
           <p className="hidden md:block text-xs">
-            {ensName
-              ? ensName
-              : address
-                ? truncateEthereumAddress(address)
-                : "unknown address"}
+            {ensName || truncateEthereumAddress(address)}
           </p>
         </Button>
       </DropdownMenuTrigger>
@@ -106,9 +89,7 @@ const WalletProfile = ({
       >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            {ensName && (
-              <p className="text-sm font-medium leading-none">{ensName}</p>
-            )}
+            <p className="text-sm font-medium leading-none">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {address ? truncateEthereumAddress(address) : "No address"}
             </p>
@@ -121,6 +102,12 @@ const WalletProfile = ({
               Profile
             </DropdownMenuItem>
           </Link>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onSelect={() => setIsAccountSelectorOpen(true)}
+          >
+            Select Account
+          </DropdownMenuItem>
           <Link href={siteConfig.links.settings}>
             <DropdownMenuItem className="cursor-pointer">
               Settings
@@ -139,6 +126,10 @@ const WalletProfile = ({
           setIsConnectOpen={setIsConnectOpen}
         />
       </DropdownMenuContent>
+      <AccountSelector
+        isOpen={isAccountSelectorOpen}
+        setIsOpen={setIsAccountSelectorOpen}
+      />
     </DropdownMenu>
   );
 };
