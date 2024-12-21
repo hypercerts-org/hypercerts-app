@@ -1,11 +1,11 @@
-import Comments from "../evaluation-list-item/comments";
-import { EvaluationData } from "../../eas/types/evaluation-data.type";
-import Evaluations from "../evaluation-list-item/evaluations";
-import FormattedDate from "../formatted-date";
-import HypercertRow from "../evaluation-list-item/hypercert-row";
+import Comments from "@/components/evaluations/evaluation-list-item/comments";
+import { EvaluationData } from "@/eas/types/evaluation-data.type";
+import Evaluations from "@/components/evaluations/evaluation-list-item/evaluations";
+import FormattedDate from "@/components/formatted-date";
+import HypercertRow from "@/components/evaluations/evaluation-list-item/hypercert-row";
 import Link from "next/link";
-import { Separator } from "../ui/separator";
-import Tags from "../evaluation-list-item/tags";
+import { Separator } from "@/components/ui/separator";
+import Tags from "@/components/evaluations/evaluation-list-item/tags";
 
 export default function EvaluatorEvaluationsListItem({
   blockTimestamp,

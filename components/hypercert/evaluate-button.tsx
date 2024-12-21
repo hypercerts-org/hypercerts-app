@@ -79,7 +79,7 @@ export default function EvaluateButton({
       <Tooltip>
         <TooltipTrigger asChild>
           <div>
-            <Button disabled={true}>Evaluate this Hypercert</Button>
+            <Button disabled={true}>Evaluate</Button>
           </div>
         </TooltipTrigger>
         <TooltipContent>{getTooltipMessage()}</TooltipContent>

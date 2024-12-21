@@ -15,8 +15,7 @@ import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useWalletClient } from "wagmi";
 import { generateBlockExplorerLink } from "@/lib/utils";
 import { useQueueMintBlueprint } from "@/blueprints/hooks/queueMintBlueprint";
-import revalidatePathServerAction from "@/app/actions";
-
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 const createExtraContent = (
   receipt: TransactionReceipt,
   hypercertId?: string,

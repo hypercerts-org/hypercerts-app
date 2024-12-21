@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { CollectionCreateFormValues } from "@/components/collections/collection-form";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { useAccount, useSignTypedData } from "wagmi";
-import revalidatePathServerAction from "@/app/actions";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useRouter } from "next/navigation";
 import { isParseableNumber } from "@/lib/isParseableInteger";

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getHypercert } from "../../hypercerts/getHypercert";
+import { getHypercert } from "@/hypercerts/getHypercert";
 
 export default async function HypercertRow({
   hypercertId,
