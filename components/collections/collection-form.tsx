@@ -25,12 +25,6 @@ import request from "graphql-request";
 import { isValidHypercertId } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import React, { ReactNode } from "react";
 import { ExternalLink, InfoIcon, LoaderCircle } from "lucide-react";
 import Link from "next/link";
@@ -38,6 +32,7 @@ import { useCreateHyperboard, useUpdateHyperboard } from "@/collections/hooks";
 import { useBlueprintsByIds } from "@/blueprints/hooks/useBlueprintsByIds";
 import { BlueprintFragment } from "@/blueprints/blueprint.fragment";
 import { isParseableNumber } from "@/lib/isParseableInteger";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const idSchema = z
   .string()
@@ -338,10 +333,10 @@ export const CollectionForm = ({
                               {index === 0 && (
                                 <FormLabel>
                                   Hypercert ID{" "}
-                                  <InfoTooltip>
+                                  <InfoPopover>
                                     You can find the Hypercert ID on the view
                                     page of the hypercert.
-                                  </InfoTooltip>
+                                  </InfoPopover>
                                 </FormLabel>
                               )}
                               <FormControl>
@@ -363,12 +358,12 @@ export const CollectionForm = ({
                               {index === 0 && (
                                 <FormLabel>
                                   Factor{" "}
-                                  <InfoTooltip>
+                                  <InfoPopover>
                                     You can adjust the relative importance of a
                                     hypercert within this collection, which will
                                     be visually represented on the hyperboard.
                                     The default is 1 for each hypercert.
-                                  </InfoTooltip>
+                                  </InfoPopover>
                                 </FormLabel>
                               )}
                               <FormControl>
@@ -426,11 +421,11 @@ export const CollectionForm = ({
                         {!fields.length && (
                           <FormLabel>
                             Hypercert or blueprint ID*{" "}
-                            <InfoTooltip>
+                            <InfoPopover>
                               You can find the Hypercert or blueprint ID on the
                               view page of the hypercert or in the profile
                               blueprints overview.
-                            </InfoTooltip>
+                            </InfoPopover>
                           </FormLabel>
                         )}
                         <FormControl>
@@ -448,12 +443,12 @@ export const CollectionForm = ({
                         {!fields.length && (
                           <FormLabel>
                             Factor*{" "}
-                            <InfoTooltip>
+                            <InfoPopover>
                               You can adjust the relative importance of a
                               hypercert within this collection, which will be
                               visually represented on the hyperboard. The
                               default is 1 for each hypercert.
-                            </InfoTooltip>
+                            </InfoPopover>
                           </FormLabel>
                         )}
                         <FormControl>
@@ -506,11 +501,11 @@ export const CollectionForm = ({
                   <FormItem>
                     <FormLabel>
                       Background image URL{" "}
-                      <InfoTooltip>
+                      <InfoPopover>
                         For best results use an aspect ratio of 16:9. The best
                         resolution depends on where it will be shown; we
                         recommend at least 1600x900 px.
-                      </InfoTooltip>
+                      </InfoPopover>
                     </FormLabel>
                     <FormControl>
                       <Input {...field} />
@@ -520,6 +515,7 @@ export const CollectionForm = ({
                 )}
               />
               {backgroundImg && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={backgroundImg}
                   className="max-h-80"
@@ -618,18 +614,16 @@ const HypercertErrorMessages = ({
   );
 };
 
-const InfoTooltip = ({ children }: { children: ReactNode }) => {
+const InfoPopover = ({ children }: { children: ReactNode }) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
-          <InfoIcon
-            size={"16px"}
-            style={{ marginBottom: "-3px", marginLeft: "4px" }}
-          />
-        </TooltipTrigger>
-        <TooltipContent>{children}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Popover>
+      <PopoverTrigger>
+        <InfoIcon
+          size={"16px"}
+          style={{ marginBottom: "-3px", marginLeft: "4px" }}
+        />
+      </PopoverTrigger>
+      <PopoverContent className="text-sm">{children}</PopoverContent>
+    </Popover>
   );
 };
