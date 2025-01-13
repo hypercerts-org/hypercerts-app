@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import React from "react";
 import { useDeleteCollection } from "@/collections/hooks";
+import { siteConfig } from "@/configs/site";
 
 export const CreateCollectionButton = () => {
   return (
@@ -22,7 +23,7 @@ export const CreateCollectionButton = () => {
       className="hover:text-white rounded-sm bg-white text-black border border-slate-300"
       asChild
     >
-      <Link href="/collections/create">Create collection</Link>
+      <Link href={siteConfig.links.createCollection}>Create collection</Link>
     </Button>
   );
 };

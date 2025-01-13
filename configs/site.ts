@@ -9,7 +9,8 @@ interface SiteConfig {
     github: string;
     docs: string;
     createHypercert: string;
-    createHyperboard: string;
+    createCollection: string;
+    createBlueprint: string;
     explore: string;
     evaluators: string;
     profile: string;
@@ -29,7 +30,8 @@ export const siteConfig: SiteConfig = {
     github: "https://github.com/hypercerts-org/",
     docs: "https://hypercerts.org/docs/",
     createHypercert: "/hypercerts/new",
-    createHyperboard: "/hyperboards/new",
+    createCollection: "/collections/create",
+    createBlueprint: "/blueprints/new",
     explore: "/explore",
     evaluators: "/evaluators",
     settings: "/settings",
