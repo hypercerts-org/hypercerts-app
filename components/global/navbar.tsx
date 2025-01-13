@@ -16,22 +16,34 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const Navbar = () => {
   const currentPath = usePathname();
+  const isLogoOnly = useMediaQuery("(max-width: 900px) and (min-width: 768px)");
   const { address } = useAccount();
 
   return (
-    <nav className="flex items-center justify-between p-3 md:px-24 border-b-[1.5px] border-black">
+    <nav className="flex items-center justify-between p-3 lg:px-24 border-b-[1.5px] border-black min-h-[66px]">
       <div className="flex items-center space-x-6 w-full">
         <Link href="/">
-          <Image
-            src="/hypercerts-header-logo.svg"
-            width={120}
-            height={50}
-            alt="Hypercerts logo"
-            className="min-w-[120px] lg:min-w-[160px]"
-          />
+          {isLogoOnly ? (
+            <Image
+              src="/hypercerts-logo.svg"
+              width={28}
+              height={28}
+              alt="Hypercerts logo"
+              className="min-w-[28px] min-h-[28px]"
+            />
+          ) : (
+            <Image
+              src="/hypercerts-header-logo.svg"
+              width={120}
+              height={50}
+              alt="Hypercerts logo"
+              className="min-w-[160px]"
+            />
+          )}
         </Link>
         <div className="hidden md:flex items-center justify-center space-x-2 w-full">
           <Link
