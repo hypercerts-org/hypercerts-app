@@ -6,9 +6,6 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarSeparator,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { WalletProfile } from "@/components/wallet-profile";
@@ -37,12 +34,26 @@ const MobileNav = () => {
           <Link href={siteConfig.links.explore} className="w-full h-full">
             <MenubarItem>Explore</MenubarItem>
           </Link>
+          <MenubarSeparator />
           <Link
+            key={siteConfig.links.createHypercert}
             href={siteConfig.links.createHypercert}
-            className="w-full h-full"
           >
-            <MenubarItem>New hypercert</MenubarItem>
+            <MenubarItem>Create hypercert</MenubarItem>
           </Link>
+          <Link
+            key={siteConfig.links.createCollection}
+            href={siteConfig.links.createCollection}
+          >
+            <MenubarItem>Create collection</MenubarItem>
+          </Link>
+          <Link
+            key={siteConfig.links.createBlueprint}
+            href={siteConfig.links.createBlueprint}
+          >
+            <MenubarItem>Create blueprint</MenubarItem>
+          </Link>
+          <MenubarSeparator />
           {address && (
             <Link
               key={siteConfig.links.profile}

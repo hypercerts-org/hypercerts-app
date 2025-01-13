@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 
 import ChainDisplay from "@/components/chain-display";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,6 +17,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "../ui/dropdown-menu";
 
 const Navbar = () => {
   const currentPath = usePathname();
@@ -57,17 +63,64 @@ const Navbar = () => {
           >
             <span className="hover:underline">Explore</span>
           </Link>
-          <Link
-            key={siteConfig.links.createHypercert}
-            href={siteConfig.links.createHypercert}
-            className={`${buttonVariants({ variant: "link" })} text-lg ${
-              currentPath === siteConfig.links.createHypercert
-                ? "opacity-1 font-semibold hover:opacity-100"
-                : "opacity-70 hover:opacity-100"
-            }`}
-          >
-            <span className="hover:underline">Create</span>
-          </Link>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="outline-none">
+              <span
+                className={`${buttonVariants({ variant: "link" })} text-lg ${
+                  currentPath === siteConfig.links.createHypercert
+                    ? "opacity-1 font-semibold hover:opacity-100"
+                    : "opacity-70 hover:opacity-100"
+                } text-sm opacity-70 hover:opacity-100`}
+              >
+                Create <ChevronDown size={16} className="ml-2" />
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="flex flex-col items-start"
+            >
+              <DropdownMenuItem asChild>
+                <Link
+                  key={siteConfig.links.createHypercert}
+                  href={siteConfig.links.createHypercert}
+                  className={`${buttonVariants({ variant: "link" })} text-lg ${
+                    currentPath === siteConfig.links.createHypercert
+                      ? "opacity-1 font-semibold hover:opacity-100"
+                      : "opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <span className="hover:underline">New Hypercert</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  key={siteConfig.links.createCollection}
+                  href={siteConfig.links.createCollection}
+                  className={`${buttonVariants({ variant: "link" })} text-lg ${
+                    currentPath === siteConfig.links.createCollection
+                      ? "opacity-1 font-semibold hover:opacity-100"
+                      : "opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <span className="hover:underline">New Collection</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  key={siteConfig.links.createBlueprint}
+                  href={siteConfig.links.createBlueprint}
+                  className={`${buttonVariants({ variant: "link" })} text-lg ${
+                    currentPath === siteConfig.links.createBlueprint
+                      ? "opacity-1 font-semibold hover:opacity-100"
+                      : "opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <span className="hover:underline">New Blueprint</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {address ? (
             <Link
