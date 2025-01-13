@@ -78,7 +78,10 @@ const formSchema = z
         z.object({
           entryId: idSchema,
           factor: z.union([
-            z.number().int().min(1, "Factor must be greater than 0"),
+            z
+              .number()
+              .int("Enter whole numbers only")
+              .min(1, "Factor must be greater than 0"),
             z.literal("").refine((value) => {
               return value !== "";
             }, "Factor is required"),
@@ -103,7 +106,10 @@ const formSchema = z
       .min(1, "Border color is required"),
     newId: idSchema,
     newFactor: z.union([
-      z.number().int().min(1, "Factor must be greater than 0"),
+      z
+        .number()
+        .int("Enter whole numbers only")
+        .min(1, "Factor must be greater than 0"),
       z.literal("").refine((value) => {
         return value !== "";
       }, "Factor is required"),
