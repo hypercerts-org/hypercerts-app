@@ -25,18 +25,13 @@ const Navbar = () => {
     <nav className="flex items-center justify-between p-3 md:px-24 border-b-[1.5px] border-black">
       <div className="flex items-center space-x-6 w-full">
         <Link href="/">
-          <div className="relative flex space-x-1">
-            <Image
-              src="/hypercerts-logo.svg"
-              width={46}
-              height={46}
-              alt="Hypercerts mark"
-              className="w-6 h-6 lg:w-8 lg:h-8"
-            />
-            <span className="font-semibold text-base lg:text-2xl tracking-tight">
-              Hypercerts
-            </span>
-          </div>
+          <Image
+            src="/hypercerts-header-logo.svg"
+            width={120}
+            height={50}
+            alt="Hypercerts logo"
+            className="min-w-[120px] lg:min-w-[160px]"
+          />
         </Link>
         <div className="hidden md:flex items-center justify-center space-x-2 w-full">
           <Link
