@@ -9,6 +9,14 @@ const nextConfig = {
       },
     ];
   },
+  rewrites: async () => {
+    return [
+      {
+        source: "/api/data/:match*",
+        destination: "https://testnet.hypercerts.org/_vercel/insights/:match*",
+      },
+    ];
+  },
   webpack: (config) => {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
