@@ -129,8 +129,14 @@ export const useCreateHyperboard = () => {
           {
             title: data.title,
             description: data.description,
-            hypercerts,
-            blueprints,
+            hypercerts: hypercerts.map((hc) => ({
+              hypercertId: hc.hypercertId,
+              factor: hc.factor as number,
+            })),
+            blueprints: blueprints.map((bp) => ({
+              blueprintId: bp.blueprintId,
+              factor: bp.factor as number,
+            })),
           },
         ],
         borderColor: data.borderColor,
@@ -314,8 +320,14 @@ export const useUpdateHyperboard = () => {
             id: data.collectionId,
             title: data.title,
             description: data.description,
-            hypercerts,
-            blueprints,
+            hypercerts: hypercerts.map((hc) => ({
+              hypercertId: hc.hypercertId,
+              factor: hc.factor as number,
+            })),
+            blueprints: blueprints.map((bp) => ({
+              blueprintId: bp.blueprintId,
+              factor: bp.factor as number,
+            })),
           },
         ],
         borderColor: data.borderColor,

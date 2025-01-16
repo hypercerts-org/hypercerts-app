@@ -7,7 +7,7 @@ const CountBadge = ({
   count = 0,
   variant = "default",
 }: {
-  count: number | null;
+  count: number | null | undefined;
   variant?: "default" | "secondary";
 }) => {
   return (
