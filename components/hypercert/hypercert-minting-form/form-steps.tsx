@@ -1,4 +1,3 @@
-"use client";
 import {
   FormControl,
   FormDescription,
@@ -16,7 +15,10 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   CalendarIcon,
+  Plus,
   Trash2Icon,
+  X,
+  Loader2,
 } from "lucide-react";
 import { RefObject, useState } from "react";
 
@@ -29,7 +31,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { cn, truncateText } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
@@ -45,11 +47,27 @@ import {
 } from "@/components/ui/table";
 import { toPng } from "html-to-image";
 import { FormattedUnits } from "@/components/formatted-units";
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import {
+  DEFAULT_NUM_FRACTIONS,
+  HYPERCERTS_API_URL_REST,
+} from "@/configs/hypercerts";
 import {
   HyperCertFormKeys,
   HypercertFormValues,
 } from "@/components/hypercert/hypercert-minting-form/index";
+import { TooltipInfo } from "@/components/tooltip-info";
+import {
+  FileUploadResult,
+  MAX_FILE_SIZE,
+} from "@/components/creator-feed/creator-feed-drawer";
+import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  CollapsibleTrigger,
+  CollapsibleContent,
+  Collapsible,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 // import Image from "next/image";
 
@@ -151,11 +169,6 @@ const formatNumber = (num: number | bigint): string => {
 };
 
 const DatesAndPeople = ({ form }: FormStepsProps) => {
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
-    form.setValue("allowlistEntries", allowlistEntries);
-  };
-  const allowlistEntries = form.watch("allowlistEntries");
   return (
     <section className="space-y-8">
       <FormField
@@ -322,75 +335,6 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
-
-      <FormField
-        control={form.control}
-        name="allowlistURL"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Allowlist (optional)</FormLabel>
-            <FormControl>
-              <Input
-                {...field}
-                value={field.value}
-                placeholder="https:// | ipfs://"
-              />
-            </FormControl>
-            <FormMessage />
-            <FormDescription>
-              Allowlists determine the number of units each address is allowed
-              to mint. You can create a new allowlist, or prefill from an
-              existing, already uploaded file. If you want to keep any fraction,
-              include yourself in the allowlist.
-            </FormDescription>
-            <div className="flex text-xs space-x-2 w-full justify-end">
-              <Button
-                type="button"
-                disabled={!!field.value}
-                variant="outline"
-                onClick={() => setCreateDialogOpen(true)}
-              >
-                {allowlistEntries ? "Edit allowlist" : "Create allowlist"}
-              </Button>
-
-              <CreateAllowlistDialog
-                setAllowlistEntries={setAllowlistEntries}
-                open={createDialogOpen}
-                setOpen={setCreateDialogOpen}
-              />
-            </div>
-            {!!allowlistEntries?.length && (
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-inherit">
-                    <TableHead className="pl-0">Address</TableHead>
-                    <TableHead>Percentage</TableHead>
-                    <TableHead className="pr-0">Units</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {allowlistEntries?.map((entry, index) => (
-                    <TableRow
-                      key={`${entry.address}-${entry.units}-${index}`}
-                      className="hover:bg-inherit"
-                    >
-                      <TableCell className="pl-0">{entry.address}</TableCell>
-                      <TableCell>
-                        {formatNumber(calculatePercentageBigInt(entry.units))}%
-                      </TableCell>
-                      <TableCell className="pr-0">
-                        <FormattedUnits decimals={2}>
-                          {formatNumber(entry.units)}
-                        </FormattedUnits>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </FormItem>
-        )}
-      />
     </section>
   );
 };
@@ -402,7 +346,86 @@ const calculatePercentageBigInt = (
   return Number((units * BigInt(10000)) / total) / 100;
 };
 
-const ReviewAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
+const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
+  const { toast } = useToast();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+    setTitle,
+  } = useStepProcessDialogContext();
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
+    form.setValue("allowlistEntries", allowlistEntries);
+  };
+  const allowlistEntries = form.watch("allowlistEntries");
+
+  const errorToast = (message: string | undefined) => {
+    toast({
+      title: message,
+      variant: "destructive",
+      duration: 2000,
+    });
+  };
+
+  async function validateFile(file: File) {
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File size must be less than 10MB",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (file.type !== "application/geo+json") {
+      errorToast("Invalid file type. Only GeoJSON files are allowed");
+      return false;
+    }
+
+    return true;
+  }
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("files", file);
+
+    setIsUploading(true);
+
+    try {
+      const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.data.results.length > 0) {
+        const uploadResult = result.data.results[0];
+        form.setValue("geoJSON", {
+          src: `ipfs://${uploadResult.cid}`,
+          name: file.name,
+        });
+      } else {
+        throw new Error("Upload failed");
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to upload file",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      setSelectedFile(null);
+    }
+  };
+
   return (
     <section className="space-y-8">
       {isBlueprint && (
@@ -420,6 +443,183 @@ const ReviewAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
           )}
         />
       )}
+
+      <Collapsible
+        open={isAdvancedOpen}
+        onOpenChange={setIsAdvancedOpen}
+        className="space-y-2"
+      >
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-semibold">Advanced Options</h4>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-9 p-0">
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isAdvancedOpen ? "rotate-180" : "",
+                )}
+              />
+              <span className="sr-only">Toggle advanced options</span>
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+
+        <CollapsibleContent className="space-y-4">
+          <FormField
+            control={form.control}
+            name="allowlistURL"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center gap-2">
+                  <FormLabel>Allowlist (optional)</FormLabel>
+                  <TooltipInfo
+                    tooltipText="Allowlists determine the number of units each address is allowed to mint. You can create a new allowlist, or prefill from an existing, already uploaded file."
+                    className="w-4 h-4"
+                  />
+                </div>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value}
+                    placeholder="https:// | ipfs://"
+                  />
+                </FormControl>
+                <FormMessage />
+                <FormDescription>
+                  If you want to keep any fraction, include yourself in the
+                  allowlist.
+                </FormDescription>
+                <div className="flex text-xs space-x-2 w-full justify-end">
+                  <Button
+                    type="button"
+                    disabled={!!field.value}
+                    variant="outline"
+                    onClick={() => setCreateDialogOpen(true)}
+                  >
+                    {allowlistEntries ? "Edit allowlist" : "Create allowlist"}
+                  </Button>
+
+                  <CreateAllowlistDialog
+                    setAllowlistEntries={setAllowlistEntries}
+                    open={createDialogOpen}
+                    setOpen={setCreateDialogOpen}
+                  />
+                </div>
+                {!!allowlistEntries?.length && (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="hover:bg-inherit">
+                        <TableHead className="pl-0">Address</TableHead>
+                        <TableHead>Percentage</TableHead>
+                        <TableHead className="pr-0">Units</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allowlistEntries?.map((entry, index) => (
+                        <TableRow
+                          key={`${entry.address}-${entry.units}-${index}`}
+                          className="hover:bg-inherit"
+                        >
+                          <TableCell className="pl-0">
+                            {entry.address}
+                          </TableCell>
+                          <TableCell>
+                            {formatNumber(
+                              calculatePercentageBigInt(entry.units),
+                            )}
+                            %
+                          </TableCell>
+                          <TableCell className="pr-0">
+                            <FormattedUnits decimals={2}>
+                              {formatNumber(entry.units)}
+                            </FormattedUnits>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="geoJSON"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center gap-2">
+                  <FormLabel>Location (optional)</FormLabel>
+                  <TooltipInfo
+                    tooltipText="Upload a geoJSON file to attach geographical data to your hypercert. This helps visualize the geographical scope of impact."
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {field.value && (
+                  <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md">
+                    <span className="text-sm">
+                      {truncateText(field.value.name, 20)}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => {
+                        field.onChange(undefined); // Clear the field value
+                        setSelectedFile(null); // Clear selected file
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {isUploading && (
+                  <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md">
+                    <span className="text-sm">
+                      Uploading {selectedFile?.name}...
+                    </span>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  id="geojson-upload"
+                  className="hidden"
+                  accept=".geojson,application/geo+json"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file && (await validateFile(file))) {
+                      setSelectedFile(file);
+                      uploadFile(file); // Start upload immediately
+                    }
+                    e.target.value = "";
+                  }}
+                />
+
+                <div className="flex text-xs space-x-2 w-full justify-end">
+                  <Button
+                    type="button"
+                    disabled={!!field.value || isUploading}
+                    variant="outline"
+                    onClick={() =>
+                      document.getElementById("geojson-upload")?.click()
+                    }
+                  >
+                    {field.value ? "GeoJSON added" : "Select GeoJSON"}
+                  </Button>
+                </div>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CollapsibleContent>
+      </Collapsible>
+
       <FormField
         control={form.control}
         name="acceptTerms"
@@ -593,7 +793,7 @@ const FormSteps = ({
         />
       )}
       {currentStep === 3 && (
-        <ReviewAndSubmit
+        <AdvancedAndSubmit
           form={form}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}

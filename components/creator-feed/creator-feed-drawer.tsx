@@ -36,16 +36,17 @@ import { getCreatorFeedAttestations } from "@/attestations/getCreatorFeedAttesta
 import { AttestationResult } from "@/attestations/fragments/attestation-list.fragment";
 import { truncateText } from "@/lib/utils";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_FILE_TYPES = [
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+export const ACCEPTED_FILE_TYPES = [
   "application/pdf",
   "text/csv",
   "application/vnd.ms-excel",
   "image/png",
   "image/jpeg",
   "image/jpg",
+  "application/geo+json",
 ];
-type FileUploadResult = {
+export type FileUploadResult = {
   cid: string;
   fileName: string;
 };
