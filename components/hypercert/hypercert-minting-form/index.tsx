@@ -100,6 +100,12 @@ const formSchema = z.object({
     })
     .optional()
     .or(z.literal("")),
+  geoJSON: z
+    .object({
+      src: z.string().startsWith("ipfs://"),
+      name: z.string().endsWith(".geojson"),
+    })
+    .optional(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
@@ -253,10 +259,11 @@ export function HypercertMintingForm({
       external_url: values.link,
     };
 
-    const formattedMetadata = formatHypercertData({
+    console.log("values", values);
+
+    const input = {
       ...metadata,
       version: "2.0",
-      properties: [],
       impactScope: ["all"],
       excludedImpactScope: [],
       workScope: values.tags,
@@ -268,7 +275,23 @@ export function HypercertMintingForm({
       impactTimeframeStart: values.projectDates?.from?.getTime?.() / 1000,
       impactTimeframeEnd: values.projectDates?.to?.getTime?.() / 1000,
       contributors: values.contributors ?? [],
-    });
+      properties: values?.geoJSON
+        ? [
+            {
+              trait_type: "geoJSON",
+              type: "application/geo+json",
+              name: values.geoJSON.name,
+              src: values.geoJSON.src,
+            },
+          ]
+        : [],
+    };
+
+    console.log("input", input);
+
+    const formattedMetadata = formatHypercertData(input);
+
+    console.log("formattedMetadata", formattedMetadata);
 
     if (!formattedMetadata.valid) {
       console.error("Invalid metadata", { errors: formattedMetadata.errors });

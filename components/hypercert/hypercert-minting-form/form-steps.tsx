@@ -16,7 +16,9 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   CalendarIcon,
+  Plus,
   Trash2Icon,
+  X,
 } from "lucide-react";
 import { RefObject, useState } from "react";
 
@@ -29,7 +31,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { cn, truncateText } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
@@ -45,11 +47,27 @@ import {
 } from "@/components/ui/table";
 import { toPng } from "html-to-image";
 import { FormattedUnits } from "@/components/formatted-units";
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import {
+  DEFAULT_NUM_FRACTIONS,
+  HYPERCERTS_API_URL_REST,
+} from "@/configs/hypercerts";
 import {
   HyperCertFormKeys,
   HypercertFormValues,
 } from "@/components/hypercert/hypercert-minting-form/index";
+import { TooltipInfo } from "@/components/tooltip-info";
+import {
+  FileUploadResult,
+  MAX_FILE_SIZE,
+} from "@/components/creator-feed/creator-feed-drawer";
+import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  CollapsibleTrigger,
+  CollapsibleContent,
+  Collapsible,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 // import Image from "next/image";
 
@@ -403,6 +421,91 @@ const calculatePercentageBigInt = (
 };
 
 const ReviewAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
+  const { toast } = useToast();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+    setTitle,
+  } = useStepProcessDialogContext();
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+
+  const errorToast = (message: string | undefined) => {
+    toast({
+      title: message,
+      variant: "destructive",
+      duration: 2000,
+    });
+  };
+
+  async function validateFile(file: File) {
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File size must be less than 10MB",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (file.type !== "application/geo+json") {
+      errorToast("Invalid file type. Only GeoJSON files are allowed");
+      return false;
+    }
+
+    return true;
+  }
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("files", file);
+
+    setIsUploading(true);
+    setTitle("Uploading GeoJSON File");
+    setSteps([{ id: "upload", description: "Uploading to IPFS" }]);
+    setOpen(true);
+    setStep("upload");
+
+    try {
+      const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.data.results.length > 0) {
+        const uploadResult = result.data.results[0];
+        form.setValue("geoJSON", {
+          src: `ipfs://${uploadResult.cid}`,
+          name: file.name,
+        });
+        await setStep("upload", "completed");
+        // Add delay to show completion state
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } else {
+        throw new Error("Upload failed");
+      }
+    } catch (error) {
+      await setStep("upload", "error");
+      toast({
+        title: "Failed to upload file",
+        variant: "destructive",
+      });
+      // Add delay to show error state
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } finally {
+      setIsUploading(false);
+      setOpen(false); // Close the dialog in all cases
+      setSelectedFile(null); // Clear selected file
+    }
+  };
+
   return (
     <section className="space-y-8">
       {isBlueprint && (
@@ -420,6 +523,122 @@ const ReviewAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
           )}
         />
       )}
+
+      <Collapsible
+        open={isAdvancedOpen}
+        onOpenChange={setIsAdvancedOpen}
+        className="space-y-2"
+      >
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-semibold">Advanced Options</h4>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-9 p-0">
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isAdvancedOpen ? "rotate-180" : "",
+                )}
+              />
+              <span className="sr-only">Toggle advanced options</span>
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+
+        <CollapsibleContent className="space-y-4">
+          <FormField
+            control={form.control}
+            name="geoJSON"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center gap-2">
+                  <FormLabel className="uppercase">GeoJSON File</FormLabel>
+                  <TooltipInfo
+                    tooltipText="Upload a geoJSON file to attach geographical data to your hypercert."
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {field.value && (
+                  <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md">
+                    <span className="text-sm">
+                      {truncateText(field.value.name, 20)}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => {
+                        form.setValue("geoJSON", undefined);
+                        setSelectedFile(null);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {selectedFile && !field.value && (
+                  <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md">
+                    <span className="text-sm">
+                      {truncateText(selectedFile.name, 20)}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="default"
+                      size="sm"
+                      disabled={isUploading}
+                      onClick={() => uploadFile(selectedFile)}
+                    >
+                      {isUploading ? "Uploading..." : "Confirm Upload"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => setSelectedFile(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  id="geojson-upload"
+                  className="hidden"
+                  accept=".geojson,application/geo+json"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file && (await validateFile(file))) {
+                      setSelectedFile(file);
+                    }
+                    e.target.value = "";
+                  }}
+                />
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  disabled={isUploading || !!selectedFile}
+                  onClick={() =>
+                    document.getElementById("geojson-upload")?.click()
+                  }
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Select GeoJSON
+                </Button>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CollapsibleContent>
+      </Collapsible>
+
       <FormField
         control={form.control}
         name="acceptTerms"
