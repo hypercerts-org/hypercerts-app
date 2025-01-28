@@ -1,10 +1,10 @@
-import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import EthAddress from "../eth-address";
 import { Cuboid } from "lucide-react";
 import { SUPPORTED_CHAINS, SupportedChainIdType } from "@/configs/constants";
 import CopyableHypercertId from "@/components/copyable-hypercert-id";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
-export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
+export default function Creator({ hypercert }: { hypercert: HypercertState }) {
   if (!hypercert) return null;
   return (
     <div className="flex flex-wrap items-center space-x-1 text-sm text-slate-600 font-medium">

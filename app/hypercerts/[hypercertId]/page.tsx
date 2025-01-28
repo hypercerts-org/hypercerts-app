@@ -53,11 +53,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
 
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
-      {/* metadata */}
-      <Suspense fallback={<PageSkeleton />}>
-        <HypercertDetails hypercert={hypercert} />
-      </Suspense>
-      {/* evaluations */}
+      <HypercertDetails hypercertId={hypercertId} />
       <div className="flex justify-between">
         <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Evaluations

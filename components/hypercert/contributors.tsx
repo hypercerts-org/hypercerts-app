@@ -9,11 +9,10 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { UserCircle2 } from "lucide-react";
 import { useState } from "react";
 import { isAddress } from "viem";
-
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 const MAX_CONTRIBUTORS_DISPLAYED = 10;
 
 function Contributor({ contributor }: { contributor: string }) {
@@ -27,7 +26,7 @@ function Contributor({ contributor }: { contributor: string }) {
 export default function Contributors({
   hypercert,
 }: {
-  hypercert: HypercertFull;
+  hypercert: HypercertState;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 

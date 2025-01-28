@@ -1,18 +1,16 @@
 "use client";
 
 import "@yaireo/tagify/dist/tagify.css"; // Tagify CSS
-import { ArrowUpRight, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
-import { cn, generateBlockExplorerLink } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
-import { useToast } from "../ui/use-toast";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { getAddress, isAddress } from "viem";
 import {
@@ -36,6 +34,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FormattedUnits } from "@/components/formatted-units";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
+import { TransactionStatus } from "../global/transaction-status";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
+import { errorToast } from "@/lib/errorToast";
 
 const transferForm = z.object({
   fractionId: z.string().optional(),
@@ -50,9 +52,8 @@ const transferForm = z.object({
 
 export type TransferCreateFormValues = z.infer<typeof transferForm>;
 
-export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
-  const { chainId, chain, address } = useAccount();
-  const { toast } = useToast();
+export function TransferDrawer({ hypercert }: { hypercert: HypercertState }) {
+  const { chainId, address } = useAccount();
   const { client } = useHypercertClient();
   const [fractionIdToTransfer, setFractionIdToTransfer] = useState<string>("");
 
@@ -91,14 +92,6 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
     setFractionIdToTransfer(fractionId);
   };
 
-  const errorToast = (message: string | undefined) => {
-    toast({
-      title: message,
-      variant: "destructive",
-      duration: 2000,
-    });
-  };
-
   const transfer = async () => {
     if (!client || !chainId || !hypercert.contract?.contract_address) {
       return;
@@ -116,52 +109,25 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
         to: getAddress(recipient) as `0x${string}`,
       });
 
-      setTxHash(hash);
+      setTxHash(hash as `0x${string}`);
     } catch (e) {
       if (errorHasReason(e)) {
         errorToast(e.reason);
       } else if (errorHasMessage(e)) {
         errorToast(e.message);
       } else {
-        errorToast("An error occurred while creating the attestation.");
+        errorToast("An error occurred while transferring the fraction.");
       }
       console.error(e);
+      setIsTransferring(false);
     }
-    setIsTransferring(false);
   };
 
   if (!isChainIdSupported(chainId)) {
     return <div>Please connect to a supported chain to transfer.</div>;
   }
 
-  if (txHash) {
-    const url = generateBlockExplorerLink(chain, txHash);
-    return (
-      <>
-        <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-          Transfer hypercert
-        </Drawer.Title>
-        <p>Your fraction is being transferred!</p>
-        <a
-          href={url}
-          title={url}
-          target="_blank"
-          rel="norefferer"
-          className="flex items-center group text-blue-600 px-2 py-1 bg-blue-50 hover:bg-blue-100 w-max rounded-lg text-sm font-medium"
-        >
-          <span>
-            {txHash.slice(0, 6)}...{txHash.slice(-4)}
-          </span>
-          <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200" />
-        </a>
-        <p>
-          Transfers will not be immediately visible on the hypercerts page but
-          will be visible in 5-10 minutes.
-        </p>
-      </>
-    );
-  }
-  let isDisabled = !fractionIdToTransfer || !recipient;
+  let isDisabled = !fractionIdToTransfer || !recipient || isTransferring;
 
   const renderFractionSelection = () => {
     if (!ownedFractions || ownedFractions.length === 0) {
@@ -277,6 +243,18 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
             </div>
           </form>
         </Form>
+        {txHash && (
+          <TransactionStatus
+            txHash={txHash as `0x${string}`}
+            onCompleted={() => {
+              setTxHash("");
+              setIsTransferring(false);
+              revalidatePathServerAction([
+                `/hypercert/${hypercert.hypercert_id}`,
+              ]);
+            }}
+          />
+        )}
       </div>
     </>
   );

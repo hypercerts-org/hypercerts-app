@@ -8,11 +8,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { truncateEthereumAddress } from "@/lib/utils";
 import { UserCircle2 } from "lucide-react";
 import { useState } from "react";
 import { FormattedUnits } from "../formatted-units";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
 const MAX_FRACTIONS_DISPLAYED = 5;
 
@@ -31,7 +31,11 @@ function Fraction({
   );
 }
 
-export default function Fractions({ hypercert }: { hypercert: HypercertFull }) {
+export default function Fractions({
+  hypercert,
+}: {
+  hypercert: HypercertState;
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   if (

@@ -1,9 +1,13 @@
 import * as R from "remeda";
 
-import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { Badge } from "@/components/ui/badge";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
-export default function WorkScope({ hypercert }: { hypercert: HypercertFull }) {
+export default function WorkScope({
+  hypercert,
+}: {
+  hypercert: HypercertState;
+}) {
   const workScope =
     R.isArray(hypercert.metadata?.work_scope) &&
     hypercert.metadata?.work_scope.length > 0

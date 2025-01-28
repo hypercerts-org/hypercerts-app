@@ -1,13 +1,12 @@
 "use client";
 
 import "@yaireo/tagify/dist/tagify.css"; // Tagify CSS
-import { ArrowUpRight, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
-import { cn, generateBlockExplorerLink } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
@@ -44,6 +43,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
+import { TransactionStatus } from "../global/transaction-status";
+import { errorToast } from "@/lib/errorToast";
 
 const burnForm = z.object({
   fractionId: z.string(),
@@ -51,12 +54,13 @@ const burnForm = z.object({
 
 export type BurnFormValues = z.infer<typeof burnForm>;
 
-export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
-  const { chainId, chain, address } = useAccount();
-  const { toast } = useToast();
+export function BurnDrawer({ hypercert }: { hypercert: HypercertState }) {
+  const { chainId, address } = useAccount();
   const { client } = useHypercertClient();
   const [fractionIdToBurn, setFractionIdToBurn] = useState<string>("");
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isBurning, setIsBurning] = useState(false);
+  const [txHash, setTxHash] = useState<string>("");
 
   // Global state
   const ownedFractions = address
@@ -76,9 +80,6 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
   const {
     formState: { errors },
   } = form;
-
-  const [isBurning, setIsBurning] = useState(false);
-  const [txHash, setTxHash] = useState<string>("");
 
   useEffect(() => {
     if (ownedFractions && ownedFractions.length === 1) {
@@ -100,14 +101,6 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     burn();
   };
 
-  const errorToast = (message: string | undefined) => {
-    toast({
-      title: message,
-      variant: "destructive",
-      duration: 2000,
-    });
-  };
-
   const burn = async () => {
     if (!client || !chainId || !hypercert.contract?.contract_address) {
       return;
@@ -124,7 +117,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
         fractionId: BigInt(tokenIdFromFraction),
       });
 
-      setTxHash(hash);
+      setTxHash(hash as `0x${string}`);
     } catch (e) {
       if (errorHasReason(e)) {
         errorToast(e.reason);
@@ -134,8 +127,8 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
         errorToast("An error occurred while trying to burn the fraction.");
       }
       console.error(e);
+      setIsBurning(false);
     }
-    setIsBurning(false);
   };
 
   const ConfirmationDialog = () => (
@@ -168,34 +161,6 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
   if (!isChainIdSupported(chainId)) {
     return (
       <div>Please connect to a supported chain to execute transactions.</div>
-    );
-  }
-
-  if (txHash) {
-    const url = generateBlockExplorerLink(chain, txHash);
-    return (
-      <>
-        <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-          Burn hypercert
-        </Drawer.Title>
-        <p>Your fraction is being burned!</p>
-        <a
-          href={url}
-          title={url}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center group text-blue-600 px-2 py-1 bg-blue-50 hover:bg-blue-100 w-max rounded-lg text-sm font-medium"
-        >
-          <span>
-            {txHash.slice(0, 6)}...{txHash.slice(-4)}
-          </span>
-          <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200" />
-        </a>
-        <p>
-          Burns will not be immediately visible on the hypercerts page but will
-          be visible in 5-10 minutes.
-        </p>
-      </>
     );
   }
 
@@ -261,7 +226,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     );
   };
 
-  let isDisabled = !fractionIdToBurn;
+  let isDisabled = !fractionIdToBurn || isBurning;
 
   return (
     <>
@@ -303,6 +268,19 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
       </div>
 
       <ConfirmationDialog />
+
+      {txHash && (
+        <TransactionStatus
+          txHash={txHash as `0x${string}`}
+          onCompleted={() => {
+            setTxHash("");
+            setIsBurning(false);
+            revalidatePathServerAction([
+              `/hypercert/${hypercert.hypercert_id}`,
+            ]);
+          }}
+        />
+      )}
     </>
   );
 }

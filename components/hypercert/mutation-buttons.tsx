@@ -7,8 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FlameIcon, MoreHorizontal, SendHorizontal, Split } from "lucide-react";
-import type { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { MoreHorizontal, SendHorizontal } from "lucide-react";
 import { Drawer } from "vaul";
 import { TransferDrawer } from "@/components/hypercert/transfer-drawer";
 import { BurnDrawer } from "@/components/hypercert/burn-drawer";
@@ -21,16 +20,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SplitDrawer } from "@/components/hypercert/split-drawer";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
 type MutationButtonsProps = {
-  hypercert: HypercertFull;
+  hypercert: HypercertState;
 };
 
 export default function MutationButtons({ hypercert }: MutationButtonsProps) {
   const [isTransferDrawerOpen, setIsTransferDrawerOpen] = useState(false);
   const [isBurnDrawerOpen, setIsBurnDrawerOpen] = useState(false);
   const [isSplitDrawerOpen, setIsSplitDrawerOpen] = useState(false);
-  const { isConnected, address, chainId } = useAccount();
+  const { isConnected, address, chainId, chain } = useAccount();
 
   const owners = hypercert.fractions?.data?.map(
     (fraction) => fraction.owner_address,
@@ -67,10 +67,7 @@ export default function MutationButtons({ hypercert }: MutationButtonsProps) {
     return "Click to perform this action.";
   };
 
-  const renderButton = (
-    Icon: typeof SendHorizontal | typeof FlameIcon,
-    action: () => void,
-  ) => (
+  const renderButton = (Icon: typeof SendHorizontal, action: () => void) => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
