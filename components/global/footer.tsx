@@ -28,7 +28,7 @@ const footerIcons = [
   {
     label: "Hypercerts Foundation",
     url: "https://hypercerts.org",
-    icon: "/hypercerts-logo.svg",
+    icon: "/hypercerts-mark.svg",
   },
   {
     label: "Github",

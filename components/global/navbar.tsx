@@ -28,14 +28,11 @@ const Navbar = () => {
           <div className="relative flex space-x-1">
             <Image
               src="/hypercerts-logo.svg"
-              width={46}
+              width={261}
               height={46}
-              alt="Hypercerts mark"
-              className="w-6 h-6 lg:w-8 lg:h-8"
+              alt="Hypercerts logo"
+              className="w-48 h-6 lg:w-[261px] lg:h-8"
             />
-            <span className="font-semibold text-base lg:text-2xl tracking-tight">
-              Hypercerts
-            </span>
           </div>
         </Link>
         <div className="hidden md:flex items-center justify-center space-x-2 w-full">
