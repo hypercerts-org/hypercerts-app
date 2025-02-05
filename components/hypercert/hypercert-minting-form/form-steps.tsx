@@ -509,6 +509,12 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                     setAllowlistEntries={setAllowlistEntries}
                     open={createDialogOpen}
                     setOpen={setCreateDialogOpen}
+                    initialValues={allowlistEntries?.map((entry) => ({
+                      address: entry.address,
+                      percentage: calculatePercentageBigInt(
+                        entry.units,
+                      ).toString(),
+                    }))}
                   />
                 </div>
                 {!!allowlistEntries?.length && (

@@ -26,13 +26,22 @@ type AllowListItem = {
   percentage?: string;
 };
 
+const defaultValues = [
+  {
+    address: "",
+    percentage: "",
+  },
+];
+
 export default function Component({
   setAllowlistEntries,
   setOpen,
   open,
+  initialValues,
 }: {
   setAllowlistEntries: (allowlistEntries: AllowlistEntry[]) => void;
   setOpen: (open: boolean) => void;
+  initialValues?: AllowListItem[];
   open: boolean;
 }) {
   const {
@@ -42,12 +51,9 @@ export default function Component({
     error: createAllowListError,
     reset,
   } = useValidateAllowlist();
-  const [allowList, setAllowList] = useState<AllowListItem[]>([
-    {
-      address: "",
-      percentage: "",
-    },
-  ]);
+  const [allowList, setAllowList] = useState<AllowListItem[]>(
+    initialValues?.length ? initialValues : defaultValues,
+  );
 
   useEffect(() => {
     if (validateAllowlistResponse?.success) {
