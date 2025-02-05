@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  DEFAULT_NUM_FRACTIONS,
-  DEFAULT_NUM_FRACTIONS_DECIMALS,
+  DEFAULT_NUM_UNITS,
+  DEFAULT_NUM_UNITS_DECIMALS,
 } from "@/configs/hypercerts";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
@@ -89,11 +89,11 @@ export const BuyFractionalOrderForm = ({
       const hypercertUnits = BigInt(hypercert.units || 0);
       const percentageAsBigInt = parseUnits(
         percentageAmount,
-        DEFAULT_NUM_FRACTIONS_DECIMALS,
+        DEFAULT_NUM_UNITS_DECIMALS,
       );
       const unitsToBuy =
         (hypercertUnits * percentageAsBigInt) /
-        (BigInt(100) * DEFAULT_NUM_FRACTIONS);
+        (BigInt(100) * DEFAULT_NUM_UNITS);
       return unitsToBuy < BigInt(0) ? BigInt(0) : unitsToBuy;
     } catch (e) {
       console.error(e);

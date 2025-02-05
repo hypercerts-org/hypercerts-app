@@ -12,7 +12,7 @@ import {
   HypercertMetadata,
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import { DEFAULT_NUM_UNITS } from "@/configs/hypercerts";
 import { Form } from "@/components/ui/form";
 import FormSteps from "@/components/hypercert/hypercert-minting-form/form-steps";
 import HypercertCard from "@/components/hypercert/hypercert-card";
@@ -320,7 +320,7 @@ export function HypercertMintingForm({
     if (!isBlueprint) {
       await mintHypercert({
         metaData: formattedMetadata.data!,
-        units: DEFAULT_NUM_FRACTIONS,
+        units: DEFAULT_NUM_UNITS,
         transferRestrictions,
         blueprintId,
         allowlistRecords:

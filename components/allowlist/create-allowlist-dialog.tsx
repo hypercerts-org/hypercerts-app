@@ -19,7 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
 import { AllowlistEntry } from "@hypercerts-org/sdk";
 
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import { DEFAULT_NUM_UNITS } from "@/configs/hypercerts";
 
 type AllowListItem = {
   address?: string;
@@ -112,7 +112,7 @@ export default function Component({
   );
 
   const submitList = async () => {
-    const totalUnits = DEFAULT_NUM_FRACTIONS;
+    const totalUnits = DEFAULT_NUM_UNITS;
     try {
       const parsedAllowList = allowList.map((entry) => {
         if (
