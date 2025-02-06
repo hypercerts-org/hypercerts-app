@@ -1,5 +1,4 @@
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
-import { Button, buttonVariants } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { generateHypercertIdFromReceipt } from "@/lib/generateHypercertIdFromReceipt";
@@ -9,74 +8,12 @@ import {
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
 import { useMutation } from "@tanstack/react-query";
-import { createElement } from "react";
-import type { Chain, TransactionReceipt } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useWalletClient } from "wagmi";
-import { generateBlockExplorerLink } from "@/lib/utils";
 import { useQueueMintBlueprint } from "@/blueprints/hooks/queueMintBlueprint";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { track } from "@vercel/analytics";
-
-const createExtraContent = (
-  receipt: TransactionReceipt,
-  hypercertId?: string,
-  chain?: Chain,
-) => {
-  const receiptButton =
-    receipt &&
-    createElement(
-      "a",
-      {
-        href: generateBlockExplorerLink(chain, receipt.transactionHash),
-        target: "_blank",
-        rel: "noopener noreferrer",
-      },
-      createElement(
-        Button,
-        {
-          size: "default",
-          className: buttonVariants({ variant: "secondary" }),
-        },
-        "View transaction",
-      ),
-    );
-
-  const hypercertButton =
-    hypercertId &&
-    createElement(
-      "a",
-      {
-        href: `/hypercerts/${hypercertId}`,
-        target: "_blank",
-        rel: "noopener noreferrer",
-      },
-      createElement(
-        Button,
-        {
-          size: "default",
-          className: buttonVariants({ variant: "default" }),
-        },
-        "View hypercert",
-      ),
-    );
-
-  return createElement(
-    "div",
-    { className: "flex flex-col space-y-2" },
-    createElement(
-      "p",
-      { className: "text-sm font-medium" },
-      "Your hypercert has been minted successfully!",
-    ),
-    createElement(
-      "div",
-      { className: "flex space-x-4" },
-      receiptButton,
-      hypercertButton,
-    ),
-  );
-};
+import { createExtraContent } from "@/components/global/extra-content";
 
 export const useMintHypercert = () => {
   const { client } = useHypercertClient();

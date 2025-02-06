@@ -2,12 +2,15 @@ import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { getAllowListRecordsForAddressByClaimed } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
 import { EmptySection } from "@/components/global/sections";
-import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
+import UnclaimedHypercertsList, {
+  UnclaimedFraction,
+} from "@/components/profile/unclaimed-hypercerts-list";
 import { Suspense } from "react";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
 import { getHypercertsByOwner } from "@/hypercerts/getHypercertsByOwner";
+import { getHypercertMetadata } from "@/hypercerts/getHypercertMetadata";
 
 const HypercertsTabContentInner = async ({
   address,
@@ -27,7 +30,35 @@ const HypercertsTabContentInner = async ({
   const claimableHypercerts = await getAllowListRecordsForAddressByClaimed(
     address,
     false,
-  );
+  ).then(async (res) => {
+    if (!res?.data) {
+      return {
+        data: [],
+        count: 0,
+      };
+    }
+    const hypercertsWithMetadata = await Promise.all(
+      res.data.map(async (record): Promise<UnclaimedFraction> => {
+        const metadata = await getHypercertMetadata(
+          record.hypercert_id as string,
+        );
+        if (!metadata) {
+          return {
+            ...record,
+            metadata: null,
+          };
+        }
+        return {
+          ...record,
+          metadata: metadata?.data,
+        };
+      }),
+    );
+    return {
+      data: hypercertsWithMetadata,
+      count: res?.count,
+    };
+  });
 
   const showCreatedHypercerts =
     createdHypercerts?.data && createdHypercerts.data.length > 0;
