@@ -24,7 +24,7 @@ export const siteConfig: SiteConfig = {
     "Explore, mint, manage, buy, sell, and evaluate Hypercerts with ease.",
   localeDefault: "en",
   links: {
-    discord: "https://discord.gg/uExrjW4h7W",
+    discord: "https://discord.gg/azPgDcSQWw",
     twitter: "https://twitter.com/hypercerts",
     github: "https://github.com/hypercerts-org/",
     docs: "https://hypercerts.org/docs/",
