@@ -21,6 +21,7 @@ const MarketplaceTabContentInner = async ({
   });
 
   const deals = await getDealsForAddress(address);
+  console.log("DEALS", JSON.stringify(deals, null, 2));
   const { buys, sells } = deals || {};
 
   const marketplaceSubTabs = subTabs.filter(
@@ -34,6 +35,7 @@ const MarketplaceTabContentInner = async ({
     "marketplace-bought": buys?.count ?? 0,
     "marketplace-sold": sells?.count ?? 0,
   };
+  console.log("TAB BADGE COUNTS", JSON.stringify(tabBadgeCounts, null, 2));
   return (
     <section>
       <SubTabsWithCount

@@ -32,13 +32,19 @@ const buyQuery = graphql(
 );
 
 export async function getDealsForAddress(address: string) {
+  console.log("GETTING DEALS FOR ADDRESS", address);
+
   const buyRes = await request(HYPERCERTS_API_URL_GRAPH, buyQuery, {
     address,
   });
 
+  console.log("BUY RES", JSON.stringify(buyRes, null, 2));
+
   const sellRes = await request(HYPERCERTS_API_URL_GRAPH, sellQuery, {
     address,
   });
+
+  console.log("SELL RES", JSON.stringify(sellRes, null, 2));
 
   if (!buyRes.sales?.data || !sellRes.sales?.data) {
     return undefined;
