@@ -694,6 +694,13 @@ export const hypercertFormSteps = new Map([
   [3, { title: "Mint", fields: ["acceptTerms"] } as FormStep],
 ]);
 
+const renderStepTitle = (title: string, isBlueprint?: boolean) => {
+  if (isBlueprint && title === "Mint") {
+    return "Send";
+  }
+  return title;
+};
+
 const FormSteps = ({
   form,
   currentStep,
@@ -813,7 +820,7 @@ const FormSteps = ({
               >
                 {step}
               </Badge>
-              <p className="md:ml-2">{title}</p>
+              <p className="md:ml-2">{renderStepTitle(title, isBlueprint)}</p>
             </div>
           ))}
         </div>

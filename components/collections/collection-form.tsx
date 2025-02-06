@@ -25,12 +25,6 @@ import request from "graphql-request";
 import { isValidHypercertId } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import React, { ReactNode } from "react";
 import { ExternalLink, InfoIcon, LoaderCircle } from "lucide-react";
 import Link from "next/link";
@@ -38,6 +32,7 @@ import { useCreateHyperboard, useUpdateHyperboard } from "@/collections/hooks";
 import { useBlueprintsByIds } from "@/blueprints/hooks/useBlueprintsByIds";
 import { BlueprintFragment } from "@/blueprints/blueprint.fragment";
 import { isParseableNumber } from "@/lib/isParseableInteger";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const idSchema = z
   .string()
@@ -78,7 +73,10 @@ const formSchema = z
         z.object({
           entryId: idSchema,
           factor: z.union([
-            z.number().int().min(1, "Factor must be greater than 0"),
+            z
+              .number()
+              .int("Enter whole numbers only")
+              .min(1, "Factor must be greater than 0"),
             z.literal("").refine((value) => {
               return value !== "";
             }, "Factor is required"),
@@ -103,7 +101,10 @@ const formSchema = z
       .min(1, "Border color is required"),
     newId: idSchema,
     newFactor: z.union([
-      z.number().int().min(1, "Factor must be greater than 0"),
+      z
+        .number()
+        .int("Enter whole numbers only")
+        .min(1, "Factor must be greater than 0"),
       z.literal("").refine((value) => {
         return value !== "";
       }, "Factor is required"),
@@ -612,16 +613,14 @@ const HypercertErrorMessages = ({
 
 const InfoTooltip = ({ children }: { children: ReactNode }) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
-          <InfoIcon
-            size={"16px"}
-            style={{ marginBottom: "-3px", marginLeft: "4px" }}
-          />
-        </TooltipTrigger>
-        <TooltipContent>{children}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Popover>
+      <PopoverTrigger>
+        <InfoIcon
+          size={"16px"}
+          style={{ marginBottom: "-3px", marginLeft: "4px" }}
+        />
+      </PopoverTrigger>
+      <PopoverContent className="text-sm">{children}</PopoverContent>
+    </Popover>
   );
 };

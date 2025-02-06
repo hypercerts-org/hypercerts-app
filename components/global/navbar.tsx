@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 
 import ChainDisplay from "@/components/chain-display";
 import { buttonVariants } from "@/components/ui/button";
@@ -16,27 +16,39 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const Navbar = () => {
   const currentPath = usePathname();
+  const isLogoOnly = useMediaQuery("(max-width: 900px)");
   const { address } = useAccount();
 
   return (
-    <nav className="flex items-center justify-between p-3 md:px-24 border-b-[1.5px] border-black">
+    <nav className="flex items-center justify-between p-3 lg:px-24 border-b-[1.5px] border-black min-h-[66px]">
       <div className="flex items-center space-x-6 w-full">
         <Link href="/">
-          <div className="relative flex space-x-1">
+          {isLogoOnly ? (
             <Image
               src="/hypercerts-logo.svg"
-              width={46}
-              height={46}
-              alt="Hypercerts mark"
-              className="w-6 h-6 lg:w-8 lg:h-8"
+              width={32}
+              height={32}
+              alt="Hypercerts logo"
+              className="min-w-8 min-h-8"
             />
-            <span className="font-semibold text-base lg:text-2xl tracking-tight">
-              Hypercerts
-            </span>
-          </div>
+          ) : (
+            <Image
+              src="/hypercerts-header-logo.svg"
+              width={120}
+              height={50}
+              alt="Hypercerts logo"
+              className="min-w-[120px] lg:min-w-[160px]"
+            />
+          )}
         </Link>
         <div className="hidden md:flex items-center justify-center space-x-2 w-full">
           <Link
@@ -50,17 +62,58 @@ const Navbar = () => {
           >
             <span className="hover:underline">Explore</span>
           </Link>
-          <Link
-            key={siteConfig.links.createHypercert}
-            href={siteConfig.links.createHypercert}
-            className={`${buttonVariants({ variant: "link" })} text-lg ${
-              currentPath === siteConfig.links.createHypercert
-                ? "opacity-1 font-semibold hover:opacity-100"
-                : "opacity-70 hover:opacity-100"
-            }`}
-          >
-            <span className="hover:underline">Create</span>
-          </Link>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="outline-none">
+              <span
+                className={`${buttonVariants({ variant: "link" })} text-lg ${
+                  currentPath === siteConfig.links.createHypercert
+                    ? "opacity-1 font-semibold hover:opacity-100"
+                    : "opacity-70 hover:opacity-100"
+                } text-sm opacity-70 hover:opacity-100`}
+              >
+                Create <ChevronDown size={16} className="ml-2" />
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="flex flex-col items-start"
+            >
+              <Link
+                key={siteConfig.links.createHypercert}
+                href={siteConfig.links.createHypercert}
+                className={`${buttonVariants({ variant: "link" })} text-lg ${
+                  currentPath === siteConfig.links.createHypercert
+                    ? "opacity-1 font-semibold hover:opacity-100"
+                    : "opacity-70 hover:opacity-100"
+                }`}
+              >
+                <span className="hover:underline">New Hypercert</span>
+              </Link>
+              <Link
+                key={siteConfig.links.createCollection}
+                href={siteConfig.links.createCollection}
+                className={`${buttonVariants({ variant: "link" })} text-lg ${
+                  currentPath === siteConfig.links.createCollection
+                    ? "opacity-1 font-semibold hover:opacity-100"
+                    : "opacity-70 hover:opacity-100"
+                }`}
+              >
+                New Collection
+              </Link>
+              <Link
+                key={siteConfig.links.createBlueprint}
+                href={siteConfig.links.createBlueprint}
+                className={`${buttonVariants({ variant: "link" })} text-lg ${
+                  currentPath === siteConfig.links.createBlueprint
+                    ? "opacity-1 font-semibold hover:opacity-100"
+                    : "opacity-70 hover:opacity-100"
+                }`}
+              >
+                New Blueprint
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {address ? (
             <Link
