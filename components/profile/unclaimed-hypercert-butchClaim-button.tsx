@@ -13,6 +13,7 @@ import { Hex, ByteArray, getAddress } from "viem";
 import { errorToast } from "@/lib/errorToast";
 import { ChainFactory } from "@/lib/chainFactory";
 import { createExtraContent } from "../global/extra-content";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TransformedClaimData {
   hypercertTokenIds: bigint[];
@@ -47,10 +48,20 @@ export default function UnclaimedHypercertBatchClaimButton({
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
-
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const selectedChain = selectedChainId
     ? ChainFactory.getChain(selectedChainId)
     : null;
+
+  const refreshData = async (address: string) => {
+    await queryClient.invalidateQueries({
+      queryKey: ["hypercerts-data", address.toLowerCase()],
+    });
+    await revalidatePathServerAction(`/profile/${address}`);
+
+    router.refresh();
+  };
 
   const claimHypercert = async () => {
     setIsLoading(true);
@@ -93,10 +104,11 @@ export default function UnclaimedHypercertBatchClaimButton({
           chain: account?.chain!,
         });
         setExtraContent(extraContent);
-        await revalidatePathServerAction([
-          `/profile/${account.address}?tab=hypercerts-claimable`,
-          `/profile/${account.address}?tab=hypercerts-owned`,
-        ]);
+        await refreshData(getAddress(account.address!));
+        // await revalidatePathServerAction([
+        //   `/profile/${account.address}?tab=hypercerts-claimable`,
+        //   `/profile/${account.address}?tab=hypercerts-owned`,
+        // ]);
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }

@@ -11,6 +11,8 @@ import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { createExtraContent } from "../global/extra-content";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getAddress } from "viem";
 
 interface UnclaimedHypercertClaimButtonProps {
   allowListRecord: Row<AllowListRecord>;
@@ -27,8 +29,20 @@ export default function UnclaimedHypercertClaimButton({
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
   const selectedHypercert = allowListRecord.original;
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
+
+  const refreshData = async (address: string) => {
+    await queryClient.invalidateQueries({
+      queryKey: ["hypercerts-data", address.toLowerCase()],
+    });
+    await revalidatePathServerAction(`/profile/${getAddress(address)}`);
+
+    router.refresh();
+  };
 
   const claimHypercert = async () => {
     setIsLoading(true);
@@ -91,11 +105,12 @@ export default function UnclaimedHypercertClaimButton({
         });
         setExtraContent(extraContent);
         await setDialogStep("done", "completed");
-        await revalidatePathServerAction([
-          `/hypercerts/${selectedHypercert?.hypercert_id}`,
-          `/profile/${account.address}?tab=hypercerts-claimable`,
-          `/profile/${account.address}?tab=hypercerts-owned`,
-        ]);
+        await refreshData(getAddress(account.address!));
+        // await revalidatePathServerAction([
+        //   `/hypercerts/${selectedHypercert?.hypercert_id}`,
+        //   `/profile/${account.address}?tab=hypercerts-claimable`,
+        //   `/profile/${account.address}?tab=hypercerts-owned`,
+        // ]);
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
