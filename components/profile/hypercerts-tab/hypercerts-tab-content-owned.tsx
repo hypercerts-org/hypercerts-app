@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { EmptySection } from "@/components/global/sections";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
+import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 
 export const OwnedContent = ({ address }: { address: string }) => {
   const { data, isLoading } = useQuery({
@@ -20,7 +21,7 @@ export const OwnedContent = ({ address }: { address: string }) => {
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,_minmax(16.875rem,_20rem))] gap-4 py-4">
-      {data.data.map((hypercert) => (
+      {data.data.map((hypercert: HypercertListFragment) => (
         <HypercertWindow
           key={hypercert.hypercert_id}
           hypercert={hypercert}
