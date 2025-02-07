@@ -36,11 +36,11 @@ export default function UnclaimedHypercertClaimButton({
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
 
   const refreshData = async (address: string) => {
+    console.log("refreshing data for address", address);
     await queryClient.invalidateQueries({
       queryKey: ["hypercerts-data", address.toLowerCase()],
     });
-    await revalidatePathServerAction(`/profile/${getAddress(address)}`);
-
+    await revalidatePathServerAction(`/profile/${address}`);
     router.refresh();
   };
 
@@ -106,11 +106,6 @@ export default function UnclaimedHypercertClaimButton({
         setExtraContent(extraContent);
         await setDialogStep("done", "completed");
         await refreshData(getAddress(account.address!));
-        // await revalidatePathServerAction([
-        //   `/hypercerts/${selectedHypercert?.hypercert_id}`,
-        //   `/profile/${account.address}?tab=hypercerts-claimable`,
-        //   `/profile/${account.address}?tab=hypercerts-owned`,
-        // ]);
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }

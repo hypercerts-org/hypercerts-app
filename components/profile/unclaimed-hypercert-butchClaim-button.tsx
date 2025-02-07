@@ -40,16 +40,15 @@ export default function UnclaimedHypercertBatchClaimButton({
   allowListRecords: AllowListRecord[];
   selectedChainId: number | null;
 }) {
+  const router = useRouter();
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
   const account = useAccount();
-  const { refresh } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
   const queryClient = useQueryClient();
-  const router = useRouter();
   const selectedChain = selectedChainId
     ? ChainFactory.getChain(selectedChainId)
     : null;
@@ -59,7 +58,6 @@ export default function UnclaimedHypercertBatchClaimButton({
       queryKey: ["hypercerts-data", address.toLowerCase()],
     });
     await revalidatePathServerAction(`/profile/${address}`);
-
     router.refresh();
   };
 
@@ -87,37 +85,41 @@ export default function UnclaimedHypercertBatchClaimButton({
     await setDialogStep("preparing, active");
     try {
       await setDialogStep("claiming", "active");
-
       const tx = await client.batchClaimFractionsFromAllowlists(claimData);
+
       if (!tx) {
         await setDialogStep("claiming", "error");
         throw new Error("Failed to claim fractions");
       }
+
+      // Start refreshing data as soon as we have the transaction
+      console.log("Starting refresh after tx:", new Date().toISOString());
+      refreshData(getAddress(account.address!));
+
       await setDialogStep("confirming", "active");
       const receipt = await waitForTransactionReceipt(walletClient, {
         hash: tx,
       });
+
       if (receipt.status == "success") {
+        console.log("Transaction confirmed:", new Date().toISOString());
         await setDialogStep("done", "completed");
         const extraContent = createExtraContent({
           receipt,
           chain: account?.chain!,
         });
         setExtraContent(extraContent);
-        await refreshData(getAddress(account.address!));
-        // await revalidatePathServerAction([
-        //   `/profile/${account.address}?tab=hypercerts-claimable`,
-        //   `/profile/${account.address}?tab=hypercerts-owned`,
-        // ]);
+
+        // Refresh again after confirmation to ensure we have the latest data
+        console.log("Starting second refresh:", new Date().toISOString());
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
-      setTimeout(() => {
-        refresh();
-      }, 5000);
     } catch (error) {
-      console.error(error);
+      console.error("Claim error:", error);
+      await setDialogStep("claiming", "error", "Transaction failed");
     } finally {
+      refreshData(getAddress(account.address!));
       setIsLoading(false);
     }
   };
