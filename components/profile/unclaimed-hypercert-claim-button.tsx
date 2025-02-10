@@ -36,7 +36,6 @@ export default function UnclaimedHypercertClaimButton({
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
 
   const refreshData = async (address: string) => {
-    console.log("refreshing data for address", address);
     await queryClient.invalidateQueries({
       queryKey: ["hypercerts-data", address.toLowerCase()],
     });
