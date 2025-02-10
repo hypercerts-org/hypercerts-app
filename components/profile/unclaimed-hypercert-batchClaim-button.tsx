@@ -92,26 +92,19 @@ export default function UnclaimedHypercertBatchClaimButton({
         throw new Error("Failed to claim fractions");
       }
 
-      // Start refreshing data as soon as we have the transaction
-      console.log("Starting refresh after tx:", new Date().toISOString());
-      refreshData(getAddress(account.address!));
-
       await setDialogStep("confirming", "active");
       const receipt = await waitForTransactionReceipt(walletClient, {
         hash: tx,
       });
 
       if (receipt.status == "success") {
-        console.log("Transaction confirmed:", new Date().toISOString());
         await setDialogStep("done", "completed");
         const extraContent = createExtraContent({
           receipt,
           chain: account?.chain!,
         });
         setExtraContent(extraContent);
-
-        // Refresh again after confirmation to ensure we have the latest data
-        console.log("Starting second refresh:", new Date().toISOString());
+        refreshData(getAddress(account.address!));
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
@@ -119,7 +112,6 @@ export default function UnclaimedHypercertBatchClaimButton({
       console.error("Claim error:", error);
       await setDialogStep("claiming", "error", "Transaction failed");
     } finally {
-      refreshData(getAddress(account.address!));
       setIsLoading(false);
     }
   };
