@@ -1,19 +1,19 @@
 "use client";
 
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
-import { Button } from "../ui/button";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
+import { ChainFactory } from "@/lib/chainFactory";
+import { errorToast } from "@/lib/errorToast";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ByteArray, getAddress, Hex } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useSwitchChain, useWalletClient } from "wagmi";
-import { useRouter } from "next/navigation";
-import { useStepProcessDialogContext } from "../global/step-process-dialog";
-import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
-import { useState } from "react";
-import { Hex, ByteArray, getAddress } from "viem";
-import { errorToast } from "@/lib/errorToast";
-import { ChainFactory } from "@/lib/chainFactory";
 import { createExtraContent } from "../global/extra-content";
-import { useQueryClient } from "@tanstack/react-query";
+import { useStepProcessDialogContext } from "../global/step-process-dialog";
+import { Button } from "../ui/button";
 
 interface TransformedClaimData {
   hypercertTokenIds: bigint[];
@@ -48,16 +48,25 @@ export default function UnclaimedHypercertBatchClaimButton({
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
-  const queryClient = useQueryClient();
   const selectedChain = selectedChainId
     ? ChainFactory.getChain(selectedChainId)
     : null;
+  const query = useOwnedHypercerts(getAddress(account.address!));
 
   const refreshData = async (address: string) => {
-    await queryClient.invalidateQueries({
-      queryKey: ["hypercerts-data", address.toLowerCase()],
+    const hypercertIds = allowListRecords.map((record) => record.hypercert_id);
+
+    const hypercertViewInvalidationPaths = hypercertIds.map((id) => {
+      return `/hypercerts/${id}`;
     });
-    await revalidatePathServerAction(`/profile/${address}`);
+
+    await revalidatePathServerAction([
+      `/profile/${address}`,
+      `/api/profile/${address}/owned`,
+      `/api/profile/${address}/claimable`,
+      ...hypercertViewInvalidationPaths,
+    ]);
+    await query.refetch();
     router.refresh();
   };
 
