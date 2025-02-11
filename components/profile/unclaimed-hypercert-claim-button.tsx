@@ -13,6 +13,7 @@ import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAc
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getAddress } from "viem";
+import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
 
 interface UnclaimedHypercertClaimButtonProps {
   allowListRecord: Row<AllowListRecord>;
@@ -29,17 +30,20 @@ export default function UnclaimedHypercertClaimButton({
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
-  const queryClient = useQueryClient();
   const router = useRouter();
+  const query = useOwnedHypercerts(getAddress(account.address!));
 
   const selectedHypercert = allowListRecord.original;
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
 
   const refreshData = async (address: string) => {
-    await queryClient.invalidateQueries({
-      queryKey: ["hypercerts-data", address.toLowerCase()],
-    });
-    await revalidatePathServerAction(`/profile/${address}`);
+    await revalidatePathServerAction([
+      `/profile/${address}`,
+      `/api/profile/${address}/owned`,
+      `/api/profile/${address}/claimable`,
+      `/hypercerts/${selectedHypercert?.hypercert_id}`,
+    ]);
+    await query.refetch();
     router.refresh();
   };
 
