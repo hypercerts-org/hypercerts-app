@@ -19,7 +19,13 @@ import { getAddress } from "viem";
 
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 
-export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
+export function ListForSaleButton({
+  hypercert,
+  disabledForChain = false,
+}: {
+  hypercert: HypercertFull;
+  disabledForChain?: boolean;
+}) {
   const { isConnected, address } = useAccount();
   const { client } = useHypercertClient();
 
@@ -53,6 +59,23 @@ export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
   });
 
   const [isOpen, setIsOpen] = useState(false);
+
+  if (disabledForChain) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <Button disabled>List for sale</Button>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            This feature is disabled on the connected chain.
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
 
   const fractions = hypercert.fractions?.data || [];
   const fractionsOwnedByUser = fractions.filter(

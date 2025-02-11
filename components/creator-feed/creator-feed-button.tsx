@@ -17,13 +17,32 @@ import { getAddress } from "viem";
 export default function CreatorFeedButton({
   hypercertId,
   creatorAddress,
+  disabledForChain = false,
 }: {
   hypercertId: string;
   creatorAddress: string;
+  disabledForChain?: boolean;
 }) {
   const { isConnected, address } = useAccount();
 
   const { chainId } = useAccount();
+
+  if (disabledForChain) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <Button disabled={true}>Submit Addtional Information</Button>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            This feature is disabled on the connected chain.
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
 
   const getTooltipMessage = () => {
     if (!isConnected) {

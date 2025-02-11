@@ -4,15 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import useIsWriteable from "@/hooks/useIsWriteable";
 import { useMintHypercert } from "@/hypercerts/hooks/useMintHypercert";
 import { useLocalStorage } from "react-use";
-import { FieldErrors, useForm, useWatch } from "react-hook-form";
+import { type FieldErrors, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
 import {
   formatHypercertData,
-  HypercertMetadata,
+  type HypercertMetadata,
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import { DEFAULT_NUM_UNITS } from "@/configs/hypercerts";
 import { Form } from "@/components/ui/form";
 import FormSteps from "@/components/hypercert/hypercert-minting-form/form-steps";
 import HypercertCard from "@/components/hypercert/hypercert-card";
@@ -36,7 +36,7 @@ const formSchema = z.object({
     .string()
     .trim()
     .min(10, { message: "We need a longer description for your hypercert" })
-    .max(5000, "max 5000 characters"),
+    .max(10000, "max 10000 characters"),
   link: z
     .string()
     .url("Please enter a valid link")
@@ -301,26 +301,10 @@ export function HypercertMintingForm({
       return;
     }
 
-    // if (writeableErrors) {
-    //   Object.values(writeableErrors).forEach((error) => {
-    //     if (error) {
-    //       toast({
-    //         variant: "destructive",
-    //         title: "Sorry! We can't start the mint...",
-    //         description: error,
-    //       });
-    //     }
-    //   });
-    //   if (!writeable) {
-    //     resetWriteableErrors();
-    //     return;
-    //   }
-    // }
-
     if (!isBlueprint) {
       await mintHypercert({
         metaData: formattedMetadata.data!,
-        units: DEFAULT_NUM_FRACTIONS,
+        units: DEFAULT_NUM_UNITS,
         transferRestrictions,
         blueprintId,
         allowlistRecords:
@@ -353,22 +337,6 @@ export function HypercertMintingForm({
       }
     }
   };
-
-  // if (writeableErrors) {
-  //   Object.values(writeableErrors).forEach((error) => {
-  //     if (error) {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Sorry! We can't start the mint...",
-  //         description: error,
-  //       });
-  //     }
-  //   });
-  //   if (!writeable) {
-  //     resetWriteableErrors();
-  //     return;
-  //   }
-  // }
 
   return (
     <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">

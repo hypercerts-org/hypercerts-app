@@ -11,22 +11,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import MDEditor, { commands } from "@uiw/react-md-editor";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
   CalendarIcon,
-  Plus,
+  Loader2,
   Trash2Icon,
   X,
-  Loader2,
 } from "lucide-react";
 import { RefObject, useMemo, useState } from "react";
+import rehypeSanitize from "rehype-sanitize";
 
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
-import {
-  MAX_FILE_SIZE
-} from "@/components/creator-feed/creator-feed-drawer";
+import { MAX_FILE_SIZE } from "@/components/creator-feed/creator-feed-drawer";
 import { FormattedUnits } from "@/components/formatted-units";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import {
@@ -62,7 +61,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import {
-  DEFAULT_NUM_FRACTIONS,
+  DEFAULT_NUM_UNITS,
   HYPERCERTS_API_URL_REST,
 } from "@/configs/hypercerts";
 import { ChainFactory } from "@/lib/chainFactory";
@@ -112,11 +111,42 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} maxLength={5000} />
+              <div className="rounded-md">
+                <MDEditor
+                  value={field.value}
+                  onChange={(value) => field.onChange(value || "")}
+                  preview="edit"
+                  height={300}
+                  textareaProps={{
+                    placeholder:
+                      "Please enter the description of your project. We support plain text input and Markdown formats",
+                    maxLength: 5000,
+                  }}
+                  commands={[
+                    commands.bold,
+                    commands.italic,
+                    commands.title1,
+                    commands.title2,
+                    commands.title3,
+                    commands.divider,
+                    commands.link,
+                    commands.image,
+                    commands.quote,
+                    commands.table,
+                    commands.checkedListCommand,
+                    commands.unorderedListCommand,
+                    commands.orderedListCommand,
+                    commands.codeBlock,
+                  ]}
+                  previewOptions={{
+                    rehypePlugins: [[rehypeSanitize]],
+                  }}
+                />
+              </div>
             </FormControl>
             <FormMessage />
             <FormDescription>
-              Describe your project: why it was created, and how it works
+              Describe your project: why it was created, and how it works.
             </FormDescription>
           </FormItem>
         )}
@@ -349,7 +379,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
 
 const calculatePercentageBigInt = (
   units: bigint,
-  total: bigint = DEFAULT_NUM_FRACTIONS,
+  total: bigint = DEFAULT_NUM_UNITS,
 ) => {
   return Number((units * BigInt(10000)) / total) / 100;
 };
@@ -511,6 +541,12 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                     setAllowlistEntries={setAllowlistEntries}
                     open={createDialogOpen}
                     setOpen={setCreateDialogOpen}
+                    initialValues={allowlistEntries?.map((entry) => ({
+                      address: entry.address,
+                      percentage: calculatePercentageBigInt(
+                        entry.units,
+                      ).toString(),
+                    }))}
                   />
                 </div>
                 {!!allowlistEntries?.length && (

@@ -169,8 +169,8 @@ function ListDialogInner({
       unitsForSale: fractionsOwnedByUser[0]?.units || "0",
       unitsMinPerOrder: "1",
       unitsMaxPerOrder: fractionsOwnedByUser[0]?.units || "0",
-      startDateTime: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 hours (1 day) in the future
-      endDateTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days in the future
+      startDateTime: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes in the future
+      endDateTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year in the future
     },
   });
 

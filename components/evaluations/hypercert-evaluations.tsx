@@ -26,9 +26,11 @@ const getAttestationData = cache(async (params: GetAttestationsParams) => {
 export default async function HypercertEvaluations({
   hypercertId,
   searchParams,
+  disabledForChain = false,
 }: {
   hypercertId: string;
   searchParams: Record<string, string>;
+  disabledForChain?: boolean;
 }) {
   const currentPage = Number(searchParams?.evaluations) || 1;
   const offset = Math.max(0, LISTINGS_PER_PAGE * (currentPage - 1));

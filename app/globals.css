@@ -97,3 +97,148 @@
   --tag-border-radius: 3px;
   --tag-inset-shadow-size: 1.5em;
 }
+
+/* Markdown Editor Styles */
+.w-md-editor {
+  background-color: rgb(255, 255, 255) !important; /* bg-white */
+  border: 1px solid hsl(214.3 31.8% 91.4%) !important;
+  border-radius: 0.5rem !important; /* rounded-md */
+}
+
+.w-md-editor > div {
+  border: none !important;
+}
+
+.w-md-editor-text-pre > code,
+.w-md-editor-text-input {
+  font-size: 0.875rem !important; /* text-sm */
+  font-weight: 500 !important; /* font-medium */
+  background-color: transparent !important;
+  color: rgb(15 23 42) !important; /* text-slate-900 */
+}
+
+.w-md-editor-toolbar {
+  background-color: rgb(255, 255, 255) !important; /* bg-white */
+  border-bottom: 1px solid hsl(214.3 31.8% 91.4%) !important;
+}
+
+.w-md-editor-toolbar-divider {
+  background-color: rgb(226 232 240) !important; /* bg-slate-200 */
+}
+
+.w-md-editor-toolbar button {
+  color: rgb(51 65 85) !important; /* text-slate-700 */
+}
+
+.w-md-editor-toolbar button:hover {
+  background-color: rgb(226 232 240) !important; /* bg-slate-200 */
+}
+
+.w-md-editor-content {
+  background-color: rgb(255, 255, 255) !important; /* bg-white */
+  color: rgb(15 23 42) !important; /* text-slate-900 */
+}
+
+.wmde-markdown {
+  background-color: rgb(255, 255, 255) !important; /* bg-white */
+  color: rgb(15 23 42) !important; /* text-slate-900 */
+}
+
+/* Markdown Image Styles */
+.wmde-markdown img {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px; /* Fixed max height */
+  object-fit: contain;
+  display: block;
+  margin: 1rem auto; /* Center the image with some vertical spacing */
+  border-radius: 0.5rem; /* Optional: rounded corners */
+}
+
+/* For smaller screens */
+@media (max-width: 768px) {
+  .wmde-markdown img {
+    max-height: 200px; /* Smaller height on mobile */
+  }
+}
+
+.w-md-editor-preview img {
+  max-width: 33%;
+  height: auto;
+  max-height: 50vh;
+  object-fit: contain;
+}
+
+/* Preview specific styles */
+.wmde-markdown p,
+.wmde-markdown table td {
+  font-family: var(--font-sans) !important;
+}
+
+/* Heading specific styles */
+.wmde-markdown h1,
+.wmde-markdown h2,
+.wmde-markdown h3,
+.wmde-markdown h4,
+.wmde-markdown h5,
+.wmde-markdown h6,
+.wmde-markdown table th {
+  font-family: var(--font-serif) !important;
+  color: rgb(15 23 42) !important; /* text-slate-900 */
+  margin: 1.5rem 0 1rem 0 !important;
+}
+
+.wmde-markdown h1 {
+  font-size: 1.875rem !important; /* text-4xl */
+  line-height: 2.5rem !important;
+}
+
+.wmde-markdown h2 {
+  font-size: 1.5rem !important; /* text-3xl */
+  line-height: 2.25rem !important;
+}
+
+.wmde-markdown h3 {
+  font-size: 1.5rem !important; /* text-2xl */
+  line-height: 2rem !important;
+}
+
+/* Table specific styles */
+.w-md-editor-text-input table,
+.wmde-markdown table {
+  background-color: rgb(255, 255, 255) !important; /* bg-white */
+  border-color: rgb(226 232 240) !important; /* border-slate-200 */
+}
+
+.w-md-editor-text-input table th,
+.wmde-markdown table th {
+  font-weight: bold !important; /* font-semibold */
+  color: rgb(51 65 85) !important; /* text-slate-700 */
+  background-color: rgb(248 250 252) !important; /* bg-slate-50 */
+}
+
+.wmde-markdown-color table tr,
+.wmde-markdown table tr {
+  font-weight: normal !important;
+  background-color: rgb(255, 255, 255) !important; /* bg-slate-50 */
+}
+
+/* List Styles */
+.wmde-markdown ul {
+  list-style-type: disc !important;
+  padding-left: 1.5rem !important;
+  margin: 1rem 0 !important;
+}
+
+.wmde-markdown ol {
+  list-style-type: decimal !important;
+  padding-left: 1.5rem !important;
+  margin: 1rem 0 !important;
+}
+
+.wmde-markdown li {
+  display: list-item !important;
+  margin: 0.25rem 0 !important;
+}
+
+/* Heading Styles */

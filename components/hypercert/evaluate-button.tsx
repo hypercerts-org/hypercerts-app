@@ -17,8 +17,10 @@ import { useAccount } from "wagmi";
 
 export default function EvaluateButton({
   hypercertId,
+  disabledForChain = false,
 }: {
   hypercertId: string;
+  disabledForChain?: boolean;
 }) {
   const { isConnected, address } = useAccount();
   const [evaluator, setEvaluator] = useState<TrustedAttestor>();
@@ -37,6 +39,23 @@ export default function EvaluateButton({
         });
     }
   }, [address]);
+
+  if (disabledForChain) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <Button disabled={true}>Evaluate</Button>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            This feature is disabled on the connected chain.
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
 
   const getTooltipMessage = () => {
     if (!isConnected) {

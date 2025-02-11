@@ -19,20 +19,29 @@ import { toast } from "@/components/ui/use-toast";
 import { useValidateAllowList } from "@/hypercerts/hooks/useValidateAllowList";
 import { AllowlistEntry } from "@hypercerts-org/sdk";
 
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import { DEFAULT_NUM_UNITS } from "@/configs/hypercerts";
 
 type AllowListItem = {
   address?: string;
   percentage?: string;
 };
 
+const defaultValues = [
+  {
+    address: "",
+    percentage: "",
+  },
+];
+
 export default function Component({
   setAllowlistEntries,
   setOpen,
   open,
+  initialValues,
 }: {
   setAllowlistEntries: (allowlistEntries: AllowlistEntry[]) => void;
   setOpen: (open: boolean) => void;
+  initialValues?: AllowListItem[];
   open: boolean;
 }) {
   const {
@@ -41,13 +50,10 @@ export default function Component({
     isPending,
     error: createAllowListError,
     reset,
-  } = useValidateAllowList();
-  const [allowList, setAllowList] = useState<AllowListItem[]>([
-    {
-      address: "",
-      percentage: "",
-    },
-  ]);
+  } = useValidateAllowlist();
+  const [allowList, setAllowList] = useState<AllowListItem[]>(
+    initialValues?.length ? initialValues : defaultValues,
+  );
 
   useEffect(() => {
     if (validateAllowlistResponse?.success) {
@@ -112,7 +118,7 @@ export default function Component({
   );
 
   const submitList = async () => {
-    const totalUnits = DEFAULT_NUM_FRACTIONS;
+    const totalUnits = DEFAULT_NUM_UNITS;
     try {
       const parsedAllowList = allowList.map((entry) => {
         if (

@@ -22,7 +22,7 @@ const footerIcons = [
   },
   {
     label: "Discord",
-    url: "https://discord.gg/VVSyKg75",
+    url: "https://discord.gg/azPgDcSQWw",
     icon: "/social-icons/discord.svg",
   },
   {
