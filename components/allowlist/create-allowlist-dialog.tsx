@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { toast } from "@/components/ui/use-toast";
-import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
+import { useValidateAllowList } from "@/hypercerts/hooks/useValidateAllowList";
 import { AllowlistEntry } from "@hypercerts-org/sdk";
 
 import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
@@ -41,7 +41,7 @@ export default function Component({
     isPending,
     error: createAllowListError,
     reset,
-  } = useValidateAllowlist();
+  } = useValidateAllowList();
   const [allowList, setAllowList] = useState<AllowListItem[]>([
     {
       address: "",
