@@ -2,24 +2,9 @@
 
 import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
-import { UnclaimedFraction } from "@/components/profile/unclaimed-hypercerts-list";
-import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
-import { useQuery } from "@tanstack/react-query";
-
-export type TabData = {
-  created?: {
-    data: HypercertListFragment[];
-    count: number;
-  };
-  owned?: {
-    data: HypercertListFragment[];
-    count: number;
-  };
-  claimable?: {
-    data: UnclaimedFraction[];
-    count: number;
-  };
-};
+import { useClaimableHypercerts } from "@/hooks/useClaimableHypercerts";
+import { useCreatedHypercerts } from "@/hooks/useCreatedHypercerts";
+import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
 
 const hypercertSubTabs = subTabs.filter(
   (tab) => tab.key.split("-")[0] === "hypercerts",
@@ -32,35 +17,10 @@ export const HypercertsTabCounts = ({
   address: string;
   activeTab: ProfileSubTabKey;
 }) => {
-  const { data: claimable, isLoading } = useQuery({
-    queryKey: ["hypercerts-claimable", address.toLowerCase()],
-    queryFn: async () => {
-      const response = await fetch(`/api/profile/${address}/claimable`);
-      const data = await response.json();
-      return data;
-    },
-    refetchInterval: 30000,
-  });
-
-  const { data: created } = useQuery({
-    queryKey: ["hypercerts-created", address.toLowerCase()],
-    queryFn: async () => {
-      const response = await fetch(`/api/profile/${address}/created`);
-      const data = await response.json();
-      return data;
-    },
-    refetchInterval: 30000,
-  });
-
-  const { data: owned } = useQuery({
-    queryKey: ["hypercerts-owned", address.toLowerCase()],
-    queryFn: async () => {
-      const response = await fetch(`/api/profile/${address}/owned`);
-      const data = await response.json();
-      return data;
-    },
-    refetchInterval: 30000,
-  });
+  // TODO: when cache invalidation works for only count queries, replace this with a call for only the count
+  const { data: claimable } = useClaimableHypercerts(address);
+  const { data: created } = useCreatedHypercerts(address);
+  const { data: owned } = useOwnedHypercerts(address);
 
   const data = {
     "hypercerts-created": created?.count ?? 0,

@@ -2,21 +2,11 @@
 
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { EmptySection } from "@/components/global/sections";
-import UnclaimedHypercertsList, {
-  UnclaimedFraction,
-} from "@/components/profile/unclaimed-hypercerts-list";
-import { useQuery } from "@tanstack/react-query";
+import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
+import { useClaimableHypercerts } from "@/hooks/useClaimableHypercerts";
 
 export const ClaimableContent = ({ address }: { address: string }) => {
-  const { data: response, isLoading } = useQuery({
-    queryKey: ["hypercerts-claimable", address.toLowerCase()],
-    queryFn: async () => {
-      const response = await fetch(`/api/profile/${address}/claimable`);
-      const data = await response.json();
-      return data;
-    },
-    refetchInterval: 30000,
-  });
+  const { data: response, isLoading } = useClaimableHypercerts(address);
 
   if (isLoading) return <ExploreListSkeleton length={4} />;
   if (!response) return <EmptySection />;
@@ -25,9 +15,5 @@ export const ClaimableContent = ({ address }: { address: string }) => {
 
   if (!data || data.length === 0) return <EmptySection />;
 
-  return (
-    <UnclaimedHypercertsList
-      unclaimedHypercerts={data as UnclaimedFraction[]}
-    />
-  );
+  return <UnclaimedHypercertsList unclaimedHypercerts={data} />;
 };
