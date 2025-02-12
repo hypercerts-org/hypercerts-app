@@ -69,16 +69,22 @@ export default function Pagination({
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full mt-4">
       <div className="flex items-center justify-start gap-2">
-        {pageNumber > 1 && (
-          <>
-            <PaginationButton href={getPageHref(1)} arrow="left">
-              First
-            </PaginationButton>
-            <PaginationButton href={getPageHref(pageNumber - 1)} arrow="left">
-              Previous
-            </PaginationButton>
-          </>
-        )}
+        <>
+          <PaginationButton
+            disabled={pageNumber === 1}
+            href={getPageHref(1)}
+            arrow="left"
+          >
+            First
+          </PaginationButton>
+          <PaginationButton
+            disabled={pageNumber === 1}
+            href={getPageHref(pageNumber - 1)}
+            arrow="left"
+          >
+            Previous
+          </PaginationButton>
+        </>
       </div>
 
       <div className="flex items-center justify-center gap-2">
@@ -86,16 +92,22 @@ export default function Pagination({
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        {pageNumber < totalPages && (
-          <>
-            <PaginationButton href={getPageHref(pageNumber + 1)} arrow="right">
-              Next
-            </PaginationButton>
-            <PaginationButton href={getPageHref(totalPages)} arrow="right">
-              Last
-            </PaginationButton>
-          </>
-        )}
+        <>
+          <PaginationButton
+            disabled={pageNumber === totalPages}
+            href={getPageHref(pageNumber + 1)}
+            arrow="right"
+          >
+            Next
+          </PaginationButton>
+          <PaginationButton
+            disabled={pageNumber === totalPages}
+            href={getPageHref(totalPages)}
+            arrow="right"
+          >
+            Last
+          </PaginationButton>
+        </>
       </div>
     </div>
   );

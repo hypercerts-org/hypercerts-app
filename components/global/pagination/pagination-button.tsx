@@ -9,6 +9,7 @@ interface PaginationButtonProps {
   children: React.ReactNode;
   active?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 export default function PaginationButton({
@@ -17,16 +18,18 @@ export default function PaginationButton({
   children,
   active,
   onClick,
+  disabled,
 }: PaginationButtonProps) {
   const buttonContent = (
     <Button
       aria-label={typeof children === "string" ? children : undefined}
       className={cn(
-        "flex items-center gap-2 border-black border-",
-        active && "bg-white text-black ",
+        "flex items-center gap-2 border-black border-2",
+        active && "bg-white text-black cursor-default hover:bg-white",
       )}
       size="sm"
       onClick={onClick}
+      disabled={disabled}
     >
       {arrow === "left" && (
         <ChevronLeft style={{ width: "10px", height: "10px" }} />
@@ -38,7 +41,7 @@ export default function PaginationButton({
     </Button>
   );
 
-  if (href) {
+  if (href && !active && !disabled) {
     return (
       <Link href={href} prefetch={true}>
         {buttonContent}
