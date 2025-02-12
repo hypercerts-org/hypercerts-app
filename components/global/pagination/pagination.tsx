@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import PaginationButton from "./pagination-button";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface PaginationProps {
   searchParams: Record<string, string>;
@@ -18,10 +19,11 @@ export default function Pagination({
   itemsPerPage,
   parameterName = "p",
   basePath = "",
-  currentPage = 1,
+  currentPage,
 }: PaginationProps) {
   const totalPages = Math.ceil((totalItems || 0) / itemsPerPage);
   const pageNumber = currentPage || Number(searchParams[parameterName]) || 1;
+  const { push } = useRouter();
 
   const getPageHref = useCallback(
     (page: number) => {
@@ -58,6 +60,11 @@ export default function Pagination({
   };
 
   if (totalPages <= 1) return null;
+
+  if (pageNumber > totalPages) {
+    // Redirect to last page if the current page is greater than the total number of pages
+    push(getPageHref(totalPages));
+  }
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full mt-4">
