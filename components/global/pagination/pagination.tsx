@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import PaginationButton from "./pagination-button";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface PaginationProps {
   searchParams: Record<string, string>;
@@ -18,10 +19,11 @@ export default function Pagination({
   itemsPerPage,
   parameterName = "p",
   basePath = "",
-  currentPage = 1,
+  currentPage,
 }: PaginationProps) {
   const totalPages = Math.ceil((totalItems || 0) / itemsPerPage);
   const pageNumber = currentPage || Number(searchParams[parameterName]) || 1;
+  const { push } = useRouter();
 
   const getPageHref = useCallback(
     (page: number) => {
@@ -59,19 +61,30 @@ export default function Pagination({
 
   if (totalPages <= 1) return null;
 
+  if (pageNumber > totalPages) {
+    // Redirect to last page if the current page is greater than the total number of pages
+    push(getPageHref(totalPages));
+  }
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full mt-4">
       <div className="flex items-center justify-start gap-2">
-        {pageNumber > 1 && (
-          <>
-            <PaginationButton href={getPageHref(1)} arrow="left">
-              First
-            </PaginationButton>
-            <PaginationButton href={getPageHref(pageNumber - 1)} arrow="left">
-              Previous
-            </PaginationButton>
-          </>
-        )}
+        <>
+          <PaginationButton
+            disabled={pageNumber === 1}
+            href={getPageHref(1)}
+            arrow="left"
+          >
+            First
+          </PaginationButton>
+          <PaginationButton
+            disabled={pageNumber === 1}
+            href={getPageHref(pageNumber - 1)}
+            arrow="left"
+          >
+            Previous
+          </PaginationButton>
+        </>
       </div>
 
       <div className="flex items-center justify-center gap-2">
@@ -79,16 +92,22 @@ export default function Pagination({
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        {pageNumber < totalPages && (
-          <>
-            <PaginationButton href={getPageHref(pageNumber + 1)} arrow="right">
-              Next
-            </PaginationButton>
-            <PaginationButton href={getPageHref(totalPages)} arrow="right">
-              Last
-            </PaginationButton>
-          </>
-        )}
+        <>
+          <PaginationButton
+            disabled={pageNumber === totalPages}
+            href={getPageHref(pageNumber + 1)}
+            arrow="right"
+          >
+            Next
+          </PaginationButton>
+          <PaginationButton
+            disabled={pageNumber === totalPages}
+            href={getPageHref(totalPages)}
+            arrow="right"
+          >
+            Last
+          </PaginationButton>
+        </>
       </div>
     </div>
   );
