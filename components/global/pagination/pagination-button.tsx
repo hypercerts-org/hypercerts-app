@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../../ui/button";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface PaginationButtonProps {
   href?: string;
@@ -20,7 +21,10 @@ export default function PaginationButton({
   const buttonContent = (
     <Button
       aria-label={typeof children === "string" ? children : undefined}
-      className={`flex items-center gap-2 ${active ? "bg-primary text-primary-foreground" : ""}`}
+      className={cn(
+        "flex items-center gap-2 border-black border-",
+        active && "bg-white text-black ",
+      )}
       size="sm"
       onClick={onClick}
     >
