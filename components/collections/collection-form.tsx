@@ -26,13 +26,14 @@ import { isValidHypercertId } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 import React, { ReactNode } from "react";
-import { ExternalLink, InfoIcon, LoaderCircle } from "lucide-react";
+import { ExternalLink, InfoIcon, LoaderCircle, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useCreateHyperboard, useUpdateHyperboard } from "@/collections/hooks";
 import { useBlueprintsByIds } from "@/blueprints/hooks/useBlueprintsByIds";
 import { BlueprintFragment } from "@/blueprints/blueprint.fragment";
 import { isParseableNumber } from "@/lib/isParseableInteger";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { ImageUploader, readAsBase64 } from "../image-uploader";
 
 const idSchema = z
   .string()
@@ -95,7 +96,7 @@ const formSchema = z
           path: ["hypercerts"],
         },
       ),
-    backgroundImg: z.union([z.literal(""), z.string().trim().url()]).optional(),
+    backgroundImg: z.string().optional(),
     borderColor: z
       .string()
       .regex(/^#(?:[0-9a-f]{3}){1,2}$/i, "Must be a color hex code")
@@ -508,7 +509,27 @@ export const CollectionForm = ({
                       </InfoPopover>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <div className="flex flex-row items-center gap-x-4">
+                        <ImageUploader
+                          handleImage={async (e) => {
+                            if (e.target.files) {
+                              const file: File | null = e.target.files[0];
+                              const base64 = await readAsBase64(file);
+                              form.setValue("backgroundImg", base64);
+                            }
+                          }}
+                          inputId="backgroundImg-upload"
+                        />
+                        <Button
+                          type="button"
+                          size={"icon"}
+                          variant={"destructive"}
+                          disabled={!field.value}
+                          onClick={() => form.setValue("backgroundImg", "")}
+                        >
+                          <Trash2Icon className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

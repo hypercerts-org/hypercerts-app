@@ -20,6 +20,7 @@ import { formatDate } from "@/lib/utils";
 import { z } from "zod";
 import { isAddress } from "viem";
 import { useCreateBlueprint } from "@/blueprints/hooks/createBlueprint";
+import { isValidImageData } from "@/components/image-uploader";
 
 const formSchema = z.object({
   blueprint_minter_address: z.string().refine((data) => isAddress(data), {
@@ -30,8 +31,20 @@ const formSchema = z.object({
     .trim()
     .min(1, "We need a title for your hypercert")
     .max(100, "Max 100 characters"),
-  logo: z.string().url("Logo URL is not valid"),
-  banner: z.string().url("Banner URL is not valid"),
+  logo: z
+    .string()
+    .min(1, "Please upload a logo image")
+    .refine(
+      isValidImageData,
+      "Please upload a valid image file or provide a valid URL",
+    ),
+  banner: z
+    .string()
+    .min(1, "Please upload a banner image")
+    .refine(
+      isValidImageData,
+      "Please upload a valid image file or provide a valid URL",
+    ),
   description: z
     .string()
     .trim()

@@ -7,6 +7,7 @@ import { useStepProcessDialogContext } from "@/components/global/step-process-di
 import { useRouter } from "next/navigation";
 import { isParseableNumber } from "@/lib/isParseableInteger";
 import { isValidHypercertId } from "@/lib/utils";
+import { base64ToBlob } from "@/components/image-uploader";
 
 export interface HyperboardCreateRequest {
   chainIds: number[];
@@ -51,6 +52,10 @@ export const useCreateHyperboard = () => {
 
       setSteps([
         {
+          id: "Pinning IPFS",
+          description: "Uploading Background Image to IPFS",
+        },
+        {
           id: "Awaiting signature",
           description: "Awaiting signature",
         },
@@ -61,6 +66,43 @@ export const useCreateHyperboard = () => {
       ]);
 
       setOpen(true);
+
+      let imageUrl = data.backgroundImg;
+      if (data.backgroundImg) {
+        setStep("Pinning IPFS", "active");
+
+        const formData = new FormData();
+        const blob = base64ToBlob(data.backgroundImg);
+        const file = new File([blob], "backgroundImg.jpg", {
+          type: "image/jpeg",
+        });
+        formData.append("files", file);
+
+        try {
+          setStep("Pinning IPFS", "active");
+          const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result?.data?.message || "Error pinning to IPFS");
+          }
+          if (result.success && result.data.results.length > 0) {
+            imageUrl = `https://${result.data.results[0].cid}.ipfs.w3s.link`;
+            await setStep("Pinning IPFS", "completed");
+          }
+        } catch (error) {
+          await setStep(
+            "Pinning IPFS",
+            "error",
+            error instanceof Error ? error.message : "Error pinning to IPFS",
+          );
+        }
+      } else {
+        await setStep("Pinning IPFS", "completed");
+      }
+
       await setStep("Awaiting signature", "active");
       let signature: string;
 
@@ -141,7 +183,7 @@ export const useCreateHyperboard = () => {
         ],
         borderColor: data.borderColor,
         chainIds: [chainId],
-        backgroundImg: data.backgroundImg,
+        backgroundImg: imageUrl,
         adminAddress: address,
         signature: signature,
       };
@@ -239,6 +281,10 @@ export const useUpdateHyperboard = () => {
 
       setSteps([
         {
+          id: "Pinning IPFS",
+          description: "Uploading Background Image to IPFS",
+        },
+        {
           id: "Awaiting signature",
           description: "Awaiting signature",
         },
@@ -249,6 +295,39 @@ export const useUpdateHyperboard = () => {
       ]);
 
       setOpen(true);
+      let imageUrl: string | undefined;
+      if (data.backgroundImg) {
+        await setStep("Pinning IPFS", "active");
+
+        const formData = new FormData();
+        const blob = base64ToBlob(data.backgroundImg);
+        const file = new File([blob], "backgroundImg.jpg", {
+          type: "image/jpeg",
+        });
+        formData.append("files", file);
+
+        try {
+          const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result?.data?.message || "Error pinning to IPFS");
+          }
+          if (result.success && result.data.results.length > 0) {
+            imageUrl = `https://${result.data.results[0].cid}.ipfs.w3s.link`;
+            await setStep("Pinning IPFS", "completed");
+          }
+        } catch (error) {
+          await setStep(
+            "Pinning IPFS",
+            "error",
+            error instanceof Error ? error.message : "Error pinning to IPFS",
+          );
+        }
+      }
+
       await setStep("Awaiting signature", "active");
       let signature: string;
 
@@ -332,7 +411,7 @@ export const useUpdateHyperboard = () => {
         ],
         borderColor: data.borderColor,
         chainIds: [chainId],
-        backgroundImg: data.backgroundImg,
+        backgroundImg: imageUrl,
         adminAddress: address,
         signature: signature,
       };

@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import isURL from "validator/lib/isURL";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2Icon } from "lucide-react";
 
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -31,10 +30,23 @@ import {
   type PendingUserUpdate,
 } from "@/settings/pending-user-update-parser";
 import { PendingUpdateCard } from "@/components/settings/pending-update-card";
+import {
+  base64ToBlob,
+  ImageUploader,
+  isValidImageData,
+  readAsBase64,
+} from "../image-uploader";
+import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 
 const formSchema = z.object({
   displayName: z.string().max(30, "Max. 30 characters").optional(),
-  avatar: z.union([z.string().url("Invalid URL"), z.literal("")]).optional(),
+  avatar: z
+    .string()
+    .refine(
+      isValidImageData,
+      "Please upload a valid image file or provide a valid URL",
+    )
+    .optional(),
 });
 
 export type SettingsFormValues = z.infer<typeof formSchema>;
@@ -76,6 +88,31 @@ export const SettingsForm = () => {
 
   const onSubmit = async (data: SettingsFormValues) => {
     try {
+      if (data.avatar) {
+        const formData = new FormData();
+        const blob = base64ToBlob(data.avatar);
+        const file = new File([blob], "avatar.jpg", {
+          type: "image/jpeg",
+        });
+        formData.append("files", file);
+
+        const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
+          method: "POST",
+          body: formData,
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result?.data?.message || "Error pinning to IPFS");
+        }
+        if (result.success && result.data.results.length > 0) {
+          form.setValue(
+            "avatar",
+            `https://${result.data.results[0].cid}.ipfs.w3s.link`,
+          );
+        }
+      }
+
+      data = form.getValues();
       await addOrUpdateUser(data);
 
       if (selectedAccount?.type !== "safe") {
@@ -151,10 +188,7 @@ export const SettingsForm = () => {
     form.formState.isSubmitting || !form.formState.isValid || isFormDisabled;
 
   const shouldShowAvatar =
-    avatar &&
-    isURL(avatar) &&
-    !form.formState.isValidating &&
-    !form.formState.errors.avatar;
+    avatar && !form.formState.isValidating && !form.formState.errors.avatar;
 
   const [updatedUserName, setUpdatedUserName] = useState(false);
   const [updatedUserNameEns, setUpdatedUserNameEns] = useState(false);
@@ -269,7 +303,28 @@ export const SettingsForm = () => {
               <FormItem>
                 <FormLabel>Image</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isFormDisabled} />
+                  <div className="flex flex-row items-center gap-x-4">
+                    <ImageUploader
+                      handleImage={async (e) => {
+                        if (e.target.files) {
+                          const file: File | null = e.target.files[0];
+                          const base64 = await readAsBase64(file);
+                          form.setValue("avatar", base64);
+                        }
+                      }}
+                      inputId="avatar-upload"
+                      disabled={isFormDisabled}
+                    />
+                    <Button
+                      type="button"
+                      size={"icon"}
+                      variant={"destructive"}
+                      disabled={isFormDisabled || !avatar}
+                      onClick={() => form.setValue("avatar", "")}
+                    >
+                      <Trash2Icon className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
