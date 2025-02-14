@@ -315,13 +315,14 @@ export const useCreateFractionalMakerAsk = ({
 
 export const useGetCurrentERC20Allowance = () => {
   const chainId = useChainId();
-  const { address } = useAccount();
+  const { address: userAddress } = useAccount();
   const hypercertsExchangeAddress =
     addressesByNetwork[utils.asDeployedChain(chainId)].EXCHANGE_V2;
 
   const { data: walletClient } = useWalletClient();
 
-  return async (currency: `0x${string}`) => {
+  return async (currency: `0x${string}`, address?: `0x${string}`) => {
+    const addressToUse = address ?? userAddress;
     if (!walletClient) {
       return BigInt(0);
     }
@@ -330,7 +331,7 @@ export const useGetCurrentERC20Allowance = () => {
       abi: WETHAbi,
       address: currency as `0x${string}`,
       functionName: "allowance",
-      args: [address, hypercertsExchangeAddress],
+      args: [addressToUse, hypercertsExchangeAddress],
     });
 
     return data as bigint;
@@ -339,7 +340,6 @@ export const useGetCurrentERC20Allowance = () => {
 
 export const useBuyFractionalMakerAsk = () => {
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
-
   const chainId = useChainId();
   const {
     setDialogStep: setStep,
@@ -379,6 +379,11 @@ export const useBuyFractionalMakerAsk = () => {
         throw new Error("No client");
       }
 
+      if (!walletClientData) {
+        setOpen(false);
+        throw new Error("No wallet client data");
+      }
+
       if (!chainId) {
         setOpen(false);
         throw new Error("No chain id");
@@ -415,6 +420,8 @@ export const useBuyFractionalMakerAsk = () => {
 
       let currency: Currency | undefined;
       let takerOrder: Taker;
+      // const safeAddress = "0x379756bB61A632Cd3C5C5Ce4F3768f4815feaCda";
+      const safeAddress = "0x462978318992f14cC43ECba405C78FC677AEaD45";
       try {
         await setStep("Setting up order execution");
         currency = getCurrencyByAddress(order.chainId, order.currency);
@@ -427,7 +434,7 @@ export const useBuyFractionalMakerAsk = () => {
 
         takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
           order,
-          address,
+          safeAddress,
           unitAmount.toString(),
           pricePerUnit,
         );
@@ -453,16 +460,15 @@ export const useBuyFractionalMakerAsk = () => {
         if (currency.address !== zeroAddress) {
           const currentAllowance = await getCurrentERC20Allowance(
             order.currency as `0x${string}`,
+            safeAddress,
           );
 
           if (currentAllowance < totalPrice) {
-            const approveTx = await hypercertExchangeClient.approveErc20(
+            const approveTx = await hypercertExchangeClient.approveErc20Safe(
+              safeAddress,
               order.currency,
               totalPrice,
             );
-            await waitForTransactionReceipt(walletClientData, {
-              hash: approveTx.hash as `0x${string}`,
-            });
           }
         }
       } catch (e) {
@@ -478,14 +484,15 @@ export const useBuyFractionalMakerAsk = () => {
       try {
         await setStep("Transfer manager");
         const isTransferManagerApproved =
-          await hypercertExchangeClient.isTransferManagerApproved();
+          await hypercertExchangeClient.isTransferManagerApproved(
+            undefined,
+            safeAddress,
+          );
         if (!isTransferManagerApproved) {
-          const transferManagerApprove = await hypercertExchangeClient
-            .grantTransferManagerApproval()
-            .call();
-          await waitForTransactionReceipt(walletClientData, {
-            hash: transferManagerApprove.hash as `0x${string}`,
-          });
+          const transferManagerApprove =
+            await hypercertExchangeClient.grantTransferManagerApprovalSafe(
+              safeAddress,
+            );
         }
       } catch (e) {
         await setStep(
@@ -501,19 +508,15 @@ export const useBuyFractionalMakerAsk = () => {
         await setStep("Setting up order execution");
         const overrides =
           currency.address === zeroAddress ? { value: totalPrice } : undefined;
-        const { call } = hypercertExchangeClient.executeOrder(
+        const tx = await hypercertExchangeClient.executeOrderSafe(
+          safeAddress,
           order,
           takerOrder,
           order.signature,
-          undefined,
           overrides,
         );
         await setStep("Awaiting buy signature");
-        const tx = await call();
         await setStep("Awaiting confirmation");
-        await waitForTransactionReceipt(walletClientData, {
-          hash: tx.hash as `0x${string}`,
-        });
         const chain = SUPPORTED_CHAINS.find((x) => x.id === order.chainId);
         await setStep("Awaiting confirmation", "completed");
         const message =
@@ -545,7 +548,7 @@ export const useBuyFractionalMakerAsk = () => {
               </Button>
               <Button asChild>
                 <Link
-                  href={generateBlockExplorerLink(chain, tx.hash)}
+                  href={generateBlockExplorerLink(chain, tx)}
                   target="_blank"
                 >
                   View transaction <ExternalLink size={14} className="ml-2" />

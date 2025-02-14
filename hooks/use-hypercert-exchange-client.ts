@@ -30,6 +30,7 @@ export const useHypercertExchangeClient = () => {
       {
         apiEndpoint: HYPERCERTS_API_URL_REST,
       },
+      walletClient,
     );
   }, [walletClient, chainId, provider, signer]);
 
