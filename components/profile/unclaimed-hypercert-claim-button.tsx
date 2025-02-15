@@ -11,6 +11,9 @@ import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { createExtraContent } from "../global/extra-content";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getAddress } from "viem";
+import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
 
 interface UnclaimedHypercertClaimButtonProps {
   allowListRecord: Row<AllowListRecord>;
@@ -27,8 +30,22 @@ export default function UnclaimedHypercertClaimButton({
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
+  const router = useRouter();
+  const query = useOwnedHypercerts(getAddress(account.address!));
+
   const selectedHypercert = allowListRecord.original;
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
+
+  const refreshData = async (address: string) => {
+    await revalidatePathServerAction([
+      `/profile/${address}`,
+      `/api/profile/${address}/owned`,
+      `/api/profile/${address}/claimable`,
+      `/hypercerts/${selectedHypercert?.hypercert_id}`,
+    ]);
+    await query.refetch();
+    router.refresh();
+  };
 
   const claimHypercert = async () => {
     setIsLoading(true);
@@ -91,11 +108,7 @@ export default function UnclaimedHypercertClaimButton({
         });
         setExtraContent(extraContent);
         await setDialogStep("done", "completed");
-        await revalidatePathServerAction([
-          `/hypercerts/${selectedHypercert?.hypercert_id}`,
-          `/profile/${account.address}?tab=hypercerts-claimable`,
-          `/profile/${account.address}?tab=hypercerts-owned`,
-        ]);
+        await refreshData(getAddress(account.address!));
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }

@@ -1,18 +1,19 @@
 "use client";
 
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
-import { Button } from "../ui/button";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
+import { ChainFactory } from "@/lib/chainFactory";
+import { errorToast } from "@/lib/errorToast";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ByteArray, getAddress, Hex } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useSwitchChain, useWalletClient } from "wagmi";
-import { useRouter } from "next/navigation";
-import { useStepProcessDialogContext } from "../global/step-process-dialog";
-import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
-import { useState } from "react";
-import { Hex, ByteArray, getAddress } from "viem";
-import { errorToast } from "@/lib/errorToast";
-import { ChainFactory } from "@/lib/chainFactory";
 import { createExtraContent } from "../global/extra-content";
+import { useStepProcessDialogContext } from "../global/step-process-dialog";
+import { Button } from "../ui/button";
 
 interface TransformedClaimData {
   hypercertTokenIds: bigint[];
@@ -39,18 +40,35 @@ export default function UnclaimedHypercertBatchClaimButton({
   allowListRecords: AllowListRecord[];
   selectedChainId: number | null;
 }) {
+  const router = useRouter();
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
   const account = useAccount();
-  const { refresh } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
-
   const selectedChain = selectedChainId
     ? ChainFactory.getChain(selectedChainId)
     : null;
+  const query = useOwnedHypercerts(getAddress(account.address!));
+
+  const refreshData = async (address: string) => {
+    const hypercertIds = allowListRecords.map((record) => record.hypercert_id);
+
+    const hypercertViewInvalidationPaths = hypercertIds.map((id) => {
+      return `/hypercerts/${id}`;
+    });
+
+    await revalidatePathServerAction([
+      `/profile/${address}`,
+      `/api/profile/${address}/owned`,
+      `/api/profile/${address}/claimable`,
+      ...hypercertViewInvalidationPaths,
+    ]);
+    await query.refetch();
+    router.refresh();
+  };
 
   const claimHypercert = async () => {
     setIsLoading(true);
@@ -76,16 +94,18 @@ export default function UnclaimedHypercertBatchClaimButton({
     await setDialogStep("preparing, active");
     try {
       await setDialogStep("claiming", "active");
-
       const tx = await client.batchClaimFractionsFromAllowlists(claimData);
+
       if (!tx) {
         await setDialogStep("claiming", "error");
         throw new Error("Failed to claim fractions");
       }
+
       await setDialogStep("confirming", "active");
       const receipt = await waitForTransactionReceipt(walletClient, {
         hash: tx,
       });
+
       if (receipt.status == "success") {
         await setDialogStep("done", "completed");
         const extraContent = createExtraContent({
@@ -93,18 +113,13 @@ export default function UnclaimedHypercertBatchClaimButton({
           chain: account?.chain!,
         });
         setExtraContent(extraContent);
-        await revalidatePathServerAction([
-          `/profile/${account.address}?tab=hypercerts-claimable`,
-          `/profile/${account.address}?tab=hypercerts-owned`,
-        ]);
+        refreshData(getAddress(account.address!));
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
-      setTimeout(() => {
-        refresh();
-      }, 5000);
     } catch (error) {
-      console.error(error);
+      console.error("Claim error:", error);
+      await setDialogStep("claiming", "error", "Transaction failed");
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,18 @@
-import { useAccount, useChainId, useWalletClient } from "wagmi";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
+import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { decodeContractError } from "@/lib/decodeContractError";
+import { generateBlockExplorerLink } from "@/lib/utils";
+import {
+  CreateFractionalOfferFormValues,
+  MarketplaceOrder,
+} from "@/marketplace/types";
+import { getCurrencyByAddress } from "@/marketplace/utils";
 import {
   addressesByNetwork,
   CreateMakerAskOutput,
@@ -10,30 +23,15 @@ import {
   utils,
   WETHAbi,
 } from "@hypercerts-org/marketplace-sdk";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
+import { useMutation } from "@tanstack/react-query";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { isAddress, parseUnits, zeroAddress } from "viem";
 import { readContract, waitForTransactionReceipt } from "viem/actions";
-import {
-  CreateFractionalOfferFormValues,
-  MarketplaceOrder,
-} from "@/marketplace/types";
-import { decodeContractError } from "@/lib/decodeContractError";
-import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
-import { toast } from "@/components/ui/use-toast";
-import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
-import { getCurrencyByAddress } from "@/marketplace/utils";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { generateBlockExplorerLink } from "@/lib/utils";
-import { SUPPORTED_CHAINS } from "@/configs/constants";
-import { useRouter } from "next/navigation";
-import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { ExternalLink } from "lucide-react";
-import React, { useEffect } from "react";
-import { clearCacheAfterListing } from "@/app/actions/clearCacheAfterListing";
-import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
+import { useAccount, useChainId, useWalletClient } from "wagmi";
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
