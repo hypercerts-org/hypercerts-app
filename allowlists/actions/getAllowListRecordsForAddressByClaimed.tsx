@@ -38,10 +38,13 @@ const query = graphql(
   [AllowListRecordFragment],
 );
 
-export async function getAllowListRecordsForAddressByClaimed(
-  address: string,
-  claimed: boolean,
-) {
+export async function getAllowListRecordsForAddressByClaimed({
+  address,
+  claimed,
+}: {
+  address: string;
+  claimed: boolean;
+}) {
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     address,
     claimed,

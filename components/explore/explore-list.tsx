@@ -4,7 +4,7 @@ import {
   getAllHypercerts,
   isClaimsFilter,
   isClaimsOrderBy,
-} from "@/hypercerts/getAllHypercerts";
+} from "@/hypercerts/actions/getAllHypercerts";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import { InfoSection } from "@/components/global/sections";
 import HypercertWindow from "@/components/hypercert/hypercert-window";

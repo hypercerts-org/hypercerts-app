@@ -1,5 +1,4 @@
 import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
-import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { SubTabsWithCountSkeleton } from "@/components/profile/sub-tabs-with-count";
 import { UnclaimedFraction } from "@/components/profile/unclaimed-hypercerts-list";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
@@ -50,21 +49,13 @@ export function HypercertsTabContent({
       </Suspense>
 
       {activeTab === "hypercerts-created" && (
-        <Suspense fallback={<ExploreListSkeleton length={4} />}>
-          <CreatedContent address={address} />
-        </Suspense>
+        <CreatedContent address={address} />
       )}
 
-      {activeTab === "hypercerts-owned" && (
-        <Suspense fallback={<ExploreListSkeleton length={4} />}>
-          <OwnedContent address={address} />
-        </Suspense>
-      )}
+      {activeTab === "hypercerts-owned" && <OwnedContent address={address} />}
 
       {activeTab === "hypercerts-claimable" && (
-        <Suspense fallback={<ExploreListSkeleton length={4} />}>
-          <ClaimableContent address={address} />
-        </Suspense>
+        <ClaimableContent address={address} />
       )}
     </section>
   );

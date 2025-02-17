@@ -1,6 +1,6 @@
 "use client";
 
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
+import { AllowListRecord } from "@/allowlists/actions/getAllowListRecordsForAddressByClaimed";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
@@ -61,9 +61,8 @@ export default function UnclaimedHypercertBatchClaimButton({
     });
 
     await revalidatePathServerAction([
-      `/profile/${address}`,
-      `/api/profile/${address}/owned`,
-      `/api/profile/${address}/claimable`,
+      `/profile/${address}?tab=hypercerts-claimable`,
+      `/profile/${address}?tab=hypercerts-owned`,
       ...hypercertViewInvalidationPaths,
     ]);
     await query.refetch();

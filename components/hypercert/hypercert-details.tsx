@@ -14,7 +14,7 @@ import Fractions from "./fractions";
 import { InfoSection } from "../global/sections";
 import PageSkeleton from "./page-skeleton";
 import { cache, Suspense } from "react";
-import { getHypercertState } from "@/hypercerts/getHypercertState";
+import { getHypercertState } from "@/hypercerts/actions/getHypercertState";
 import { getOrders } from "@/marketplace/getOpenOrders";
 
 function HypercertDetailsNotFound() {

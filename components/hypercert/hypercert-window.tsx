@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { SUPPORTED_CHAINS, SupportedChainIdType } from "@/configs/constants";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
-import { getEvaluationStatus } from "@/hypercerts/getEvaluationStatus";
+import { getEvaluationStatus } from "@/hypercerts/actions/getEvaluationStatus";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { formatPercentageToFirstNonZeroDigit } from "@/lib/formatPercentage";
 import { getCurrencyByAddress } from "@/marketplace/utils";

@@ -1,19 +1,18 @@
-"use client";
-
-import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { EmptySection } from "@/components/global/sections";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
+import { getHypercertsByOwner } from "@/hypercerts/actions/getHypercertsByOwner";
 
-export const OwnedContent = ({ address }: { address: string }) => {
-  const { data: response, isLoading } = useOwnedHypercerts(address);
+export const OwnedContent = async ({ address }: { address: string }) => {
+  const response = await getHypercertsByOwner({ ownerAddress: address });
 
-  if (isLoading) return <ExploreListSkeleton length={4} />;
-  if (!response?.data) return <EmptySection />;
+  if (!response || !response.data || response.data.length === 0) {
+    return <EmptySection />;
+  }
 
+  const { data } = response;
   return (
     <div className="grid grid-cols-[repeat(auto-fit,_minmax(16.875rem,_20rem))] gap-4 py-4">
-      {response.data.map((hypercert) => (
+      {data.map((hypercert) => (
         <HypercertWindow
           key={hypercert.hypercert_id}
           hypercert={hypercert}

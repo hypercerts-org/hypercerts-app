@@ -1,19 +1,23 @@
-"use client";
-
-import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { EmptySection } from "@/components/global/sections";
+import { getHypercertsByCreator } from "@/hypercerts/actions/getHypercertsByCreator"; // Server Action
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import { useCreatedHypercerts } from "@/hooks/useCreatedHypercerts";
 
-export const CreatedContent = ({ address }: { address: string }) => {
-  const { data: response, isLoading } = useCreatedHypercerts(address);
+interface CreatedContentProps {
+  address: string;
+}
 
-  if (isLoading) return <ExploreListSkeleton length={4} />;
-  if (!response?.data) return <EmptySection />;
+export async function CreatedContent({ address }: CreatedContentProps) {
+  const response = await getHypercertsByCreator({ creatorAddress: address });
+
+  if (!response || !response.data || response.data.length === 0) {
+    return <EmptySection />;
+  }
+
+  const { data } = response;
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,_minmax(16.875rem,_20rem))] gap-4 py-4">
-      {response.data.map((hypercert) => (
+      {data.map((hypercert) => (
         <HypercertWindow
           key={hypercert.hypercert_id}
           hypercert={hypercert}
@@ -22,4 +26,4 @@ export const CreatedContent = ({ address }: { address: string }) => {
       ))}
     </div>
   );
-};
+}

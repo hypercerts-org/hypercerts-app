@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator";
-import { getEvaluationStatus } from "@/hypercerts/getEvaluationStatus";
+import { getEvaluationStatus } from "@/hypercerts/actions/getEvaluationStatus";
 import Image from "next/image";
 import Link from "next/link";
 import { SUPPORTED_CHAINS, SupportedChainIdType } from "@/configs/constants";
