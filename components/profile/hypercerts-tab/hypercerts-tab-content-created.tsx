@@ -9,7 +9,7 @@ interface CreatedContentProps {
 export async function CreatedContent({ address }: CreatedContentProps) {
   const response = await getHypercertsByCreator({ creatorAddress: address });
 
-  if (!response || !response.data || response.data.length === 0) {
+  if (!response?.data?.length) {
     return <EmptySection />;
   }
 

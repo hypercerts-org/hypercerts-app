@@ -5,7 +5,7 @@ import { getHypercertsByOwner } from "@/hypercerts/actions/getHypercertsByOwner"
 export const OwnedContent = async ({ address }: { address: string }) => {
   const response = await getHypercertsByOwner({ ownerAddress: address });
 
-  if (!response || !response.data || response.data.length === 0) {
+  if (!response?.data?.length) {
     return <EmptySection />;
   }
 
