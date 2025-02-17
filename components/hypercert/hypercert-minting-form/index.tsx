@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import useIsWriteable from "@/hooks/useIsWriteable";
 import { useMintHypercert } from "@/hypercerts/hooks/useMintHypercert";
 import { useLocalStorage } from "react-use";
-import { type FieldErrors, useForm, useWatch } from "react-hook-form";
+import { type FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -178,17 +178,16 @@ export function HypercertMintingForm({
 }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
-  const {
-    writeable,
-    errors: writeableErrors,
-    resetErrors: resetWriteableErrors,
-  } = useIsWriteable();
+  const { errors: writeableErrors } = useIsWriteable();
 
   const { mutateAsync: mintHypercert } = useMintHypercert();
   const { mutateAsync: createBlueprint } = useCreateBlueprint();
-  const [value, setValue] = useLocalStorage<HypercertFormValues>(
-    "user-hypercert-create-form-data",
-    formDefaultValues,
+  const localStorageKey = blueprintId
+    ? `user-hypercert-blueprint-${blueprintId}-form-data`
+    : "user-hypercert-create-form-data";
+  const [values, setValues] = useLocalStorage<HypercertFormValues>(
+    localStorageKey,
+    presetValues || formDefaultValues,
     {
       raw: false,
       serializer: JSON.stringify,
@@ -202,37 +201,24 @@ export function HypercertMintingForm({
         blueprint_minter_address: true,
       });
 
-  const defaultValues = presetValues
-    ? {
-        ...presetValues,
-        allowlistEntries: presetValues.allowlistEntries?.map((entry) => ({
-          ...entry,
-          units: BigInt(entry.units),
-        })),
-        projectDates: {
-          to: new Date(presetValues.projectDates.to),
-          from: new Date(presetValues.projectDates.from),
-        },
-      }
-    : value;
-
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchemaUsed),
-    defaultValues,
+    defaultValues: values,
     mode: "onBlur",
   });
 
-  const watchedValues = useWatch({
-    control: form.control,
-    name: ["title", "banner", "logo", "tags", "projectDates"],
-  });
+  const title = form.watch("title");
+  const banner = form.watch("banner");
+  const logo = form.watch("logo");
+  const tags = form.watch("tags");
+  const projectDates = form.watch("projectDates");
 
   const cardPreviewData = {
-    title: watchedValues[0] ?? formDefaultValues.title,
-    banner: watchedValues[1] ?? formDefaultValues.banner,
-    logo: watchedValues[2] ?? formDefaultValues.logo,
-    tags: watchedValues[3] ?? formDefaultValues.tags,
-    projectDates: watchedValues[4] ?? formDefaultValues.projectDates,
+    title: title ?? formDefaultValues.title,
+    banner: banner ?? formDefaultValues.banner,
+    logo: logo ?? formDefaultValues.logo,
+    tags: tags ?? formDefaultValues.tags,
+    projectDates: projectDates ?? formDefaultValues.projectDates,
   };
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -241,12 +227,11 @@ export function HypercertMintingForm({
   }, []);
 
   const onBlur = () => {
-    console.log("blur");
-    setValue(form.getValues());
+    setValues(form.getValues());
   };
 
   const onReset = () => {
-    setValue(formDefaultValues);
+    setValues(formDefaultValues);
     form.reset(formDefaultValues);
     setCurrentStep(1);
   };

@@ -21,7 +21,19 @@ export default async function NewHypercertPage({
       return <div>Blueprint not found</div>;
     }
 
-    formValues = fetchedBlueprint.form_values as HypercertFormValues;
+    formValues = {
+      ...fetchedBlueprint.form_values,
+      allowlistEntries: fetchedBlueprint.form_values.allowlistEntries?.map(
+        (entry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        }),
+      ),
+      projectDates: {
+        from: new Date(fetchedBlueprint.form_values.projectDates.from),
+        to: new Date(fetchedBlueprint.form_values.projectDates.to),
+      },
+    } as HypercertFormValues;
     blueprintChainId = fetchedBlueprint.admins[0].chain_id
       ? parseInt(fetchedBlueprint.admins[0].chain_id)
       : undefined;
