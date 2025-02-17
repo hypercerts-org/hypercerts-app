@@ -50,12 +50,7 @@ async function getMetadataWithDeduping(hypercertId: string) {
   const requestPromise = getHypercertMetadata(hypercertId);
   requestMap.set(hypercertId, requestPromise);
 
-  try {
-    const result = await requestPromise;
-    return result;
-  } finally {
-    requestMap.delete(hypercertId);
-  }
+  return await requestPromise;
 }
 
 export async function getAllowListRecordsForAddressByClaimedWithMetadata({
