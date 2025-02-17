@@ -1,6 +1,6 @@
 "use client";
 
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
+import { AllowListRecord } from "@/allowlists/actions/getAllowListRecordsForAddressByClaimed";
 import { Button } from "../ui/button";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { waitForTransactionReceipt } from "viem/actions";
@@ -38,9 +38,8 @@ export default function UnclaimedHypercertClaimButton({
 
   const refreshData = async (address: string) => {
     await revalidatePathServerAction([
-      `/profile/${address}`,
-      `/api/profile/${address}/owned`,
-      `/api/profile/${address}/claimable`,
+      `/profile/${address}?tab=hypercerts-claimable`,
+      `/profile/${address}?tab=hypercerts-owned`,
       `/hypercerts/${selectedHypercert?.hypercert_id}`,
     ]);
     await query.refetch();

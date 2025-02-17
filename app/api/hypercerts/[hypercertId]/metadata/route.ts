@@ -1,4 +1,4 @@
-import { getHypercertMetadata } from "@/hypercerts/getHypercertMetadata";
+import { getHypercertMetadata } from "@/hypercerts/actions/getHypercertMetadata";
 import { NextResponse } from "next/server";
 
 export async function GET(

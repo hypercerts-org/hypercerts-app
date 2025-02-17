@@ -3,7 +3,7 @@ import { graphql, readFragment } from "@/lib/graphql";
 
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import request from "graphql-request";
-import { HypercertMetadataFragment } from "./fragments/hypercert-metadata.fragment";
+import { HypercertMetadataFragment } from "../fragments/hypercert-metadata.fragment";
 
 const query = graphql(
   `

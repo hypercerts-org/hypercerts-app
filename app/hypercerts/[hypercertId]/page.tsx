@@ -1,6 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next";
 
-import { getHypercert } from "@/hypercerts/getHypercert";
+import { getHypercert } from "@/hypercerts/actions/getHypercert";
 
 import CreatorFeedButton from "@/components/creator-feed/creator-feed-button";
 import CreatorFeeds from "@/components/creator-feed/creator-feeds";
