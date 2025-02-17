@@ -12,7 +12,7 @@ export async function ClaimableContent({ address }: ClaimableContentProps) {
     claimed: false,
   });
 
-  if (!response || !response.data || response.data.length === 0) {
+  if (!response?.data?.length) {
     return <EmptySection />;
   }
 
