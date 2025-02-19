@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import useIsWriteable from "@/hooks/useIsWriteable";
 import { useMintHypercert } from "@/hypercerts/hooks/useMintHypercert";
 import { useLocalStorage } from "react-use";
-import { type FieldErrors, useForm, useWatch } from "react-hook-form";
+import { type FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -176,13 +176,11 @@ export function HypercertMintingForm({
   blueprintChainId?: number;
   blueprintMinterAddress?: `0x${string}`;
 }) {
+  console.log("presetValues", presetValues);
+  const isMintingFromBlueprint = !!blueprintId;
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
-  const {
-    writeable,
-    errors: writeableErrors,
-    resetErrors: resetWriteableErrors,
-  } = useIsWriteable();
+  const { errors: writeableErrors } = useIsWriteable();
 
   const { mutateAsync: mintHypercert } = useMintHypercert();
   const { mutateAsync: createBlueprint } = useCreateBlueprint();
@@ -222,17 +220,18 @@ export function HypercertMintingForm({
     mode: "onBlur",
   });
 
-  const watchedValues = useWatch({
-    control: form.control,
-    name: ["title", "banner", "logo", "tags", "projectDates"],
-  });
+  const title = form.watch("title");
+  const banner = form.watch("banner");
+  const logo = form.watch("logo");
+  const tags = form.watch("tags");
+  const projectDates = form.watch("projectDates");
 
   const cardPreviewData = {
-    title: watchedValues[0] ?? formDefaultValues.title,
-    banner: watchedValues[1] ?? formDefaultValues.banner,
-    logo: watchedValues[2] ?? formDefaultValues.logo,
-    tags: watchedValues[3] ?? formDefaultValues.tags,
-    projectDates: watchedValues[4] ?? formDefaultValues.projectDates,
+    title: title ?? formDefaultValues.title,
+    banner: banner ?? formDefaultValues.banner,
+    logo: logo ?? formDefaultValues.logo,
+    tags: tags ?? formDefaultValues.tags,
+    projectDates: projectDates ?? formDefaultValues.projectDates,
   };
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -241,12 +240,15 @@ export function HypercertMintingForm({
   }, []);
 
   const onBlur = () => {
-    console.log("blur");
-    setValue(form.getValues());
+    if (!isMintingFromBlueprint) {
+      setValue(form.getValues());
+    }
   };
 
   const onReset = () => {
-    setValue(formDefaultValues);
+    if (!isMintingFromBlueprint) {
+      setValue(formDefaultValues);
+    }
     form.reset(formDefaultValues);
     setCurrentStep(1);
   };
