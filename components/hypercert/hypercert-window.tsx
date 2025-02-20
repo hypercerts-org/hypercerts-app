@@ -3,6 +3,7 @@ import { SUPPORTED_CHAINS, SupportedChainIdType } from "@/configs/constants";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import { getEvaluationStatus } from "@/hypercerts/getEvaluationStatus";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { formatPercentageToFirstNonZeroDigit } from "@/lib/formatPercentage";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -95,7 +96,12 @@ const HypercertWindow = memo(
             <section className="flex text-xs justify-between">
               <section>
                 <h6 className="opacity-70">for sale</h6>
-                <p> {percentAvailable ? `${percentAvailable}%` : "--"}</p>
+                <p>
+                  {" "}
+                  {percentAvailable
+                    ? `${formatPercentageToFirstNonZeroDigit(percentAvailable)}%`
+                    : "--"}
+                </p>
               </section>
               <section>
                 <h6 className="text-end opacity-70">lowest per %</h6>
