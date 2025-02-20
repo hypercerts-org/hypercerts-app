@@ -265,10 +265,16 @@ function ListDialogInner({
         </DialogTitle>
       </DialogHeader>
 
-      <DialogDescription>
-        List your hypercert fraction for sale, allowing buyers to directly
-        purchase all or part of it. Adjust settings to retain portions for
-        yourself or set a minimum transaction amount as needed.
+      <DialogDescription className="flex flex-col gap-2">
+        <p>
+          List your hypercert fraction for sale, allowing buyers to directly
+          purchase all or part of it. Adjust settings to retain portions for
+          yourself or set a minimum transaction amount as needed.
+        </p>
+
+        <p className="text-sm text-slate-500">
+          Any sale will include a 1% protocol fee.
+        </p>
       </DialogDescription>
 
       {fractionsOwnedByUser.length > 1 && (
