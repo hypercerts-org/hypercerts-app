@@ -12,11 +12,10 @@ export const metadata: Metadata = {
     "The best place to discover and contribute to hypercerts and hyperboards.",
 };
 
-export default function ExplorePage({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
+export default async function ExplorePage(props: {
+  searchParams: Promise<Record<string, string>>;
 }) {
+  const searchParams = await props.searchParams;
   return (
     <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-2xl">
       <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">

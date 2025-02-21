@@ -62,8 +62,9 @@ async function servePlaceholderImage() {
 // GET handler to fetch and return the image associated with the given hypercert ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hypercertId: string } },
+  props: { params: Promise<{ hypercertId: string }> },
 ) {
+  const params = await props.params;
   const { hypercertId } = params;
 
   // Validate hypercert ID

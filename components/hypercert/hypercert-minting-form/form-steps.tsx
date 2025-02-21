@@ -81,7 +81,7 @@ interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
   currentStep: number;
   setCurrentStep: (step: number) => void;
-  cardRef: RefObject<HTMLDivElement>;
+  cardRef: RefObject<HTMLDivElement | null>;
   reset: () => void;
   isBlueprint?: boolean;
   blueprintChainId?: number;

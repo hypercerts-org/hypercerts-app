@@ -3,8 +3,9 @@ import { getTrustedAttestor } from "@/github/getTrustedAttestor";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { evaluatorId: string } },
+  props: { params: Promise<{ evaluatorId: string }> },
 ) {
+  const params = await props.params;
   const { evaluatorId } = params;
 
   if (!evaluatorId) {

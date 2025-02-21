@@ -4,11 +4,13 @@ import {
 } from "@/components/collections/collection-form";
 import { getCollectionById } from "@/collections/getCollectionById";
 
-const EditCollectionPage = async ({
-  params: { collectionId },
-}: {
-  params: { collectionId: string };
+const EditCollectionPage = async (props: {
+  params: Promise<{ collectionId: string }>;
 }) => {
+  const params = await props.params;
+
+  const { collectionId } = params;
+
   const data = await getCollectionById(collectionId);
 
   if (!data) {
