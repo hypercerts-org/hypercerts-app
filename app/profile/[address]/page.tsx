@@ -9,13 +9,12 @@ import { CollectionsTabContent } from "@/app/profile/[address]/collections-tab-c
 import { MarketplaceTabContent } from "@/app/profile/[address]/marketplace-tab-content";
 import { BlueprintsTabContent } from "@/app/profile/[address]/blueprint-tab-content";
 
-export default function ProfilePage({
-  params,
-  searchParams,
-}: {
-  params: { address: string };
-  searchParams: Record<string, string>;
+export default async function ProfilePage(props: {
+  params: Promise<{ address: string }>;
+  searchParams: Promise<Record<string, string>>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const address = params.address;
   const tab = searchParams?.tab || "hypercerts-owned";
   const mainTab = tab?.split("-")[0] ?? "hypercerts";

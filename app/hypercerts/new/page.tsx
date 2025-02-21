@@ -4,11 +4,10 @@ import {
 } from "@/components/hypercert/hypercert-minting-form";
 import { getBlueprintById } from "@/blueprints/getBlueprints";
 
-export default async function NewHypercertPage({
-  searchParams,
-}: {
-  searchParams: { blueprintId?: string };
+export default async function NewHypercertPage(props: {
+  searchParams: Promise<{ blueprintId?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   let formValues: HypercertFormValues | undefined;
   let parsedId: number | undefined;
   let blueprintChainId: number | undefined;

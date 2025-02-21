@@ -6,11 +6,10 @@ import { getBlueprintById } from "@/blueprints/getBlueprints";
 import { TransferRestrictions } from "@hypercerts-org/sdk";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
-export default async function NewHypercertPage({
-  searchParams,
-}: {
-  searchParams: { blueprintId?: string };
+export default async function NewHypercertPage(props: {
+  searchParams: Promise<{ blueprintId?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   let formValues: HypercertFormValues | undefined;
   let parsedId: number | undefined;
   if (searchParams.blueprintId) {

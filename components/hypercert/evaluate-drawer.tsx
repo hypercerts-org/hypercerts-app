@@ -41,7 +41,7 @@ function isAnySectionInvalid(state: AllEvaluationStates) {
 
 export function EvaluateDrawer({ hypercertId }: { hypercertId: string }) {
   const { toast } = useToast();
-  const tagifyRef = useRef<Tagify<Tagify.BaseTagData>>();
+  const tagifyRef = useRef<Tagify<Tagify.BaseTagData>>(undefined);
   const [chainId, contractAddress, tokenId] = hypercertId.split("-");
   const rpcSigner = useEthersSigner({ chainId: +chainId });
 

@@ -1,6 +1,8 @@
 import { Button } from "./ui/button";
 import { Copy } from "lucide-react";
 
+import type { JSX } from "react";
+
 export function CopyButton({
   textToCopy,
   ...props
