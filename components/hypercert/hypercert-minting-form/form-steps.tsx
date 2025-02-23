@@ -559,8 +559,8 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                 <FormControl>
                   <Input
                     {...field}
-                    value={field.value}
                     placeholder="https:// | ipfs://"
+                    disabled={!!allowlistEntries}
                   />
                 </FormControl>
                 <FormMessage />
@@ -576,6 +576,18 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                     onClick={() => setCreateDialogOpen(true)}
                   >
                     {allowlistEntries ? "Edit allowlist" : "Create allowlist"}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    disabled={!allowlistEntries && !field.value}
+                    onClick={() => {
+                      form.setValue("allowlistEntries", undefined);
+                      form.setValue("allowlistURL", "");
+                    }}
+                  >
+                    <Trash2Icon className="w-4 h-4 mr-2" />
+                    Reset
                   </Button>
 
                   <CreateAllowlistDialog
