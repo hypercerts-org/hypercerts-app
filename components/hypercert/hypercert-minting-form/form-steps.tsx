@@ -17,10 +17,11 @@ import {
   ArrowRightIcon,
   CalendarIcon,
   Loader2,
+  LoaderCircle,
   Trash2Icon,
   X,
 } from "lucide-react";
-import { RefObject, useMemo, useState } from "react";
+import { RefObject, useEffect, useMemo, useState } from "react";
 import rehypeSanitize from "rehype-sanitize";
 
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
@@ -74,7 +75,11 @@ import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
 import { useAccount, useChainId } from "wagmi";
 import { ImageUploader, readAsBase64 } from "@/components/image-uploader";
-
+import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
+import Papa from "papaparse";
+import { getAddress, parseUnits } from "viem";
+import { errorHasMessage } from "@/lib/errorHasMessage";
+import { errorToast } from "@/lib/errorToast";
 // import Image from "next/image";
 
 interface FormStepsProps {
@@ -433,6 +438,12 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
     setOpen,
     setTitle,
   } = useStepProcessDialogContext();
+  const {
+    mutate: validateAllowlist,
+    data: validateAllowlistResponse,
+    isPending: isPendingValidateAllowlist,
+    error: createAllowListError,
+  } = useValidateAllowlist();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -442,13 +453,27 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
   };
   const allowlistEntries = form.watch("allowlistEntries");
 
-  const errorToast = (message: string | undefined) => {
-    toast({
-      title: message,
-      variant: "destructive",
-      duration: 2000,
-    });
-  };
+  useEffect(() => {
+    if (createAllowListError) {
+      toast({
+        title: "Error",
+        description: createAllowListError.message,
+        variant: "destructive",
+      });
+    }
+  }, [createAllowListError]);
+
+  useEffect(() => {
+    if (validateAllowlistResponse?.success) {
+      const bigintUnits = validateAllowlistResponse.values.map(
+        (entry: AllowlistEntry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        }),
+      );
+      form.setValue("allowlistEntries", bigintUnits);
+    }
+  }, [validateAllowlistResponse]);
 
   async function validateFile(file: File) {
     if (file.size > MAX_FILE_SIZE) {
@@ -560,6 +585,70 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                   <Input
                     {...field}
                     placeholder="https:// | ipfs://"
+                    onChange={async (e) => {
+                      const value = e.target.value;
+
+                      let data;
+                      let allowList;
+                      const url = value.startsWith("ipfs://")
+                        ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
+                        : value.startsWith("https://")
+                          ? value
+                          : null;
+
+                      if (!url) return errorToast("Invalid Url type");
+                      data = await fetch(url);
+
+                      const contentType = data.headers.get("content-type");
+
+                      if (
+                        contentType?.includes("text/csv") ||
+                        contentType?.includes("text/plain") ||
+                        value.endsWith(".csv")
+                      ) {
+                        const text = await data.text();
+                        const parsedData = Papa.parse<AllowlistEntry>(text, {
+                          header: true,
+                          skipEmptyLines: true,
+                        });
+                        // check if address isAddress, and units is a bigint type
+                        // if not, throw error
+                        allowList = parsedData.data
+                          .filter((entry) => entry.address && entry.units)
+                          .map((entry) => {
+                            const address = getAddress(entry.address);
+                            return {
+                              address: address,
+                              units: entry.units,
+                            };
+                          });
+                      } else {
+                        return errorToast("Invalid file type.");
+                      }
+
+                      const totalUnits = DEFAULT_NUM_UNITS;
+
+                      // validateAllowlist
+                      try {
+                        validateAllowlist({
+                          allowList,
+                          totalUnits,
+                        });
+                      } catch (e) {
+                        if (errorHasMessage(e)) {
+                          toast({
+                            title: "Error",
+                            description: e.message,
+                            variant: "destructive",
+                          });
+                        } else {
+                          toast({
+                            title: "Error",
+                            description: "Failed to upload allow list",
+                          });
+                        }
+                      }
+                    }}
                     disabled={!!allowlistEntries}
                   />
                 </FormControl>
@@ -571,16 +660,28 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                 <div className="flex text-xs space-x-2 w-full justify-end">
                   <Button
                     type="button"
-                    disabled={!!field.value}
+                    disabled={isPendingValidateAllowlist}
                     variant="outline"
                     onClick={() => setCreateDialogOpen(true)}
                   >
-                    {allowlistEntries ? "Edit allowlist" : "Create allowlist"}
+                    {isPendingValidateAllowlist ? (
+                      <>
+                        <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
+                        Loading...
+                      </>
+                    ) : allowlistEntries ? (
+                      "Edit allowlist"
+                    ) : (
+                      "Create allowlist"
+                    )}
                   </Button>
 
                   <Button
                     type="button"
-                    disabled={!allowlistEntries && !field.value}
+                    disabled={
+                      (!allowlistEntries && !field.value) ||
+                      isPendingValidateAllowlist
+                    }
                     onClick={() => {
                       form.setValue("allowlistEntries", undefined);
                       form.setValue("allowlistURL", "");
