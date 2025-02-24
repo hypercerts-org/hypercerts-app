@@ -1,11 +1,13 @@
 import { EmptySection } from "@/components/global/sections";
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
+import { AllowListRecord } from "@/allowlists/actions/getAllowListRecordsForAddressByClaimed";
 import { UnclaimedFractionTable } from "./unclaimed-table/unclaimed-fraction-table";
 import { UnclaimedFractionColumns } from "./unclaimed-table/unclaimed-fraction-columns";
 import { HypercertMetadata } from "@/hypercerts/fragments/hypercert-metadata.fragment";
+import { Suspense } from "react";
+import { UnclaimedFractionTableSkeleton } from "./unclaimed-table/unclaimed-fraction-table-skeleton";
 
 export type UnclaimedFraction = AllowListRecord & {
-  metadata: HypercertMetadata | null;
+  metadata?: HypercertMetadata | null;
 };
 
 export default async function UnclaimedHypercertsList({
@@ -23,10 +25,12 @@ export default async function UnclaimedHypercertsList({
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
-      <UnclaimedFractionTable
-        columns={UnclaimedFractionColumns}
-        data={unclaimedHypercerts}
-      />
+      <Suspense fallback={<UnclaimedFractionTableSkeleton />}>
+        <UnclaimedFractionTable
+          columns={UnclaimedFractionColumns}
+          data={unclaimedHypercerts}
+        />
+      </Suspense>
     </div>
   );
 }

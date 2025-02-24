@@ -1,6 +1,5 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,17 +8,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { LoaderCircle, MinusCircle, PlusCircle } from "lucide-react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { isAddress } from "viem";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { errorHasMessage } from "@/lib/errorHasMessage";
 import { toast } from "@/components/ui/use-toast";
-import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
+import { errorHasMessage } from "@/lib/errorHasMessage";
+import { cn } from "@/lib/utils";
 import { AllowlistEntry } from "@hypercerts-org/sdk";
 
 import { DEFAULT_NUM_UNITS } from "@/configs/hypercerts";
+import { useValidateAllowList } from "@/hypercerts/hooks/useValidateAllowList";
 
 type AllowListItem = {
   address?: string;
@@ -50,7 +50,7 @@ export default function Component({
     isPending,
     error: createAllowListError,
     reset,
-  } = useValidateAllowlist();
+  } = useValidateAllowList();
   const [allowList, setAllowList] = useState<AllowListItem[]>(
     initialValues?.length ? initialValues : defaultValues,
   );

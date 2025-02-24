@@ -4,7 +4,7 @@ import { AllowlistEntry } from "@hypercerts-org/sdk";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 
-export const useValidateAllowlist = () => {
+export const useValidateAllowList = () => {
   return useMutation({
     mutationFn: async ({
       allowList,
