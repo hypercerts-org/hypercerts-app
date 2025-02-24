@@ -6,7 +6,8 @@ import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { useAccountStore } from "@/lib/account-store";
 import {
-  CreateFractionalOfferFormValues
+  BuyFractionalMakerAskParams,
+  CreateFractionalOfferFormValues,
 } from "@/marketplace/types";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 import {
