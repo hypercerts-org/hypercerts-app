@@ -192,8 +192,8 @@ export async function getAllHypercerts({
     [],
   );
 
-  const difference = res.hypercerts?.count
-    ? res.hypercerts?.count - data.length
+  const difference = res.hypercerts?.data?.length
+    ? res.hypercerts?.data?.length - data.length
     : 0;
   const totalCount = res.hypercerts?.count
     ? res.hypercerts?.count - difference

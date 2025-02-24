@@ -3,6 +3,7 @@ import {
   HypercertMintingForm,
 } from "@/components/hypercert/hypercert-minting-form";
 import { getBlueprintById } from "@/blueprints/getBlueprints";
+import { InfoSection } from "@/components/global/sections";
 
 export default async function NewHypercertPage({
   searchParams,
@@ -18,10 +19,28 @@ export default async function NewHypercertPage({
     const fetchedBlueprint = await getBlueprintById(parsedId);
 
     if (!fetchedBlueprint) {
-      return <div>Blueprint not found</div>;
+      return (
+        <main className="flex flex-col p-8 md:px-16 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
+          <InfoSection>
+            The blueprint you are trying to use does not exist.
+          </InfoSection>
+        </main>
+      );
     }
 
-    formValues = fetchedBlueprint.form_values as HypercertFormValues;
+    formValues = {
+      ...fetchedBlueprint.form_values,
+      allowlistEntries: fetchedBlueprint.form_values.allowlistEntries?.map(
+        (entry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        }),
+      ),
+      projectDates: {
+        from: new Date(fetchedBlueprint.form_values.projectDates.from),
+        to: new Date(fetchedBlueprint.form_values.projectDates.to),
+      },
+    } as HypercertFormValues;
     blueprintChainId = fetchedBlueprint.admins[0].chain_id
       ? parseInt(fetchedBlueprint.admins[0].chain_id)
       : undefined;
