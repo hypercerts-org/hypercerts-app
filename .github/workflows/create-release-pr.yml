@@ -1,9 +1,8 @@
 name: Create Release PR
 on:
   push:
-    branches: [release-test]
+    branches: [ release-test ]
 
-# Add permissions block
 permissions:
   contents: write
   pull-requests: write
@@ -12,7 +11,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: release-test
@@ -25,7 +24,6 @@ jobs:
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
-          branch: release-test
           extra_plugins: |
             @semantic-release/commit-analyzer
             @semantic-release/release-notes-generator
@@ -34,16 +32,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
-        run: |
-          echo "Checking differences between branches..."
-          git diff release...release-test --name-only
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: 'chore: Create new release'
+          base: release
+          delete-branch: true
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          labels: |
+            automated pr
+          body: |
+            Automated PR from release-test to release
 
-          # Create PR using gh cli
-          gh pr create \
-            --base release \
-            --head release-test \
-            --title "chore: Create new release" \
-            --body "Automated PR from release-test to release" \
-            || echo "PR already exists or no changes to create PR"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            Changes included in this PR:
+            ${{ github.event.head_commit.message }}
+
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
