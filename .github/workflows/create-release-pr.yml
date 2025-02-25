@@ -19,6 +19,10 @@ jobs:
       - name: Fetch release branch
         run: |
           git fetch origin release:release
+          git fetch origin release-test:release-test
+          git checkout release-test
+          git log --oneline release..release-test  # Debug: Show commits that differ
+          git diff release release-test --stat     # Debug: Show file differences
           git status
 
       - name: Semantic Release
@@ -32,11 +36,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: 'chore: Create new release'
           base: release
+          branch: release-pr
           delete-branch: true
           author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
           labels: |
