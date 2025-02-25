@@ -11,16 +11,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          branches: |
+            ['release-test']
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           title: 'chore: Create new release'
           base: release
+          branch: release-pr
           body: 'Automated PR from dev to release'
-
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          branch: release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
