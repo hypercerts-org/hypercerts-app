@@ -12,18 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: release-test
-
-      - name: Fetch release branch
-        run: |
-          git remote -v  # Debug: show remotes
-          git fetch origin
-          git checkout -B release-test origin/release-test
-          git log --oneline origin/release..origin/release-test  # Debug: Show commits that differ
-          git diff origin/release origin/release-test --stat     # Debug: Show file differences
-          git status
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
@@ -36,16 +24,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: 'chore: Create new release'
-          base: release
-          branch: release-test
-          delete-branch: false
-          commit-message: "chore: merge release-test into release"
-          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
-          labels: |
-            automated pr
-          body: |
-            Automated PR from release-test to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create PR using GitHub CLI
+          gh pr create \
+            --base release \
+            --head release-test \
+            --title "chore: Create new release" \
+            --body "Automated PR from release-test to release" \
+            --label "automated pr"
