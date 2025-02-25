@@ -42,16 +42,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: 'chore: Create new release'
           base: release
-          branch: release-pr
-          delete-branch: true
+          branch: release-test
+          delete-branch: false
+          commit-message: "chore: merge release-test into release"
           author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
           labels: |
             automated pr
           body: |
             Automated PR from release-test to release
-
-            Changes included in this PR:
-            ${{ github.event.head_commit.message }}
 
       - name: Check outputs
         if: ${{ steps.cpr.outputs.pull-request-number }}
