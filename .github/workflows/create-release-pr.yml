@@ -1,7 +1,7 @@
 name: Create Release PR
 on:
   push:
-    branches: [ release-test ]
+    branches: [release-test]
 
 jobs:
   release:
@@ -20,6 +20,7 @@ jobs:
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
+          branch: release-test
           extra_plugins: |
             @semantic-release/commit-analyzer
             @semantic-release/release-notes-generator
@@ -28,21 +29,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: 'chore: Create new release'
-          base: release
-          branch: release-pr
-          delete-branch: true
-          body: |
-            Automated PR from release-test to release
-
-            Changes included in this PR:
-            ${{ github.event.head_commit.message }}
-
-      - name: Check outputs
-        if: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
-          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Checking differences between branches..."
+          git diff release...release-test --name-only
+
+          # Create PR using gh cli
+          gh pr create \
+            --base release \
+            --head release-test \
+            --title "chore: Create new release" \
+            --body "Automated PR from release-test to release" \
+            || echo "PR already exists or no changes to create PR"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
