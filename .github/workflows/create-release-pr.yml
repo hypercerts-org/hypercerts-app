@@ -31,6 +31,6 @@ jobs:
           gh pr create \
             --base release \
             --head release-test \
-            --title "chore: create new release" \
+            --title "chore: new release" \
             --body "Automated PR from release-test to release" \
             --label "automated pr"
