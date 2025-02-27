@@ -1,6 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { UnifiedRpcClientFactory } from "@/lib/rpcClientFactory";
-import * as viem from "viem";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/constants", () => ({
   environment: "test",
