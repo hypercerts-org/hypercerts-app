@@ -96,9 +96,9 @@ describe("RPC Providers", () => {
       expect(url).toContain("infura-key");
     });
 
-    it("should return Glif URL for Filecoin", () => {
+    it("should return ankr.com URL for Filecoin", () => {
       const url = EvmClientFactory.getRpcUrl(314159);
-      expect(url).toContain("glif.io");
+      expect(url).toContain("https://rpc.ankr.com/");
     });
 
     it("should throw error for unsupported chain", () => {
