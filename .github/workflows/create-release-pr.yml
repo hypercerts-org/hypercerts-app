@@ -1,0 +1,35 @@
+name: Create Release PR
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Semantic Release Versioning
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release PR
+        env:
+          GH_TOKEN: ${{ secrets.GHA_CREATE_PR }}
+        run: |
+          gh pr create \
+            --base release \
+            --head main \
+            --title "chore: new release" \
+            --body "Automated PR from main to release" \
+            --label "automated pr"
