@@ -68,21 +68,31 @@ export default async function HypercertDetails({
             <Creator hypercert={hypercert} />
             <ReadMore text={hypercert?.metadata?.description} length={280} />
             <ExternalUrl url={hypercert?.metadata?.external_url} />
-            {(hypercert?.metadata?.work_timeframe_from as string) && (
-              <>
-                <Separator />
-                <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-                  TIME OF WORK
-                </h2>
-                <TimeFrame
-                  from={hypercert.metadata?.work_timeframe_from}
-                  to={hypercert.metadata?.work_timeframe_to}
-                />
-              </>
-            )}
           </section>
         </article>
 
+        {(hypercert?.metadata?.work_timeframe_from ||
+          hypercert?.metadata?.work_scope) && (
+          <>
+            <Separator />
+            <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
+              {hypercert?.metadata?.work_timeframe_from && (
+                <div className="flex flex-col gap-y-2 w-full max-w-[500px]">
+                  <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+                    TIME OF WORK
+                  </h2>
+                  <TimeFrame
+                    from={hypercert.metadata?.work_timeframe_from}
+                    to={hypercert.metadata?.work_timeframe_to}
+                  />
+                </div>
+              )}
+              {hypercert?.metadata?.work_scope && (
+                <WorkScope hypercert={hypercert} />
+              )}
+            </section>
+          </>
+        )}
         <Separator />
         <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
           {hypercert?.metadata?.contributors && (
@@ -90,12 +100,6 @@ export default async function HypercertDetails({
           )}
           <Fractions hypercert={hypercert} />
         </section>
-        {hypercert?.metadata?.work_scope && (
-          <>
-            <Separator />
-            <WorkScope hypercert={hypercert} />
-          </>
-        )}
         <Separator />
       </Suspense>
     </section>
