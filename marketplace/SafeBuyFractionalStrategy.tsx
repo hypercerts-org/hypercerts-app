@@ -14,14 +14,10 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
     order,
     unitAmount,
     pricePerUnit,
-    hypercertName,
-    totalUnitsInHypercert,
   }: {
     order: MarketplaceOrder;
     unitAmount: bigint;
     pricePerUnit: string;
-    hypercertName?: string | null;
-    totalUnitsInHypercert?: bigint;
   }) {
     const {
       setDialogStep: setStep,
