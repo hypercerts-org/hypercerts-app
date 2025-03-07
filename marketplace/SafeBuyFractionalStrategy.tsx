@@ -26,17 +26,17 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       setExtraContent,
     } = this.dialogContext;
     if (!this.exchangeClient) {
-      this.dialogContext.setOpen(false);
+      setOpen(false);
       throw new Error("No client");
     }
 
     if (!this.chainId) {
-      this.dialogContext.setOpen(false);
+      setOpen(false);
       throw new Error("No chain id");
     }
 
     if (!this.walletClient.data) {
-      this.dialogContext.setOpen(false);
+      setOpen(false);
       throw new Error("No wallet client data");
     }
 
