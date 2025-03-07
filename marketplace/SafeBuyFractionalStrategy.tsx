@@ -1,13 +1,13 @@
 import { Currency, Taker } from "@hypercerts-org/marketplace-sdk";
 import { zeroAddress } from "viem";
 
-import { SUPPORTED_CHAINS } from "@/configs/constants";
 import { decodeContractError } from "@/lib/decodeContractError";
-
 import { ExtraContent } from "@/components/global/extra-content";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
+
 import { BuyFractionalStrategy } from "./BuyFractionalStrategy";
-import { MarketplaceOrder } from "./types";
 import { getCurrencyByAddress } from "./utils";
+import { MarketplaceOrder } from "./types";
 
 export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
   async execute({
