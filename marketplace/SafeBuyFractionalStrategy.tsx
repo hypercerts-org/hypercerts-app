@@ -40,7 +40,6 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       throw new Error("No wallet client data");
     }
 
-    // TODO: we might have to change some steps here
     setSteps([
       {
         id: "Setting up order execution",
@@ -107,8 +106,6 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
           order.currency as `0x${string}`,
         );
 
-        // TODO: if this is not approved yet, we need to create a Safe TX and drop out of this
-        // dialog early, so that the next invocation runs through this check without stopping.
         if (currentAllowance < totalPrice) {
           console.debug("Approving ERC20");
           await this.exchangeClient.approveErc20Safe(
@@ -128,12 +125,11 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       throw new Error("Approval error");
     }
 
-    // TODO: this whole step should probably not be here
     try {
       await setStep("Transfer manager");
       const isTransferManagerApproved =
         await this.exchangeClient.isTransferManagerApprovedSafe(this.address);
-      // FIXME: this shouldn't be here, unless we're missing something
+
       if (!isTransferManagerApproved) {
         console.debug("Approving transfer manager");
         await this.exchangeClient.grantTransferManagerApprovalSafe(
