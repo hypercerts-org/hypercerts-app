@@ -13,6 +13,8 @@ interface ExtraContentProps {
   receipt?: TransactionReceipt;
 }
 
+// TODO: not really reusable for safe. breaks when minting hypercert from safe.
+// We should make this reusable for all strategies.
 export function ExtraContent({
   message = "Your hypercert has been minted successfully!",
   hypercertId,
