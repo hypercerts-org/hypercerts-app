@@ -90,10 +90,9 @@ describe("RPC Providers", () => {
       expect(url).toContain("alchemy-key");
     });
 
-    it("should return Infura URL when Alchemy is not available", () => {
+    it("should return Ankr URL when Alchemy is not available", () => {
       const url = EvmClientFactory.getRpcUrl(42220); // Celo
-      expect(url).toContain("infura.io");
-      expect(url).toContain("infura-key");
+      expect(url).toContain("ankr.com");
     });
 
     it("should return ankr.com URL for Filecoin", () => {
