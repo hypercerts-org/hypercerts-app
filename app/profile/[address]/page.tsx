@@ -9,6 +9,7 @@ import { CollectionsTabContent } from "@/app/profile/[address]/collections-tab-c
 import { MarketplaceTabContent } from "@/app/profile/[address]/marketplace-tab-content";
 import { BlueprintsTabContent } from "@/app/profile/[address]/blueprint-tab-content";
 
+import { ContractAccountBanner } from "@/components/profile/contract-accounts-banner";
 export default function ProfilePage({
   params,
   searchParams,
@@ -22,6 +23,7 @@ export default function ProfilePage({
 
   return (
     <section className="flex flex-col gap-2">
+      <ContractAccountBanner address={address} />
       <section className="flex flex-wrap gap-2 items-center">
         <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
           Profile
