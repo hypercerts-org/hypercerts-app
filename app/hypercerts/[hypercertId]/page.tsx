@@ -1,4 +1,4 @@
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata, NextPage, ResolvingMetadata } from "next";
 
 import { getHypercert } from "@/hypercerts/getHypercert";
 
@@ -23,15 +23,14 @@ import {
   marketplaceListingsFlag,
 } from "@/flags/chain-actions-flag";
 
-type Props = {
-  params: { hypercertId: string };
-  searchParams: Record<string, string>;
-};
-
 export async function generateMetadata(
-  { params }: Props,
+  props: {
+    params: Promise<{ hypercertId: string }>;
+    searchParams: Promise<Record<string, string>>;
+  },
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
+  const params = await props.params;
   const { hypercertId } = params;
   const hypercert = await getHypercert(hypercertId);
 
@@ -48,7 +47,13 @@ export async function generateMetadata(
     },
   };
 }
-export default async function HypercertPage({ params, searchParams }: Props) {
+
+export default async function HypercertPage(props: {
+  params: Promise<{ hypercertId: string }>;
+  searchParams: Promise<Record<string, string>>;
+}) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { hypercertId } = params;
 
   const hypercert = await getHypercert(hypercertId);

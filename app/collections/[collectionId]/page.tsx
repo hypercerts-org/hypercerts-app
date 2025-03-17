@@ -29,13 +29,12 @@ const CollectionPageInner = async ({
   );
 };
 
-export default async function CollectionPage({
-  params,
-}: {
-  params: {
+export default async function CollectionPage(props: {
+  params: Promise<{
     collectionId: string;
-  };
+  }>;
 }) {
+  const params = await props.params;
   return (
     <main className="flex flex-col p-8 md:p-24 pb-24 space-y-4">
       <Suspense fallback={"Loading"}>
