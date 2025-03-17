@@ -448,9 +448,13 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const setAllowlistURL = (allowlistURL: string) => {
+    form.setValue("allowlistURL", allowlistURL);
+  };
   const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
     form.setValue("allowlistEntries", allowlistEntries);
   };
+
   const allowlistEntries = form.watch("allowlistEntries");
 
   useEffect(() => {
@@ -554,19 +558,31 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
         header: true,
         skipEmptyLines: true,
       });
-      // check if address isAddress, and units is a bigint type
-      // if not, throw error
-      allowList = parsedData.data
-        .filter((entry) => entry.address && entry.units)
-        .map((entry) => {
-          const address = getAddress(entry.address);
-          return {
-            address: address,
-            units: BigInt(entry.units),
-          };
-        });
+
+      const validEntries = parsedData.data.filter(
+        (entry) => entry.address && entry.units,
+      );
+
+      // Calculate total units
+      const total = validEntries.reduce(
+        (sum, entry) => sum + BigInt(entry.units),
+        BigInt(0),
+      );
+
+      allowList = validEntries.map((entry) => {
+        const address = getAddress(entry.address);
+        const originalUnits = BigInt(entry.units);
+        // Scale units proportionally to DEFAULT_NUM_UNITS
+        const scaledUnits =
+          total > 0 ? (originalUnits * DEFAULT_NUM_UNITS) / total : BigInt(0);
+
+        return {
+          address: address,
+          units: scaledUnits,
+        };
+      });
     } else {
-      return errorToast("Invalid file type.");
+      return errorToast("Invalid allowlist.");
     }
 
     const totalUnits = DEFAULT_NUM_UNITS;
@@ -706,6 +722,8 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
 
                   <CreateAllowlistDialog
                     setAllowlistEntries={setAllowlistEntries}
+                    setAllowlistURL={setAllowlistURL}
+                    allowlistURL={field?.value}
                     open={createDialogOpen}
                     setOpen={setCreateDialogOpen}
                     initialValues={allowlistEntries?.map((entry) => ({
