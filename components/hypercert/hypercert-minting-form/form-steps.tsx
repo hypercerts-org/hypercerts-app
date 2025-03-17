@@ -530,6 +530,70 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
     }
   };
 
+  const fetchAllowlist = async (value: string) => {
+    let data;
+    let allowList;
+    const url = value.startsWith("ipfs://")
+      ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
+      : value.startsWith("https://")
+        ? value
+        : null;
+
+    if (!url) return errorToast("Invalid URL");
+    data = await fetch(url);
+
+    const contentType = data.headers.get("content-type");
+
+    if (
+      contentType?.includes("text/csv") ||
+      contentType?.includes("text/plain") ||
+      value.endsWith(".csv")
+    ) {
+      const text = await data.text();
+      const parsedData = Papa.parse<AllowlistEntry>(text, {
+        header: true,
+        skipEmptyLines: true,
+      });
+      // check if address isAddress, and units is a bigint type
+      // if not, throw error
+      allowList = parsedData.data
+        .filter((entry) => entry.address && entry.units)
+        .map((entry) => {
+          const address = getAddress(entry.address);
+          return {
+            address: address,
+            units: BigInt(entry.units),
+          };
+        });
+    } else {
+      return errorToast("Invalid file type.");
+    }
+
+    const totalUnits = DEFAULT_NUM_UNITS;
+
+    // validateAllowlist
+    try {
+      validateAllowlist({
+        allowList,
+        totalUnits,
+      });
+      form.setValue("allowlistEntries", allowList);
+    } catch (e) {
+      if (errorHasMessage(e)) {
+        toast({
+          title: "Error",
+          description: e.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to upload allow list",
+        });
+      }
+    }
+  };
+
   return (
     <section className="space-y-8">
       {isBlueprint && (
@@ -574,81 +638,30 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
             name="allowlistURL"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center gap-2">
-                  <FormLabel>Allowlist (optional)</FormLabel>
-                  <TooltipInfo
-                    tooltipText="Allowlists determine the number of units each address is allowed to mint. You can create a new allowlist, or prefill from an existing, already uploaded file."
-                    className="w-4 h-4"
-                  />
+                <div className="flex items-center gap-2 justify-between">
+                  <div className="flex flex-row items-center gap-2">
+                    <FormLabel>Allowlist (optional)</FormLabel>
+                    <TooltipInfo
+                      tooltipText="Allowlists determine the number of units each address is allowed to mint. You can create a new allowlist, or prefill from an existing, already uploaded file."
+                      className="w-4 h-4"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={
+                      (form.getValues("allowlistEntries")?.length ?? 0) > 0
+                    }
+                    onClick={() => fetchAllowlist(field?.value as string)}
+                  >
+                    Fetch URL
+                  </Button>
                 </div>
                 <FormControl>
                   <Input
                     {...field}
                     placeholder="https:// | ipfs://"
-                    onChange={async (e) => {
-                      const value = e.target.value;
-
-                      let data;
-                      let allowList;
-                      const url = value.startsWith("ipfs://")
-                        ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
-                        : value.startsWith("https://")
-                          ? value
-                          : null;
-
-                      if (!url) return errorToast("Invalid Url type");
-                      data = await fetch(url);
-
-                      const contentType = data.headers.get("content-type");
-
-                      if (
-                        contentType?.includes("text/csv") ||
-                        contentType?.includes("text/plain") ||
-                        value.endsWith(".csv")
-                      ) {
-                        const text = await data.text();
-                        const parsedData = Papa.parse<AllowlistEntry>(text, {
-                          header: true,
-                          skipEmptyLines: true,
-                        });
-                        // check if address isAddress, and units is a bigint type
-                        // if not, throw error
-                        allowList = parsedData.data
-                          .filter((entry) => entry.address && entry.units)
-                          .map((entry) => {
-                            const address = getAddress(entry.address);
-                            return {
-                              address: address,
-                              units: entry.units,
-                            };
-                          });
-                      } else {
-                        return errorToast("Invalid file type.");
-                      }
-
-                      const totalUnits = DEFAULT_NUM_UNITS;
-
-                      // validateAllowlist
-                      try {
-                        validateAllowlist({
-                          allowList,
-                          totalUnits,
-                        });
-                      } catch (e) {
-                        if (errorHasMessage(e)) {
-                          toast({
-                            title: "Error",
-                            description: e.message,
-                            variant: "destructive",
-                          });
-                        } else {
-                          toast({
-                            title: "Error",
-                            description: "Failed to upload allow list",
-                          });
-                        }
-                      }
-                    }}
                     disabled={!!allowlistEntries}
                   />
                 </FormControl>
