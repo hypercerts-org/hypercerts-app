@@ -729,7 +729,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                     initialValues={allowlistEntries?.map((entry) => ({
                       address: entry.address,
                       percentage: calculatePercentageBigInt(
-                        entry.units,
+                        BigInt(entry.units),
                       ).toString(),
                     }))}
                   />
@@ -754,7 +754,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                           </TableCell>
                           <TableCell>
                             {formatNumber(
-                              calculatePercentageBigInt(entry.units),
+                              calculatePercentageBigInt(BigInt(entry.units)),
                             )}
                             %
                           </TableCell>
