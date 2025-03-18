@@ -654,25 +654,12 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
             name="allowlistURL"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center gap-2 justify-between">
-                  <div className="flex flex-row items-center gap-2">
-                    <FormLabel>Allowlist (optional)</FormLabel>
-                    <TooltipInfo
-                      tooltipText="Allowlists determine the number of units each address is allowed to mint. You can create a new allowlist, or prefill from an existing, already uploaded file."
-                      className="w-4 h-4"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={
-                      (form.getValues("allowlistEntries")?.length ?? 0) > 0
-                    }
-                    onClick={() => fetchAllowlist(field?.value as string)}
-                  >
-                    Fetch URL
-                  </Button>
+                <div className="flex flex-row items-center gap-2">
+                  <FormLabel>Allowlist (optional)</FormLabel>
+                  <TooltipInfo
+                    tooltipText="Allowlists determine the number of units each address is allowed to mint. You can create a new allowlist, or prefill from an existing, already uploaded file."
+                    className="w-4 h-4"
+                  />
                 </div>
                 <FormControl>
                   <Input
@@ -689,6 +676,17 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                 <div className="flex text-xs space-x-2 w-full justify-end">
                   <Button
                     type="button"
+                    variant="outline"
+                    disabled={
+                      (form.getValues("allowlistEntries")?.length ?? 0) > 0 ||
+                      !field.value
+                    }
+                    onClick={() => fetchAllowlist(field?.value as string)}
+                  >
+                    Import from URL
+                  </Button>
+                  <Button
+                    type="button"
                     disabled={isPendingValidateAllowlist}
                     variant="outline"
                     onClick={() => setCreateDialogOpen(true)}
@@ -698,10 +696,10 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                         <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
                         Loading...
                       </>
-                    ) : allowlistEntries ? (
+                    ) : allowlistEntries || field.value ? (
                       "Edit allowlist"
                     ) : (
-                      "Create allowlist"
+                      "New allowlist"
                     )}
                   </Button>
 
@@ -717,7 +715,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                     }}
                   >
                     <Trash2Icon className="w-4 h-4 mr-2" />
-                    Reset
+                    Delete
                   </Button>
 
                   <CreateAllowlistDialog
