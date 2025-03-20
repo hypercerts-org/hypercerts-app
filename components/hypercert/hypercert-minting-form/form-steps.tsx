@@ -423,66 +423,47 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
   );
 };
 
-const parseAllowList = async (value: string) => {
-  let data;
-  let allowList: AllowlistEntry[] = [];
-  const url = value.startsWith("ipfs://")
-    ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
-    : value.startsWith("https://")
-      ? value
-      : null;
+export const parseAllowList = async (data: Response | string) => {
+  let allowList: AllowlistEntry[];
+  try {
+    const text = typeof data === "string" ? data : await data.text();
+    const parsedData = Papa.parse<AllowlistEntry>(text, {
+      header: true,
+      skipEmptyLines: true,
+    });
 
-  if (!url) {
-    errorToast("Invalid URL. URL must start with 'https://' or 'ipfs://'");
-    return;
-  }
-  data = await fetch(url);
+    const validEntries = parsedData.data.filter(
+      (entry) => entry.address && entry.units,
+    );
 
-  const contentType = data.headers.get("content-type");
+    // Calculate total units
+    const total = validEntries.reduce(
+      (sum, entry) => sum + BigInt(entry.units),
+      BigInt(0),
+    );
 
-  if (
-    contentType?.includes("text/csv") ||
-    contentType?.includes("text/plain") ||
-    value.endsWith(".csv")
-  ) {
-    try {
-      const text = await data.text();
-      const parsedData = Papa.parse<AllowlistEntry>(text, {
-        header: true,
-        skipEmptyLines: true,
-      });
+    allowList = validEntries.map((entry) => {
+      const address = getAddress(entry.address);
+      const originalUnits = BigInt(entry.units);
+      // Scale units proportionally to DEFAULT_NUM_UNITS
+      const scaledUnits =
+        total > 0 ? (originalUnits * DEFAULT_NUM_UNITS) / total : BigInt(0);
 
-      const validEntries = parsedData.data.filter(
-        (entry) => entry.address && entry.units,
-      );
+      return {
+        address: address,
+        units: scaledUnits,
+      };
+    });
 
-      // Calculate total units
-      const total = validEntries.reduce(
-        (sum, entry) => sum + BigInt(entry.units),
-        BigInt(0),
-      );
-
-      allowList = validEntries.map((entry) => {
-        const address = getAddress(entry.address);
-        const originalUnits = BigInt(entry.units);
-        // Scale units proportionally to DEFAULT_NUM_UNITS
-        const scaledUnits =
-          total > 0 ? (originalUnits * DEFAULT_NUM_UNITS) / total : BigInt(0);
-
-        return {
-          address: address,
-          units: scaledUnits,
-        };
-      });
-
-      return allowList;
-    } catch (e) {
-      e instanceof Error
-        ? errorToast(e.message)
-        : errorToast("Failed to parse allowlist.");
+    return allowList;
+  } catch (e) {
+    if (errorHasMessage(e)) {
+      errorToast(e.message);
+      throw new Error(e.message);
+    } else {
+      errorToast("Failed to parse allowlist.");
+      throw new Error("Failed to parse allowlist.");
     }
-  } else {
-    errorToast("Invalid file type.");
   }
 };
 
@@ -598,31 +579,57 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
   };
 
   const fetchAllowlist = async (value: string) => {
-    const allowList = await parseAllowList(value);
-    if (!allowList || allowList.length === 0) return;
+    let data: Response;
+    const url = value.startsWith("ipfs://")
+      ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
+      : value.startsWith("https://")
+        ? value
+        : null;
 
-    const totalUnits = DEFAULT_NUM_UNITS;
+    if (!url) {
+      errorToast("Invalid URL. URL must start with 'https://' or 'ipfs://'");
+      throw new Error(
+        "Invalid URL. URL must start with 'https://' or 'ipfs://'",
+      );
+    }
+    data = await fetch(url);
 
-    // validateAllowlist
-    try {
-      validateAllowlist({
-        allowList,
-        totalUnits,
-      });
-      form.setValue("allowlistEntries", allowList);
-    } catch (e) {
-      if (errorHasMessage(e)) {
-        toast({
-          title: "Error",
-          description: e.message,
-          variant: "destructive",
+    const contentType = data.headers.get("content-type");
+
+    if (
+      contentType?.includes("text/csv") ||
+      contentType?.includes("text/plain") ||
+      value.endsWith(".csv")
+    ) {
+      const allowList = await parseAllowList(data);
+      if (!allowList || allowList.length === 0) return;
+
+      const totalUnits = DEFAULT_NUM_UNITS;
+
+      // validateAllowlist
+      try {
+        validateAllowlist({
+          allowList,
+          totalUnits,
         });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to upload allow list",
-        });
+        form.setValue("allowlistEntries", allowList);
+      } catch (e) {
+        if (errorHasMessage(e)) {
+          toast({
+            title: "Error",
+            description: e.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to upload allow list",
+          });
+        }
       }
+    } else {
+      errorToast("Invalid file type.");
+      throw new Error("Invalid file type.");
     }
   };
 
