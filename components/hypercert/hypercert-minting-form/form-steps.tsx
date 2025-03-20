@@ -423,7 +423,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
   );
 };
 
-const parseAllowlist = async (value: string) => {
+const parseAllowList = async (value: string) => {
   let data;
   let allowList: AllowlistEntry[] = [];
   const url = value.startsWith("ipfs://")
@@ -598,7 +598,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
   };
 
   const fetchAllowlist = async (value: string) => {
-    const allowList = await parseAllowlist(value);
+    const allowList = await parseAllowList(value);
     if (!allowList || allowList.length === 0) return;
 
     const totalUnits = DEFAULT_NUM_UNITS;
