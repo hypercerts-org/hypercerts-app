@@ -423,6 +423,69 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
   );
 };
 
+const parseAllowlist = async (value: string) => {
+  let data;
+  let allowList: AllowlistEntry[] = [];
+  const url = value.startsWith("ipfs://")
+    ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
+    : value.startsWith("https://")
+      ? value
+      : null;
+
+  if (!url) {
+    errorToast("Invalid URL. URL must start with 'https://' or 'ipfs://'");
+    return;
+  }
+  data = await fetch(url);
+
+  const contentType = data.headers.get("content-type");
+
+  if (
+    contentType?.includes("text/csv") ||
+    contentType?.includes("text/plain") ||
+    value.endsWith(".csv")
+  ) {
+    try {
+      const text = await data.text();
+      const parsedData = Papa.parse<AllowlistEntry>(text, {
+        header: true,
+        skipEmptyLines: true,
+      });
+
+      const validEntries = parsedData.data.filter(
+        (entry) => entry.address && entry.units,
+      );
+
+      // Calculate total units
+      const total = validEntries.reduce(
+        (sum, entry) => sum + BigInt(entry.units),
+        BigInt(0),
+      );
+
+      allowList = validEntries.map((entry) => {
+        const address = getAddress(entry.address);
+        const originalUnits = BigInt(entry.units);
+        // Scale units proportionally to DEFAULT_NUM_UNITS
+        const scaledUnits =
+          total > 0 ? (originalUnits * DEFAULT_NUM_UNITS) / total : BigInt(0);
+
+        return {
+          address: address,
+          units: scaledUnits,
+        };
+      });
+
+      return allowList;
+    } catch (e) {
+      e instanceof Error
+        ? errorToast(e.message)
+        : errorToast("Failed to parse allowlist.");
+    }
+  } else {
+    errorToast("Invalid file type.");
+  }
+};
+
 const calculatePercentageBigInt = (
   units: bigint,
   total: bigint = DEFAULT_NUM_UNITS,
@@ -535,55 +598,8 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
   };
 
   const fetchAllowlist = async (value: string) => {
-    let data;
-    let allowList;
-    const url = value.startsWith("ipfs://")
-      ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
-      : value.startsWith("https://")
-        ? value
-        : null;
-
-    if (!url) return errorToast("Invalid URL");
-    data = await fetch(url);
-
-    const contentType = data.headers.get("content-type");
-
-    if (
-      contentType?.includes("text/csv") ||
-      contentType?.includes("text/plain") ||
-      value.endsWith(".csv")
-    ) {
-      const text = await data.text();
-      const parsedData = Papa.parse<AllowlistEntry>(text, {
-        header: true,
-        skipEmptyLines: true,
-      });
-
-      const validEntries = parsedData.data.filter(
-        (entry) => entry.address && entry.units,
-      );
-
-      // Calculate total units
-      const total = validEntries.reduce(
-        (sum, entry) => sum + BigInt(entry.units),
-        BigInt(0),
-      );
-
-      allowList = validEntries.map((entry) => {
-        const address = getAddress(entry.address);
-        const originalUnits = BigInt(entry.units);
-        // Scale units proportionally to DEFAULT_NUM_UNITS
-        const scaledUnits =
-          total > 0 ? (originalUnits * DEFAULT_NUM_UNITS) / total : BigInt(0);
-
-        return {
-          address: address,
-          units: scaledUnits,
-        };
-      });
-    } else {
-      return errorToast("Invalid allowlist.");
-    }
+    const allowList = await parseAllowlist(value);
+    if (!allowList || allowList.length === 0) return;
 
     const totalUnits = DEFAULT_NUM_UNITS;
 
