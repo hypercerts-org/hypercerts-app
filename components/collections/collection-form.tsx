@@ -25,7 +25,7 @@ import request from "graphql-request";
 import { isValidHypercertId } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { ExternalLink, InfoIcon, LoaderCircle, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useCreateHyperboard, useUpdateHyperboard } from "@/collections/hooks";
@@ -34,6 +34,7 @@ import { BlueprintFragment } from "@/blueprints/blueprint.fragment";
 import { isParseableNumber } from "@/lib/isParseableInteger";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ImageUploader, readAsBase64 } from "../image-uploader";
+import { useAccountStore } from "@/lib/account-store";
 
 const idSchema = z
   .string()
@@ -229,6 +230,13 @@ export const CollectionForm = ({
   });
   const { mutateAsync: createHyperboard } = useCreateHyperboard();
   const { mutateAsync: updateHyperboard } = useUpdateHyperboard();
+  const { selectedAccount } = useAccountStore();
+  const isSafeAccount = selectedAccount?.type === "safe";
+
+  // Force form validation when account type changes
+  useEffect(() => {
+    form.trigger();
+  }, [isSafeAccount, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -276,7 +284,10 @@ export const CollectionForm = ({
     form.formState.errors["newFactor"] === undefined;
 
   const canCreateCollection =
-    form.formState.isValid && !isFetching && (!newId || newId === "");
+    form.formState.isValid &&
+    !isFetching &&
+    (!newId || newId === "") &&
+    !isSafeAccount;
 
   const buttonText = form.watch("id")
     ? "Update collection"
@@ -285,6 +296,14 @@ export const CollectionForm = ({
   return (
     <section className="flex flex-col-reverse md:flex-row space-x-4 items-stretch md:justify-start">
       <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
+        {isSafeAccount && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+            <div className="text-sm text-yellow-700">
+              The feature to create collections isn&rsquo;t yet released for
+              multi-sigs. Please switch to your normal wallet...
+            </div>
+          </div>
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <section className="space-y-8">
