@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type AccountType = "eoa" | "safe";
 
@@ -12,10 +13,17 @@ interface AccountState {
   setSelectedAccount: (account: Account | null) => void;
 }
 
-export const useAccountStore = create<AccountState>((set) => ({
-  selectedAccount: null,
-  setSelectedAccount: (account) => set({ selectedAccount: account }),
-}));
+export const useAccountStore = create<AccountState>()(
+  persist(
+    (set) => ({
+      selectedAccount: null,
+      setSelectedAccount: (account) => set({ selectedAccount: account }),
+    }),
+    {
+      name: "selected-account-storage",
+    },
+  ),
+);
 
 export function selectWalletAccount(address: string) {
   useAccountStore.setState({
