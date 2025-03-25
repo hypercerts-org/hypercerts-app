@@ -11,9 +11,9 @@ import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { createExtraContent } from "../global/extra-content";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+// import { useQueryClient } from "@tanstack/react-query";
 import { getAddress } from "viem";
-import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
+// import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
 
 interface UnclaimedHypercertClaimButtonProps {
   allowListRecord: Row<AllowListRecord>;
@@ -31,19 +31,28 @@ export default function UnclaimedHypercertClaimButton({
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
   const router = useRouter();
-  const query = useOwnedHypercerts(getAddress(account.address!));
+  // const query = useOwnedHypercerts(getAddress(account.address!));
 
   const selectedHypercert = allowListRecord.original;
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
 
   const refreshData = async (address: string) => {
     await revalidatePathServerAction([
-      `/profile/${address}?tab=hypercerts-claimable`,
-      `/profile/${address}?tab=hypercerts-owned`,
-      `/hypercerts/${selectedHypercert?.hypercert_id}`,
-    ]);
-    await query.refetch();
-    router.refresh();
+      { path: `/profile/${address}?tab`, type: "page" },
+      { path: `/profile/${address}?tab=hypercerts-claimable`, type: "page" },
+      { path: `/profile/${address}?tab=hypercerts-owned`, type: "page" },
+      { path: `/hypercerts/${selectedHypercert?.hypercert_id}`, type: "page" },
+      { path: "/", type: "layout" },
+    ]).then(async () => {
+      setTimeout(() => {
+        // refresh after 5 seconds
+        router.refresh();
+
+        // push to the profile page with the hypercerts-claimable tab
+        // because revalidatePath will revalidate on the next page visit.
+        router.push(`/profile/${address}?tab=hypercerts-claimable`);
+      }, 5000);
+    });
   };
 
   const claimHypercert = async () => {
@@ -111,9 +120,6 @@ export default function UnclaimedHypercertClaimButton({
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
-      setTimeout(() => {
-        refresh();
-      }, 5000);
     } catch (error) {
       console.error(error);
     } finally {

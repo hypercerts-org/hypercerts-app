@@ -51,7 +51,7 @@ export default function UnclaimedHypercertBatchClaimButton({
   const selectedChain = selectedChainId
     ? ChainFactory.getChain(selectedChainId)
     : null;
-  const query = useOwnedHypercerts(getAddress(account.address!));
+  // const query = useOwnedHypercerts(getAddress(account.address!));
 
   const refreshData = async (address: string) => {
     const hypercertIds = allowListRecords.map((record) => record.hypercert_id);
@@ -61,12 +61,21 @@ export default function UnclaimedHypercertBatchClaimButton({
     });
 
     await revalidatePathServerAction([
-      `/profile/${address}?tab=hypercerts-claimable`,
-      `/profile/${address}?tab=hypercerts-owned`,
+      { path: `/profile/${address}?tab`, type: "page" },
+      { path: `/profile/${address}?tab=hypercerts-claimable`, type: "page" },
+      { path: `/profile/${address}?tab=hypercerts-owned`, type: "page" },
       ...hypercertViewInvalidationPaths,
-    ]);
-    await query.refetch();
-    router.refresh();
+      { path: "/", type: "layout" },
+    ]).then(async () => {
+      setTimeout(() => {
+        // refresh after 5 seconds
+        router.refresh();
+
+        // push to the profile page with the hypercerts-claimable tab
+        // because revalidatePath will revalidate on the next page visit.
+        router.push(`/profile/${address}?tab=hypercerts-claimable`);
+      }, 5000);
+    });
   };
 
   const claimHypercert = async () => {
