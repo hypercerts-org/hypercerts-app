@@ -66,9 +66,9 @@ export default function UnclaimedHypercertClaimButton({
       }}
       disabled={selectedHypercert?.user_address !== activeAddress || isLoading}
     >
-      {hypercertChainId === currentChain?.id?.toString()
-        ? "Claim"
-        : `Switch chain`}
+      {hypercertChainId === activeAddress && !currentChain?.id?.toString()
+        ? "Switch chain"
+        : "Claim"}
     </Button>
   );
 }
