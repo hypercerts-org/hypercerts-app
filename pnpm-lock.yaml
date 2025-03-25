@@ -21,11 +21,11 @@ importers:
         specifier: 2.0.0-alpha.12
         version: 2.0.0-alpha.12(bufferutil@4.0.9)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@hypercerts-org/marketplace-sdk':
-        specifier: ' 0.5.0-alpha.0'
+        specifier: 0.5.0-alpha.0
         version: 0.5.0-alpha.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@hypercerts-org/sdk':
-        specifier: 2.5.0-beta.6
-        version: 2.5.0-beta.6(@swc/helpers@0.5.5)(bufferutil@4.0.9)(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
+        specifier: 2.6.0
+        version: 2.6.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@next/env':
         specifier: ^14.2.10
         version: 14.2.23
@@ -107,6 +107,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.15
         version: 4.17.15
+      '@types/papaparse':
+        specifier: ^5.3.15
+        version: 5.3.15
       '@types/validator':
         specifier: ^13.12.2
         version: 13.12.2
@@ -161,6 +164,9 @@ importers:
       next:
         specifier: ^14.2.18
         version: 14.2.23(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      papaparse:
+        specifier: ^5.5.2
+        version: 5.5.2
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -829,8 +835,13 @@ packages:
   '@hypercerts-org/sdk@2.4.0':
     resolution: {integrity: sha512-9vxQW3zBwi3WCOUBMwU1fWEk3z29eyxtDWlaIS7jdUlGwnCcN9IkPzIk7w/jHO96yiH8+vcL/EWFvOp06mtXAw==}
 
-  '@hypercerts-org/sdk@2.5.0-beta.6':
-    resolution: {integrity: sha512-v24hjmCwkL2/lkbQbYxzepLAJOc2SwfHVBoADNcdcT+/s7Fvpq5I+MddlWHYDcBLacPhyF3k+F9O/tkwvofY1g==}
+  '@hypercerts-org/sdk@2.6.0':
+    resolution: {integrity: sha512-uq+9WzgW+GWazEKTUEhUPZr8sTxhORaNI6DfRfDTZ8w0FJtPEXSSLt5mr9x5VN8EghM1NsPvKzf38jkO8wBkZg==}
+    peerDependencies:
+      '@safe-global/api-kit': ^2.5.7
+      '@safe-global/protocol-kit': ^5.2.0
+      '@safe-global/types-kit': ^1.0.4
+      ethers: ^6.6.2
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -2256,6 +2267,9 @@ packages:
 
   '@types/node@22.7.5':
     resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
+
+  '@types/papaparse@5.3.15':
+    resolution: {integrity: sha512-JHe6vF6x/8Z85nCX4yFdDslN11d+1pr12E526X8WAfhadOeaOTx5AuIkvDKIBopfvlzpzkdMx4YyvSKCM9oqtw==}
 
   '@types/pbkdf2@3.1.2':
     resolution: {integrity: sha512-uRwJqmiXmh9++aSu1VNEn3iIxWOhd8AHXNSdlaLfdAAdSTY9jYVeGWnzejM3dvrkbqE3/hyQkQQ29IFATEGlew==}
@@ -4971,6 +4985,9 @@ packages:
   pako@2.1.0:
     resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
+  papaparse@5.5.2:
+    resolution: {integrity: sha512-PZXg8UuAc4PcVwLosEEDYjPyfWnTEhOrUfdv+3Bx+NuAb+5NhDmXzg5fHWmdCh1mP5p7JAZfFr3IMQfcntNAdA==}
+
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -7276,17 +7293,21 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/sdk@2.5.0-beta.6(@swc/helpers@0.5.5)(bufferutil@4.0.9)(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)':
+  '@hypercerts-org/sdk@2.6.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
       '@hypercerts-org/contracts': 2.0.0-alpha.12(bufferutil@4.0.9)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@openzeppelin/merkle-tree': 1.0.7
+      '@safe-global/api-kit': 2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      '@safe-global/protocol-kit': 5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      '@safe-global/types-kit': 1.0.2(typescript@5.7.3)(zod@3.24.1)
       '@swc/core': 1.10.9(@swc/helpers@0.5.5)
       ajv: 8.17.1
       axios: 1.7.9
       dotenv: 16.4.7
+      ethers: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       rollup-plugin-swc3: 0.11.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(rollup@4.31.0)
-      viem: 2.23.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      viem: 2.23.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       zod: 3.24.1
     transitivePeerDependencies:
       - '@swc/helpers'
@@ -8825,6 +8846,10 @@ snapshots:
   '@types/node@22.7.5':
     dependencies:
       undici-types: 6.19.8
+
+  '@types/papaparse@5.3.15':
+    dependencies:
+      '@types/node': 20.17.14
 
   '@types/pbkdf2@3.1.2':
     dependencies:
@@ -12543,6 +12568,8 @@ snapshots:
   package-json-from-dist@1.0.1: {}
 
   pako@2.1.0: {}
+
+  papaparse@5.5.2: {}
 
   parent-module@1.0.1:
     dependencies:

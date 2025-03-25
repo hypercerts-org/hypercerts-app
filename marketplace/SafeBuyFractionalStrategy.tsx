@@ -1,27 +1,23 @@
 import { Currency, Taker } from "@hypercerts-org/marketplace-sdk";
 import { zeroAddress } from "viem";
 
-import { SUPPORTED_CHAINS } from "@/configs/constants";
 import { decodeContractError } from "@/lib/decodeContractError";
-
 import { ExtraContent } from "@/components/global/extra-content";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
+
 import { BuyFractionalStrategy } from "./BuyFractionalStrategy";
-import { MarketplaceOrder } from "./types";
 import { getCurrencyByAddress } from "./utils";
+import { MarketplaceOrder } from "./types";
 
 export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
   async execute({
     order,
     unitAmount,
     pricePerUnit,
-    hypercertName,
-    totalUnitsInHypercert,
   }: {
     order: MarketplaceOrder;
     unitAmount: bigint;
     pricePerUnit: string;
-    hypercertName?: string | null;
-    totalUnitsInHypercert?: bigint;
   }) {
     const {
       setDialogStep: setStep,
@@ -30,21 +26,20 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       setExtraContent,
     } = this.dialogContext;
     if (!this.exchangeClient) {
-      this.dialogContext.setOpen(false);
+      setOpen(false);
       throw new Error("No client");
     }
 
     if (!this.chainId) {
-      this.dialogContext.setOpen(false);
+      setOpen(false);
       throw new Error("No chain id");
     }
 
     if (!this.walletClient.data) {
-      this.dialogContext.setOpen(false);
+      setOpen(false);
       throw new Error("No wallet client data");
     }
 
-    // TODO: we might have to change some steps here
     setSteps([
       {
         id: "Setting up order execution",
@@ -111,8 +106,6 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
           order.currency as `0x${string}`,
         );
 
-        // TODO: if this is not approved yet, we need to create a Safe TX and drop out of this
-        // dialog early, so that the next invocation runs through this check without stopping.
         if (currentAllowance < totalPrice) {
           console.debug("Approving ERC20");
           await this.exchangeClient.approveErc20Safe(
@@ -132,12 +125,11 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       throw new Error("Approval error");
     }
 
-    // TODO: this whole step should probably not be here
     try {
       await setStep("Transfer manager");
       const isTransferManagerApproved =
         await this.exchangeClient.isTransferManagerApprovedSafe(this.address);
-      // FIXME: this shouldn't be here, unless we're missing something
+
       if (!isTransferManagerApproved) {
         console.debug("Approving transfer manager");
         await this.exchangeClient.grantTransferManagerApprovalSafe(
