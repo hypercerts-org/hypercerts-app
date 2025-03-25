@@ -8,7 +8,7 @@ import { useStepProcessDialogContext } from "@/components/global/step-process-di
 import { BuyFractionalStrategy } from "./BuyFractionalStrategy";
 import { EOABuyFractionalStrategy } from "./EOABuyFractionalStrategy";
 import { SafeBuyFractionalStrategy } from "./SafeBuyFractionalStrategy";
-import { Address, getAddress, isAddress } from "viem";
+import { getAddress, isAddress } from "viem";
 
 export const useBuyFractionalStrategy = (): (() => BuyFractionalStrategy) => {
   const { address, chainId } = useAccount();
