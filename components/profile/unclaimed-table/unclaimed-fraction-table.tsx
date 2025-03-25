@@ -29,6 +29,8 @@ import UnclaimedHypercertBatchClaimButton from "../unclaimed-hypercert-butchClai
 import { TableToolbar } from "./table-toolbar";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { UnclaimedFraction } from "../unclaimed-hypercerts-list";
+import { useAccountStore } from "@/lib/account-store";
+import { useRouter } from "next/navigation";
 
 export interface DataTableProps {
   columns: ColumnDef<UnclaimedFraction>[];
@@ -36,6 +38,8 @@ export interface DataTableProps {
 }
 
 export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
+  const { selectedAccount } = useAccountStore();
+  const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -138,6 +142,11 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
   useEffect(() => {
     setSelectedRecords(getSelectedRecords());
   }, [rowSelection, getSelectedRecords]);
+
+  // Refresh the entire route when account changes
+  useEffect(() => {
+    router.refresh();
+  }, [selectedAccount?.address, router]);
 
   return (
     <div className="w-full">
