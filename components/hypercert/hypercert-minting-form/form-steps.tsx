@@ -17,10 +17,11 @@ import {
   ArrowRightIcon,
   CalendarIcon,
   Loader2,
+  LoaderCircle,
   Trash2Icon,
   X,
 } from "lucide-react";
-import { RefObject, useMemo, useState } from "react";
+import { RefObject, useEffect, useMemo, useState } from "react";
 import rehypeSanitize from "rehype-sanitize";
 
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
@@ -74,7 +75,11 @@ import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
 import { useAccount, useChainId } from "wagmi";
 import { ImageUploader, readAsBase64 } from "@/components/image-uploader";
-
+import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
+import Papa from "papaparse";
+import { getAddress, parseUnits } from "viem";
+import { errorHasMessage } from "@/lib/errorHasMessage";
+import { errorToast } from "@/lib/errorToast";
 // import Image from "next/image";
 
 interface FormStepsProps {
@@ -418,6 +423,50 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
   );
 };
 
+export const parseAllowList = async (data: Response | string) => {
+  let allowList: AllowlistEntry[];
+  try {
+    const text = typeof data === "string" ? data : await data.text();
+    const parsedData = Papa.parse<AllowlistEntry>(text, {
+      header: true,
+      skipEmptyLines: true,
+    });
+
+    const validEntries = parsedData.data.filter(
+      (entry) => entry.address && entry.units,
+    );
+
+    // Calculate total units
+    const total = validEntries.reduce(
+      (sum, entry) => sum + BigInt(entry.units),
+      BigInt(0),
+    );
+
+    allowList = validEntries.map((entry) => {
+      const address = getAddress(entry.address);
+      const originalUnits = BigInt(entry.units);
+      // Scale units proportionally to DEFAULT_NUM_UNITS
+      const scaledUnits =
+        total > 0 ? (originalUnits * DEFAULT_NUM_UNITS) / total : BigInt(0);
+
+      return {
+        address: address,
+        units: scaledUnits,
+      };
+    });
+
+    return allowList;
+  } catch (e) {
+    if (errorHasMessage(e)) {
+      errorToast(e.message);
+      throw new Error(e.message);
+    } else {
+      errorToast("Failed to parse allowlist.");
+      throw new Error("Failed to parse allowlist.");
+    }
+  }
+};
+
 const calculatePercentageBigInt = (
   units: bigint,
   total: bigint = DEFAULT_NUM_UNITS,
@@ -433,22 +482,46 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
     setOpen,
     setTitle,
   } = useStepProcessDialogContext();
+  const {
+    mutate: validateAllowlist,
+    data: validateAllowlistResponse,
+    isPending: isPendingValidateAllowlist,
+    error: createAllowListError,
+  } = useValidateAllowlist();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const setAllowlistURL = (allowlistURL: string) => {
+    form.setValue("allowlistURL", allowlistURL);
+  };
   const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
     form.setValue("allowlistEntries", allowlistEntries);
   };
+
   const allowlistEntries = form.watch("allowlistEntries");
 
-  const errorToast = (message: string | undefined) => {
-    toast({
-      title: message,
-      variant: "destructive",
-      duration: 2000,
-    });
-  };
+  useEffect(() => {
+    if (createAllowListError) {
+      toast({
+        title: "Error",
+        description: createAllowListError.message,
+        variant: "destructive",
+      });
+    }
+  }, [createAllowListError]);
+
+  useEffect(() => {
+    if (validateAllowlistResponse?.success) {
+      const bigintUnits = validateAllowlistResponse.values.map(
+        (entry: AllowlistEntry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        }),
+      );
+      form.setValue("allowlistEntries", bigintUnits);
+    }
+  }, [validateAllowlistResponse]);
 
   async function validateFile(file: File) {
     if (file.size > MAX_FILE_SIZE) {
@@ -505,6 +578,61 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
     }
   };
 
+  const fetchAllowlist = async (value: string) => {
+    let data: Response;
+    const url = value.startsWith("ipfs://")
+      ? `https://ipfs.io/ipfs/${value.replace("ipfs://", "")}`
+      : value.startsWith("https://")
+        ? value
+        : null;
+
+    if (!url) {
+      errorToast("Invalid URL. URL must start with 'https://' or 'ipfs://'");
+      throw new Error(
+        "Invalid URL. URL must start with 'https://' or 'ipfs://'",
+      );
+    }
+    data = await fetch(url);
+
+    const contentType = data.headers.get("content-type");
+
+    if (
+      contentType?.includes("text/csv") ||
+      contentType?.includes("text/plain") ||
+      value.endsWith(".csv")
+    ) {
+      const allowList = await parseAllowList(data);
+      if (!allowList || allowList.length === 0) return;
+
+      const totalUnits = DEFAULT_NUM_UNITS;
+
+      // validateAllowlist
+      try {
+        validateAllowlist({
+          allowList,
+          totalUnits,
+        });
+        form.setValue("allowlistEntries", allowList);
+      } catch (e) {
+        if (errorHasMessage(e)) {
+          toast({
+            title: "Error",
+            description: e.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to upload allow list",
+          });
+        }
+      }
+    } else {
+      errorToast("Invalid file type.");
+      throw new Error("Invalid file type.");
+    }
+  };
+
   return (
     <section className="space-y-8">
       {isBlueprint && (
@@ -549,7 +677,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
             name="allowlistURL"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-row items-center gap-2">
                   <FormLabel>Allowlist (optional)</FormLabel>
                   <TooltipInfo
                     tooltipText="Allowlists determine the number of units each address is allowed to mint. You can create a new allowlist, or prefill from an existing, already uploaded file."
@@ -559,8 +687,8 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                 <FormControl>
                   <Input
                     {...field}
-                    value={field.value}
                     placeholder="https:// | ipfs://"
+                    disabled={!!allowlistEntries}
                   />
                 </FormControl>
                 <FormMessage />
@@ -571,21 +699,58 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                 <div className="flex text-xs space-x-2 w-full justify-end">
                   <Button
                     type="button"
-                    disabled={!!field.value}
+                    variant="outline"
+                    disabled={
+                      (form.getValues("allowlistEntries")?.length ?? 0) > 0 ||
+                      !field.value
+                    }
+                    onClick={() => fetchAllowlist(field?.value as string)}
+                  >
+                    Import from URL
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={isPendingValidateAllowlist}
                     variant="outline"
                     onClick={() => setCreateDialogOpen(true)}
                   >
-                    {allowlistEntries ? "Edit allowlist" : "Create allowlist"}
+                    {isPendingValidateAllowlist ? (
+                      <>
+                        <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
+                        Loading...
+                      </>
+                    ) : allowlistEntries || field.value ? (
+                      "Edit allowlist"
+                    ) : (
+                      "New allowlist"
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    disabled={
+                      (!allowlistEntries && !field.value) ||
+                      isPendingValidateAllowlist
+                    }
+                    onClick={() => {
+                      form.setValue("allowlistEntries", undefined);
+                      form.setValue("allowlistURL", "");
+                    }}
+                  >
+                    <Trash2Icon className="w-4 h-4 mr-2" />
+                    Delete
                   </Button>
 
                   <CreateAllowlistDialog
                     setAllowlistEntries={setAllowlistEntries}
+                    setAllowlistURL={setAllowlistURL}
+                    allowlistURL={field?.value}
                     open={createDialogOpen}
                     setOpen={setCreateDialogOpen}
                     initialValues={allowlistEntries?.map((entry) => ({
                       address: entry.address,
                       percentage: calculatePercentageBigInt(
-                        entry.units,
+                        BigInt(entry.units),
                       ).toString(),
                     }))}
                   />
@@ -610,7 +775,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                           </TableCell>
                           <TableCell>
                             {formatNumber(
-                              calculatePercentageBigInt(entry.units),
+                              calculatePercentageBigInt(BigInt(entry.units)),
                             )}
                             %
                           </TableCell>
