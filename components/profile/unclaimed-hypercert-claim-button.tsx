@@ -11,9 +11,7 @@ import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { createExtraContent } from "../global/extra-content";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useState } from "react";
-// import { useQueryClient } from "@tanstack/react-query";
 import { getAddress } from "viem";
-// import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
 
 interface UnclaimedHypercertClaimButtonProps {
   allowListRecord: Row<AllowListRecord>;
@@ -31,7 +29,6 @@ export default function UnclaimedHypercertClaimButton({
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
   const router = useRouter();
-  // const query = useOwnedHypercerts(getAddress(account.address!));
 
   const selectedHypercert = allowListRecord.original;
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];

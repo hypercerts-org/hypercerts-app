@@ -3,7 +3,6 @@
 import { AllowListRecord } from "@/allowlists/actions/getAllowListRecordsForAddressByClaimed";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { useOwnedHypercerts } from "@/hooks/useOwnedHypercerts";
 import { ChainFactory } from "@/lib/chainFactory";
 import { errorToast } from "@/lib/errorToast";
 import { useRouter } from "next/navigation";
@@ -51,7 +50,6 @@ export default function UnclaimedHypercertBatchClaimButton({
   const selectedChain = selectedChainId
     ? ChainFactory.getChain(selectedChainId)
     : null;
-  // const query = useOwnedHypercerts(getAddress(account.address!));
 
   const refreshData = async (address: string) => {
     const hypercertIds = allowListRecords.map((record) => record.hypercert_id);
