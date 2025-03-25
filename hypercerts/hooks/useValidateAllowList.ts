@@ -31,10 +31,11 @@ export const useValidateAllowList = () => {
           }),
         },
       );
+      const jsonRes = await res.json();
       if (!res.ok || !(res.status === 200 || res.status === 201)) {
+        console.error("Errors: ", jsonRes.errors);
         throw new Error("Failed to validate allowlist");
       }
-      const jsonRes = await res.json();
       return {
         ...jsonRes,
         values: allowList,

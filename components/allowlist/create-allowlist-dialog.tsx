@@ -35,11 +35,15 @@ const defaultValues = [
 
 export default function Component({
   setAllowlistEntries,
+  setAllowlistURL,
+  allowlistURL,
   setOpen,
   open,
   initialValues,
 }: {
   setAllowlistEntries: (allowlistEntries: AllowlistEntry[]) => void;
+  setAllowlistURL: (allowlistURL: string) => void;
+  allowlistURL: string | undefined;
   setOpen: (open: boolean) => void;
   initialValues?: AllowListItem[];
   open: boolean;
@@ -54,6 +58,16 @@ export default function Component({
   const [allowList, setAllowList] = useState<AllowListItem[]>(
     initialValues?.length ? initialValues : defaultValues,
   );
+
+  useEffect(() => {
+    if (open && !allowList[0].address && !allowList[0].percentage) {
+      if (initialValues && initialValues.length > 0) {
+        setAllowList(initialValues);
+      } else {
+        setAllowList(defaultValues);
+      }
+    }
+  }, [open]);
 
   useEffect(() => {
     if (validateAllowlistResponse?.success) {
@@ -141,6 +155,7 @@ export default function Component({
         throw new Error("Allow list is empty");
       }
       validateAllowlist({ allowList: parsedAllowList, totalUnits });
+      setAllowlistURL("");
     } catch (e) {
       if (errorHasMessage(e)) {
         toast({
@@ -264,6 +279,12 @@ export default function Component({
             </Button>
           </div>
         </div>
+        {allowlistURL && (
+          <p className="text-sm text-red-600">
+            If you edit an original allowlist imported via URL, the original
+            allowlist will be deleted.
+          </p>
+        )}
         <CreateAllowListErrorMessage />
         <div className="flex gap-2 justify-evenly w-full">
           <Button
