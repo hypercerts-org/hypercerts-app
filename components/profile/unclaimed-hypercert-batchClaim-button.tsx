@@ -59,11 +59,11 @@ export default function UnclaimedHypercertBatchClaimButton({
     });
 
     await revalidatePathServerAction([
-      { path: `/profile/${address}?tab`, type: "page" },
-      { path: `/profile/${address}?tab=hypercerts-claimable`, type: "page" },
-      { path: `/profile/${address}?tab=hypercerts-owned`, type: "page" },
+      `/profile/${address}`,
+      `/profile/${address}?tab`,
+      `/profile/${address}?tab=hypercerts-claimable`,
+      `/profile/${address}?tab=hypercerts-owned`,
       ...hypercertViewInvalidationPaths,
-      { path: "/", type: "layout" },
     ]).then(async () => {
       setTimeout(() => {
         // refresh after 5 seconds

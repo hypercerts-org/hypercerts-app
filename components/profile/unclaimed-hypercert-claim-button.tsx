@@ -35,16 +35,15 @@ export default function UnclaimedHypercertClaimButton({
 
   const refreshData = async (address: string) => {
     await revalidatePathServerAction([
-      { path: `/profile/${address}?tab`, type: "page" },
-      { path: `/profile/${address}?tab=hypercerts-claimable`, type: "page" },
-      { path: `/profile/${address}?tab=hypercerts-owned`, type: "page" },
-      { path: `/hypercerts/${selectedHypercert?.hypercert_id}`, type: "page" },
-      { path: "/", type: "layout" },
-    ]).then(async () => {
+      `/profile/${address}`,
+      `/profile/${address}?tab`,
+      `/profile/${address}?tab=hypercerts-claimable`,
+      `/profile/${address}?tab=hypercerts-owned`,
+      `/hypercerts/${selectedHypercert?.hypercert_id}`,
+    ]).then(() => {
       setTimeout(() => {
         // refresh after 5 seconds
         router.refresh();
-
         // push to the profile page with the hypercerts-claimable tab
         // because revalidatePath will revalidate on the next page visit.
         router.push(`/profile/${address}?tab=hypercerts-claimable`);
