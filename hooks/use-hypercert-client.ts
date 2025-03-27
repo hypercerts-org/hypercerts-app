@@ -4,15 +4,21 @@ import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { ENVIRONMENT, SUPPORTED_CHAINS } from "@/configs/constants";
 import { EvmClientFactory } from "@/lib/evmClient";
+import { PublicClient } from "viem";
 
 export const useHypercertClient = () => {
   const { data: walletClient } = useWalletClient();
   const { isConnected } = useAccount();
   const [client, setClient] = useState<HypercertClient>();
 
-  const publicClient = walletClient?.chain.id
-    ? EvmClientFactory.createClient(walletClient.chain.id)
-    : undefined;
+  let publicClient: PublicClient | undefined;
+  try {
+    publicClient = walletClient?.chain.id
+      ? EvmClientFactory.createClient(walletClient.chain.id)
+      : undefined;
+  } catch (error) {
+    console.error(`Error creating public client: ${error}`);
+  }
 
   useEffect(() => {
     if (!walletClient || !isConnected) {
