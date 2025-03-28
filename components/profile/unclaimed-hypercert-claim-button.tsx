@@ -1,6 +1,6 @@
 "use client";
 
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
+import { AllowListRecord } from "@/allowlists/actions/getAllowListRecordsForAddressByClaimed";
 import { Button } from "../ui/button";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { waitForTransactionReceipt } from "viem/actions";
@@ -11,6 +11,7 @@ import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { createExtraContent } from "../global/extra-content";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useState } from "react";
+import { getAddress } from "viem";
 
 interface UnclaimedHypercertClaimButtonProps {
   allowListRecord: Row<AllowListRecord>;
@@ -27,8 +28,28 @@ export default function UnclaimedHypercertClaimButton({
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
+  const router = useRouter();
+
   const selectedHypercert = allowListRecord.original;
   const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
+
+  const refreshData = async (address: string) => {
+    await revalidatePathServerAction([
+      `/profile/${address}`,
+      `/profile/${address}?tab`,
+      `/profile/${address}?tab=hypercerts-claimable`,
+      `/profile/${address}?tab=hypercerts-owned`,
+      `/hypercerts/${selectedHypercert?.hypercert_id}`,
+    ]).then(() => {
+      setTimeout(() => {
+        // refresh after 5 seconds
+        router.refresh();
+        // push to the profile page with the hypercerts-claimable tab
+        // because revalidatePath will revalidate on the next page visit.
+        router.push(`/profile/${address}?tab=hypercerts-claimable`);
+      }, 5000);
+    });
+  };
 
   const claimHypercert = async () => {
     setIsLoading(true);
@@ -91,17 +112,10 @@ export default function UnclaimedHypercertClaimButton({
         });
         setExtraContent(extraContent);
         await setDialogStep("done", "completed");
-        await revalidatePathServerAction([
-          `/hypercerts/${selectedHypercert?.hypercert_id}`,
-          `/profile/${account.address}?tab=hypercerts-claimable`,
-          `/profile/${account.address}?tab=hypercerts-owned`,
-        ]);
+        await refreshData(getAddress(account.address!));
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
-      setTimeout(() => {
-        refresh();
-      }, 5000);
     } catch (error) {
       console.error(error);
     } finally {

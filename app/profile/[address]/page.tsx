@@ -4,7 +4,7 @@ import {
 } from "@/app/profile/[address]/tabs";
 
 import EthAddress from "@/components/eth-address";
-import { HypercertsTabContent } from "@/app/profile/[address]/hypercerts-tab-content";
+import { HypercertsTabContent } from "@/components/profile/hypercerts-tab/hypercerts-tab-content";
 import { CollectionsTabContent } from "@/app/profile/[address]/collections-tab-content";
 import { MarketplaceTabContent } from "@/app/profile/[address]/marketplace-tab-content";
 import { BlueprintsTabContent } from "@/app/profile/[address]/blueprint-tab-content";

@@ -75,7 +75,7 @@ import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
 import { useAccount, useChainId } from "wagmi";
 import { ImageUploader, readAsBase64 } from "@/components/image-uploader";
-import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
+import { useValidateAllowList } from "@/hypercerts/hooks/useValidateAllowList";
 import Papa from "papaparse";
 import { getAddress, parseUnits } from "viem";
 import { errorHasMessage } from "@/lib/errorHasMessage";
@@ -487,7 +487,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
     data: validateAllowlistResponse,
     isPending: isPendingValidateAllowlist,
     error: createAllowListError,
-  } = useValidateAllowlist();
+  } = useValidateAllowList();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
