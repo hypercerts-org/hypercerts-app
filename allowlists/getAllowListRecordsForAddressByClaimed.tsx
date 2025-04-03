@@ -42,10 +42,18 @@ export async function getAllowListRecordsForAddressByClaimed(
   address: string,
   claimed: boolean,
 ) {
-  const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
-    address,
-    claimed,
-  });
+  const res = await request(
+    HYPERCERTS_API_URL_GRAPH,
+    query,
+    {
+      address,
+      claimed,
+    },
+    new Headers({
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    }),
+  );
 
   const allowlistRecords = res.allowlistRecords.data;
   if (!allowlistRecords) {
