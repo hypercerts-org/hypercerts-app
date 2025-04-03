@@ -1,11 +1,9 @@
-"use client";
+import { isContract } from "@/lib/isContract";
 
-import { useIsContract } from "@/hooks/useIsContract";
+export async function ContractAccountBanner({ address }: { address: string }) {
+  const isContractAddress = await isContract(address);
 
-export function ContractAccountBanner({ address }: { address: string }) {
-  const { isContract, isLoading } = useIsContract(address);
-
-  if (!isContract || isLoading) return null;
+  if (!isContractAddress) return null;
 
   return (
     <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
