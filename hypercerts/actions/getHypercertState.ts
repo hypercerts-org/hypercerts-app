@@ -3,7 +3,7 @@ import "server-only";
 import { graphql, readFragment } from "@/lib/graphql";
 
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
-import { HypercertStateFragment } from "./fragments/hypercert-state.fragment";
+import { HypercertStateFragment } from "../fragments/hypercert-state.fragment";
 import request from "graphql-request";
 import { getAddress, isAddress } from "viem";
 

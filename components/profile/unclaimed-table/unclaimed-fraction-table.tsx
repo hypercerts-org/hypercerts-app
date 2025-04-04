@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import UnclaimedHypercertBatchClaimButton from "../unclaimed-hypercert-butchClaim-button";
+import UnclaimedHypercertBatchClaimButton from "../unclaimed-hypercert-batchClaim-button";
 import { TableToolbar } from "./table-toolbar";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { UnclaimedFraction } from "../unclaimed-hypercerts-list";

@@ -45,3 +45,31 @@ export const SubTabsWithCount = ({
     </section>
   );
 };
+
+export const SubTabsWithCountSkeleton = ({
+  tabs,
+  activeTab,
+}: {
+  tabs: { key: string; triggerLabel: string }[];
+  activeTab: string;
+}) => {
+  return (
+    <section className="bg-slate-100 w-max flex rounded-sm p-1 my-2">
+      {tabs.map(({ key, triggerLabel }) => (
+        <div key={key}>
+          <button
+            className={cn(
+              "flex gap-1.5 px-3 py-2 text-sm rounded-md tracking-tight transition duration-300 border-[1.5px] shadow-sm font-semibold",
+              key === activeTab
+                ? "bg-white border-slate-300"
+                : "opacity-60 border-transparent",
+            )}
+          >
+            {triggerLabel}
+            <div className="h-5 w-5 rounded-full bg-slate-200 animate-pulse" />
+          </button>
+        </div>
+      ))}
+    </section>
+  );
+};
