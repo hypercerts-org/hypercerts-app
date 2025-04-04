@@ -1,5 +1,4 @@
 import { waitForTransactionReceipt } from "viem/actions";
-import assert from "assert";
 
 import { createExtraContent } from "@/components/global/extra-content";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
@@ -9,11 +8,8 @@ import {
   ClaimHypercertParams,
 } from "./ClaimHypercertStrategy";
 
-export class EOAClaimHypercertStrategy extends ClaimHypercertStrategy {
-  async execute(params: ClaimHypercertParams[]) {
-    assert(params.length === 1, "Only one claim params object allowed");
-
-    const { tokenId, units, proof } = params[0];
+export class EOABatchClaimHypercertStrategy extends ClaimHypercertStrategy {
+  async execute(params: ClaimHypercertParams[]): Promise<void> {
     const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
       this.dialogContext;
     const { data: walletClient } = this.walletClient;
@@ -23,27 +19,23 @@ export class EOAClaimHypercertStrategy extends ClaimHypercertStrategy {
 
     setOpen(true);
     setSteps([
-      { id: "preparing", description: "Preparing to claim fraction..." },
-      { id: "claiming", description: "Claiming fraction on-chain..." },
+      { id: "preparing", description: "Preparing to claim fractions..." },
+      { id: "claiming", description: "Claiming fractions on-chain..." },
       { id: "confirming", description: "Waiting for on-chain confirmation" },
-      { id: "route", description: "Creating your new fraction's link..." },
       { id: "done", description: "Claiming complete!" },
     ]);
-    setTitle("Claim fraction from Allowlist");
+    setTitle("Claim fractions from Allowlist");
 
     try {
       await setDialogStep("preparing", "active");
       await setDialogStep("claiming", "active");
-      const tx = await this.client.mintClaimFractionFromAllowlist(
-        tokenId,
-        units,
-        proof,
-        undefined,
-      );
 
+      const tx = await this.client.batchClaimFractionsFromAllowlists(
+        mapClaimParams(params),
+      );
       if (!tx) {
         await setDialogStep("claiming", "error");
-        throw new Error("Failed to claim fraction");
+        throw new Error("Failed to claim fractions");
       }
 
       await setDialogStep("confirming", "active");
@@ -52,22 +44,24 @@ export class EOAClaimHypercertStrategy extends ClaimHypercertStrategy {
       });
 
       if (receipt.status === "success") {
-        await setDialogStep("route", "active");
+        await setDialogStep("done", "completed");
         const extraContent = createExtraContent({
           receipt,
-          hypercertId: `${this.chain.id}-${tokenId}`,
           chain: this.chain,
         });
         setExtraContent(extraContent);
-        await setDialogStep("done", "completed");
+
+        const hypercertViewInvalidationPaths = params.map((param) => {
+          return `/hypercerts/${param.tokenId}`;
+        });
 
         // Revalidate all relevant paths
         await revalidatePathServerAction([
-          `/hypercerts/${this.chain.id}-${tokenId}`,
           `/profile/${this.address}`,
           `/profile/${this.address}?tab`,
           `/profile/${this.address}?tab=hypercerts-claimable`,
           `/profile/${this.address}?tab=hypercerts-owned`,
+          ...hypercertViewInvalidationPaths,
         ]);
 
         // Wait 5 seconds before refreshing and navigating
@@ -75,12 +69,21 @@ export class EOAClaimHypercertStrategy extends ClaimHypercertStrategy {
           this.router.refresh();
           this.router.push(`/profile/${this.address}?tab=hypercerts-claimable`);
         }, 5000);
-      } else {
+      } else if (receipt.status === "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Claim error:", error);
+      await setDialogStep("claiming", "error", "Transaction failed");
       throw error;
     }
   }
+}
+
+function mapClaimParams(params: ClaimHypercertParams[]) {
+  return {
+    hypercertTokenIds: params.map((p) => p.tokenId),
+    units: params.map((p) => p.units),
+    proofs: params.map((p) => p.proof),
+  };
 }

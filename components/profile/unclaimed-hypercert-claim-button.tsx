@@ -35,11 +35,13 @@ export default function UnclaimedHypercertClaimButton({
         throw new Error("Invalid allow list record");
       }
 
-      await claimHypercert({
-        tokenId: BigInt(selectedHypercert.token_id),
-        units: BigInt(selectedHypercert.units),
-        proof: selectedHypercert.proof as `0x${string}`[],
-      });
+      await claimHypercert([
+        {
+          tokenId: BigInt(selectedHypercert.token_id),
+          units: BigInt(selectedHypercert.units),
+          proof: selectedHypercert.proof as `0x${string}`[],
+        },
+      ]);
     } catch (error) {
       console.error(error);
     } finally {

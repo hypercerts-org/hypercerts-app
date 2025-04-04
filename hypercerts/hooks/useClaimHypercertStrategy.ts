@@ -6,11 +6,18 @@ import { useAccountStore } from "@/lib/account-store";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 
-import { ClaimHypercertStrategy } from "../ClaimHypercertStrategy";
+import {
+  ClaimHypercertParams,
+  ClaimHypercertStrategy,
+} from "../ClaimHypercertStrategy";
 import { EOAClaimHypercertStrategy } from "../EOAClaimHypercertStrategy";
 import { SafeClaimHypercertStrategy } from "../SafeClaimHypercertStrategy";
+import { EOABatchClaimHypercertStrategy } from "../EOABatchClaimHypercertStrategy";
+import { SafeBatchClaimHypercertStrategy } from "../SafeBatchClaimHypercertStrategy";
 
-export const useClaimHypercertStrategy = (): (() => ClaimHypercertStrategy) => {
+export const useClaimHypercertStrategy = (): ((
+  params: ClaimHypercertParams[],
+) => ClaimHypercertStrategy) => {
   const { address, chain } = useAccount();
   const { client } = useHypercertClient();
   const { selectedAccount } = useAccountStore();
@@ -18,7 +25,7 @@ export const useClaimHypercertStrategy = (): (() => ClaimHypercertStrategy) => {
   const walletClient = useWalletClient();
   const router = useRouter();
 
-  return () => {
+  return (params: ClaimHypercertParams[]) => {
     const activeAddress =
       selectedAccount?.address || (address as `0x${string}`);
 
@@ -29,10 +36,30 @@ export const useClaimHypercertStrategy = (): (() => ClaimHypercertStrategy) => {
     if (!walletClient) throw new Error("No walletClient found");
     if (!dialogContext) throw new Error("No dialogContext found");
 
-    return selectedAccount?.type === "safe"
-      ? new SafeClaimHypercertStrategy(
-            router,
-            router,
+    const isBatch = params.length > 1;
+
+    if (selectedAccount?.type === "safe") {
+      return isBatch
+        ? new SafeBatchClaimHypercertStrategy(
+            activeAddress,
+            chain,
+            client,
+            dialogContext,
+            walletClient,
+            router
+          )
+        : new SafeClaimHypercertStrategy(
+            activeAddress,
+            chain,
+            client,
+            dialogContext,
+            walletClient,
+            router
+          );
+    }
+
+    return isBatch
+      ? new EOABatchClaimHypercertStrategy(
           activeAddress,
           chain,
           client,

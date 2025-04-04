@@ -1,5 +1,6 @@
 import { Chain } from "viem";
 import { ExternalLink } from "lucide-react";
+import assert from "assert";
 
 import { Button } from "@/components/ui/button";
 import { generateSafeAppLink } from "@/lib/utils";
@@ -10,7 +11,10 @@ import {
 } from "./ClaimHypercertStrategy";
 
 export class SafeClaimHypercertStrategy extends ClaimHypercertStrategy {
-  async execute({ tokenId, units, proof }: ClaimHypercertParams) {
+  async execute(params: ClaimHypercertParams[]) {
+    assert(params.length === 1, "Only one claim params object allowed");
+
+    const { tokenId, units, proof } = params[0];
     const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
       this.dialogContext;
 

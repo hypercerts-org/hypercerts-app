@@ -21,5 +21,5 @@ export abstract class ClaimHypercertStrategy {
     protected router: AppRouterInstance,
   ) {}
 
-  abstract execute(params: ClaimHypercertParams): Promise<void>;
+  abstract execute(params: ClaimHypercertParams[]): Promise<void>;
 }
