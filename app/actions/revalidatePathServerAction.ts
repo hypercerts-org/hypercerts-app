@@ -9,11 +9,12 @@ export async function revalidatePathServerAction(
 ) {
   const pathArray = Array.isArray(paths) ? paths : [paths];
 
-  pathArray.forEach((p) => {
+  for (const p of pathArray) {
+    console.debug("Revalidating path: ", p);
     if (typeof p === "string") {
       revalidatePath(p);
     } else {
       revalidatePath(p.path, p.type);
     }
-  });
+  }
 }
