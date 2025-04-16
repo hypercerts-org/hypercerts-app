@@ -19,6 +19,7 @@ import { ImageIcon } from "../user-icon/ImageIcon";
 import { SvgIcon } from "../user-icon/SvgIcon";
 import EthAddress from "../eth-address";
 import { UserName } from "../user-name";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 const MAX_FRACTIONS_DISPLAYED = 5;
 
 function Fraction({
@@ -37,6 +38,16 @@ function Fraction({
   const { data: userData, isFetching } = useGetUser({
     address: address,
   });
+
+  const calculatedPercentage = calculateBigIntPercentage(
+    units as string,
+    totalUnits as string,
+  );
+
+  const roundedPercentage =
+    calculatedPercentage! < 1
+      ? "<1"
+      : Math.round(calculatedPercentage!).toString();
 
   if (isFetching) {
     return (
@@ -68,7 +79,10 @@ function Fraction({
           <EthAddress address={address} showEnsName={true} />
         </div>
       )}
-      &mdash; <FormattedUnits>{units as string}</FormattedUnits>
+      <div className="flex flex-row items-center gap-2">
+        &mdash; <FormattedUnits>{units as string}</FormattedUnits>
+        <span>{`(${roundedPercentage}%)`}</span>
+      </div>
     </>
   );
 }
