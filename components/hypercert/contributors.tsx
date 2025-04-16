@@ -15,10 +15,10 @@ import { getAddress, isAddress } from "viem";
 import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 import { useGetUser } from "@/users/hooks";
 import { UserIcon } from "../user-icon";
-import EnsName from "../ens-name";
 import { ImageIcon } from "../user-icon/ImageIcon";
 import { SvgIcon } from "../user-icon/SvgIcon";
 import { Skeleton } from "../ui/skeleton";
+import { UserName } from "../user-name";
 const MAX_CONTRIBUTORS_DISPLAYED = 10;
 
 function Contributor({ contributor }: { contributor: string }) {
@@ -47,16 +47,17 @@ function Contributor({ contributor }: { contributor: string }) {
         <SvgIcon size="tiny" />
       )}
       <div className="flex flex-col justify-center items-start">
-        <p>{userData.user.display_name}</p>
-        <EthAddress address={userData.user.address} />
+        <UserName
+          address={userData.user.address}
+          userName={userData.user.display_name}
+        />
       </div>
     </div>
   ) : address ? (
     <div className="flex gap-2">
       <UserIcon address={address} size="tiny" />
       <div className="flex flex-col justify-center items-start">
-        <EnsName address={address} />
-        <EthAddress address={address} />
+        <EthAddress address={address} showEnsName={true} />
       </div>
     </div>
   ) : (
