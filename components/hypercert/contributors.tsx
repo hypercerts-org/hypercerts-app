@@ -11,15 +11,60 @@ import {
 } from "@/components/ui/command";
 import { UserCircle2 } from "lucide-react";
 import { useState } from "react";
-import { isAddress } from "viem";
+import { getAddress, isAddress } from "viem";
 import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
+import { useGetUser } from "@/users/hooks";
+import { UserIcon } from "../user-icon";
+import { ImageIcon } from "../user-icon/ImageIcon";
+import { SvgIcon } from "../user-icon/SvgIcon";
+import { Skeleton } from "../ui/skeleton";
+import { UserName } from "../user-name";
 const MAX_CONTRIBUTORS_DISPLAYED = 10;
 
 function Contributor({ contributor }: { contributor: string }) {
-  return isAddress(contributor) ? (
-    <EthAddress address={contributor} />
+  const address = isAddress(contributor.trim())
+    ? getAddress(contributor.trim())
+    : undefined;
+
+  const { data: userData, isFetching } = useGetUser({
+    address: address,
+  });
+
+  if (isFetching) {
+    return (
+      <div className="flex flex-row gap-2 items-center">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-8 w-32" />
+      </div>
+    );
+  }
+
+  return userData?.user ? (
+    <div className="flex gap-2">
+      {userData.user.avatar ? (
+        <ImageIcon url={userData.user.avatar} size="tiny" />
+      ) : (
+        <SvgIcon size="tiny" />
+      )}
+      <div className="flex flex-col justify-center items-start">
+        <UserName
+          address={userData.user.address}
+          userName={userData.user.display_name}
+        />
+      </div>
+    </div>
+  ) : address ? (
+    <div className="flex gap-2">
+      <UserIcon address={address} size="tiny" />
+      <div className="flex flex-col justify-center items-start">
+        <EthAddress address={address} showEnsName={true} />
+      </div>
+    </div>
   ) : (
-    <div>{contributor}</div>
+    <div className="flex items-center flex-row">
+      <UserCircle2 className="mr-2 h-4 w-4" />
+      {contributor}
+    </div>
   );
 }
 
@@ -58,7 +103,6 @@ export default function Contributors({
           <CommandGroup>
             {hypercert.metadata?.contributors.map((contributor) => (
               <CommandItem key={contributor}>
-                <UserCircle2 className="mr-2 h-4 w-4" />
                 <Contributor contributor={contributor} />
               </CommandItem>
             ))}

@@ -8,26 +8,82 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { truncateEthereumAddress } from "@/lib/utils";
-import { UserCircle2 } from "lucide-react";
 import { useState } from "react";
 import { FormattedUnits } from "../formatted-units";
 import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
-
+import { getAddress, isAddress } from "viem";
+import { useGetUser } from "@/users/hooks";
+import { Skeleton } from "../ui/skeleton";
+import { UserIcon } from "../user-icon";
+import { ImageIcon } from "../user-icon/ImageIcon";
+import { SvgIcon } from "../user-icon/SvgIcon";
+import EthAddress from "../eth-address";
+import { UserName } from "../user-name";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 const MAX_FRACTIONS_DISPLAYED = 5;
 
 function Fraction({
   ownerAddress,
+  totalUnits,
   units,
 }: {
-  ownerAddress: string | null;
-  units: unknown;
+  ownerAddress: string;
+  totalUnits: string | null | undefined;
+  units: string | null | undefined;
 }) {
+  const address = isAddress(ownerAddress.trim())
+    ? getAddress(ownerAddress.trim())
+    : undefined;
+
+  const { data: userData, isFetching } = useGetUser({
+    address: address,
+  });
+
+  const calculatedPercentage = calculateBigIntPercentage(
+    units as string,
+    totalUnits as string,
+  );
+
+  const roundedPercentage =
+    calculatedPercentage! < 1
+      ? "<1"
+      : Math.round(calculatedPercentage!).toString();
+
+  if (isFetching) {
+    return (
+      <div className="flex flex-row gap-2 items-center">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-8 w-32" />
+      </div>
+    );
+  }
   return (
-    <div className="flex flex-col w-full">
-      {truncateEthereumAddress(ownerAddress as `0x${string}`)} &mdash;{" "}
-      <FormattedUnits>{units as string}</FormattedUnits>
-    </div>
+    <>
+      {userData?.user ? (
+        <div className="flex flex-row gap-2">
+          {userData?.user?.avatar ? (
+            <ImageIcon url={userData.user.avatar} size="tiny" />
+          ) : (
+            <SvgIcon size="tiny" />
+          )}
+          <div className="flex justify-center items-start">
+            <UserName
+              address={userData.user.address}
+              userName={userData.user.display_name}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-row items-center gap-2">
+          <UserIcon address={address} size="tiny" />
+          <EthAddress address={address} showEnsName={true} />
+        </div>
+      )}
+      <div className="flex flex-row items-center gap-2">
+        &mdash; <FormattedUnits>{units as string}</FormattedUnits>
+        <span>{`(${roundedPercentage}%)`}</span>
+      </div>
+    </>
   );
 }
 
@@ -77,10 +133,9 @@ export default function Fractions({
                 key={fraction.fraction_id}
                 title={fraction.owner_address || ""}
               >
-                <UserCircle2 className="mr-2 h-4 w-4" />
-                <span className="hidden">{fraction.owner_address}</span>
                 <Fraction
-                  ownerAddress={fraction.owner_address}
+                  ownerAddress={fraction.owner_address as string}
+                  totalUnits={hypercert.units}
                   units={fraction.units}
                 />
               </CommandItem>
