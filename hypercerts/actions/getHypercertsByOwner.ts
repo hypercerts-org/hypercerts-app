@@ -9,7 +9,7 @@ import { getAddress } from "viem";
 
 const query = graphql(
   `
-    query AllHypercerts($where: HypercertsWhereArgs) {
+    query AllHypercerts($where: HypercertWhereInput) {
       hypercerts(where: $where) {
         count
         data {
