@@ -30,7 +30,7 @@ export const useGetUser = ({ address }: { address?: string }) => {
 
       const query = graphql(
         `
-          query UserQuery($address: String!, $chainId: BigInt!) {
+          query UserQuery($address: String!, $chainId: Int!) {
             users(
               where: { address: { eq: $address }, chain_id: { eq: $chainId } }
             ) {
@@ -54,7 +54,7 @@ export const useGetUser = ({ address }: { address?: string }) => {
 
       const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
         address,
-        chainId: chainId.toString(),
+        chainId: chainId,
       });
 
       const userFragment = res.users?.data?.[0];
