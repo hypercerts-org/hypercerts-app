@@ -9,6 +9,7 @@ import { UnclaimedFraction } from "@/components/profile/unclaimed-hypercerts-lis
 
 export const AllowListRecordFragment = graphql(`
   fragment AllowListRecordFragment on AllowlistRecord {
+    id
     hypercert_id
     token_id
     root

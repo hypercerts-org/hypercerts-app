@@ -87,6 +87,9 @@ export const orderFragmentToMarketplaceOrder = (
   if (!order.chainId) {
     throw new Error("Order does not have a chain ID");
   }
+  if (!order.id) {
+    throw new Error("Order does not have an ID");
+  }
   return {
     signer: order.signer,
     price: order.price,
@@ -100,7 +103,7 @@ export const orderFragmentToMarketplaceOrder = (
     id: order.id,
     collectionType: order.collectionType,
     collection: order.collection,
-    createdAt: order.createdAt,
+    createdAt: order.createdAt.toString(),
     endTime: order.endTime,
     orderNonce: order.orderNonce,
     subsetNonce: order.subsetNonce,
@@ -108,8 +111,7 @@ export const orderFragmentToMarketplaceOrder = (
     globalNonce: order.globalNonce,
     quoteType: order.quoteType,
     signature: order.signature,
-    validator_codes:
-      order.validator_codes?.map((code) => parseInt(code, 10)) || null,
+    validator_codes: order.validator_codes || null,
     hypercert_id: order.hypercert_id,
   };
 };
