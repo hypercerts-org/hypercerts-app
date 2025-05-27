@@ -8,7 +8,7 @@ import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 
 const query = graphql(
   `
-    query Hyperboard($id: UUID!) {
+    query Hyperboard($id: String!) {
       hyperboards(where: { id: { eq: $id } }) {
         data {
           ...HyperboardFragment
