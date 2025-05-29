@@ -67,5 +67,4 @@ export const hypercertApiSigningDomainSafe = (
 
 export const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 export const drpcApiPkey = process.env.NEXT_PUBLIC_DRPC_API_PKEY;
-export const infuraApiKey = process.env.NEXT_PUBLIC_INFURA_API_KEY;
 export const filecoinApiKey = process.env.NEXT_PUBLIC_FILECOIN_API_KEY;

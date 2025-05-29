@@ -1,4 +1,4 @@
-import { alchemyApiKey, drpcApiPkey, infuraApiKey } from "@/configs/constants";
+import { alchemyApiKey, drpcApiPkey } from "@/configs/constants";
 import { PublicClient, createPublicClient, fallback } from "viem";
 import { ChainFactory } from "./chainFactory";
 import { UnifiedRpcClientFactory } from "./rpcClientFactory";
@@ -15,21 +15,9 @@ class AlchemyProvider implements RpcProvider {
       8453: `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
       42161: `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
       421614: `https://arb-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
+      42220: `https://celo-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
       84532: `https://base-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
       11155111: `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
-    };
-    return urls[chainId];
-  }
-}
-
-class InfuraProvider implements RpcProvider {
-  getUrl(chainId: number): string | undefined {
-    if (!infuraApiKey) return undefined;
-    const urls: Record<number, string> = {
-      10: `https://optimism-mainnet.infura.io/v3/${infuraApiKey}`,
-      42220: `https://celo-mainnet.infura.io/v3/${infuraApiKey}`,
-      42161: `https://arbitrum-mainnet.infura.io/v3/${infuraApiKey}`,
-      421614: `https://arbitrum-sepolia.infura.io/v3/${infuraApiKey}`,
     };
     return urls[chainId];
   }
@@ -84,7 +72,6 @@ export class EvmClientFactory {
   private static readonly providers: RpcProvider[] = [
     new AlchemyProvider(),
     new AnkrProvider(),
-    new InfuraProvider(),
     new FVMProvider(),
     new DrpcProvider(),
   ];
