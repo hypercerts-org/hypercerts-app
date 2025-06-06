@@ -36,17 +36,23 @@ export const HyperboardsOverview = ({
         </div>
       )}
       <div className="flex flex-col gap-4">
-        {hyperboards.map((hyperboard) => (
-          <HyperboardRow
-            key={hyperboard.id}
-            hyperboardId={hyperboard.id}
-            name={hyperboard.name || ""}
-            description={
-              hyperboard.sections?.data?.[0]?.collection.description || ""
-            }
-            showEditAndDeleteButtons={isOwnProfile}
-          />
-        ))}
+        {hyperboards.map((hyperboard) => {
+          if (!hyperboard.id) {
+            return null;
+          }
+          return (
+            <HyperboardRow
+              key={hyperboard.id}
+              hyperboardId={hyperboard.id}
+              name={hyperboard.name || ""}
+              description={
+                hyperboard.sections?.data?.[0]?.collections?.[0].description ||
+                ""
+              }
+              showEditAndDeleteButtons={isOwnProfile}
+            />
+          );
+        })}
       </div>
     </div>
   );

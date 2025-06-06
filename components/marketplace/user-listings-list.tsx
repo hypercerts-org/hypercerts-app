@@ -253,7 +253,7 @@ export default function UserListingsList({
 
         const cancelDisabled = Number(order.chainId) !== chainId;
         const isCancelled = order.validator_codes?.includes(
-          OrderValidatorCode.USER_ORDER_NONCE_EXECUTED_OR_CANCELLED.toString(),
+          OrderValidatorCode.USER_ORDER_NONCE_EXECUTED_OR_CANCELLED,
         );
 
         if (!isCancelled) {
@@ -300,6 +300,9 @@ export default function UserListingsList({
                     className="ml-2"
                     onClick={async (e) => {
                       e.preventDefault();
+                      if (!order.id) {
+                        return;
+                      }
                       await deleteOrder({
                         orderId: order.id,
                         hypercertId: order.hypercert_id,

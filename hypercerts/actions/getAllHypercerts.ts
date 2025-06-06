@@ -30,12 +30,17 @@ export function isClaimsFilter(value: string): value is ClaimsFilter {
 const query = graphql(
   `
     query AllHypercerts(
-      $where: HypercertsWhereArgs
-      $sort: HypercertFetchInput
+      $where: HypercertWhereInput
+      $sortBy: HypercertSortOptions
       $first: Int
       $offset: Int
     ) {
-      hypercerts(where: $where, first: $first, offset: $offset, sort: $sort) {
+      hypercerts(
+        where: $where
+        first: $first
+        offset: $offset
+        sortBy: $sortBy
+      ) {
         count
 
         data {
@@ -53,32 +58,26 @@ function createOrderBy({
   orderBy,
 }: {
   orderBy?: ClaimsOrderBy;
-}): VariableTypes["sort"] {
+}): VariableTypes["sortBy"] {
   if (orderBy) {
     const directionDivider = orderBy.lastIndexOf("_");
     const orderByAttribute = orderBy.substring(0, directionDivider);
     const orderByDirection = orderBy.substring(directionDivider + 1);
     if (orderByAttribute === "created") {
       return {
-        by: {
-          creation_block_timestamp:
-            orderByDirection === "asc" ? "ascending" : "descending",
-        },
+        creation_block_timestamp:
+          orderByDirection === "asc" ? "ascending" : "descending",
       };
     }
     if (orderByAttribute === "attestations_count") {
       return {
-        by: {
-          attestations_count:
-            orderByDirection === "asc" ? "ascending" : "descending",
-        },
+        attestations_count:
+          orderByDirection === "asc" ? "ascending" : "descending",
       };
     }
   }
   return {
-    by: {
-      creation_block_timestamp: "descending",
-    },
+    creation_block_timestamp: "descending",
   };
 }
 

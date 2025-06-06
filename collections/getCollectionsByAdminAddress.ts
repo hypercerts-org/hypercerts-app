@@ -11,7 +11,7 @@ const query = graphql(
   `
     query Collection($admin_address: String!, $first: Int, $offset: Int) {
       hyperboards(
-        where: { admin_id: { eq: $admin_address } }
+        where: { admin_address: { eq: $admin_address } }
         first: $first
         offset: $offset
       ) {

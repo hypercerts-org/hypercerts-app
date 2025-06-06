@@ -17,13 +17,13 @@ const EditCollectionPage = async ({
 
   const prefilledValues: CollectionCreateFormValues = {
     id: collectionId,
-    collectionId: data.sections.data[0].collection.id,
+    collectionId: data.sections?.data?.[0]?.collections?.[0]?.id || "",
     title: data.name,
-    description: data.sections.data[0].collection.description,
+    description: data.sections?.data?.[0]?.collections?.[0]?.description || "",
     borderColor: data.tile_border_color || "#000000",
     backgroundImg: data.background_image || "",
     entries:
-      data.sections.data[0].entries?.map((hc) => ({
+      data.sections?.data?.[0]?.entries?.map((hc) => ({
         entryId: hc.id,
         factor: hc.display_size,
       })) || [],
