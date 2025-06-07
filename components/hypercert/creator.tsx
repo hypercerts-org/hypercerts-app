@@ -14,7 +14,7 @@ export default function Creator({ hypercert }: { hypercert: HypercertState }) {
       {hypercert.creator_address && (
         <div className="flex space-x-1 items-center">
           <span>by</span>
-          <EthAddress address={hypercert.creator_address} />
+          <EthAddress address={hypercert.creator_address} showEnsName />
         </div>
       )}
       {hypercert.contract?.chain_id && (
