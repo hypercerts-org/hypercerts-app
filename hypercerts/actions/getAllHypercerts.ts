@@ -85,10 +85,12 @@ function createFilter({
   filter,
   search,
   chainId,
+  burned,
 }: {
   filter?: ClaimsFilter;
   search?: string;
   chainId?: number;
+  burned?: boolean;
 }): VariableTypes["where"] {
   const where: VariableTypes["where"] = {};
   if (search && search.length > 2) {
@@ -106,6 +108,9 @@ function createFilter({
       },
     };
   }
+  where.burned = {
+    eq: burned,
+  };
 
   return where;
 }
@@ -117,46 +122,8 @@ export type GetAllHypercertsParams = {
   search?: string;
   filter?: ClaimsFilter;
   chainId?: number;
+  burned?: boolean;
 };
-
-// TODO: Remove this once we have a proper way to filter out hypercerts that have been burned
-const filteredIds = new Set<string>();
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24840612785228507832826346342519079436288",
-);
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24500330418307569369362971735087311224832",
-);
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24160048051386630905899597127655543013376",
-);
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23819765684465692442436222520223774801920",
-);
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-25180895152149446296289720949950847647744",
-);
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23139200950623815515509473305360238379008",
-);
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23479483317544753978972847912792006590464",
-);
-filteredIds.add(
-  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-27222589353675077077069968594541456916480",
-);
-filteredIds.add(
-  "10-0x822F17A9A5EeCFd66dBAFf7946a8071C265D1d07-16604758658641034201622290718847993414418432",
-);
-filteredIds.add(
-  "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-2041694201525630780780247644590609268736",
-);
-filteredIds.add(
-  "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-2381976568446569244243622252022377480192",
-);
-filteredIds.add(
-  "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-680564733841876926926749214863536422912",
-);
 
 export async function getAllHypercerts({
   first,
@@ -165,12 +132,13 @@ export async function getAllHypercerts({
   search,
   filter,
   chainId,
+  burned = false,
 }: GetAllHypercertsParams) {
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     first,
     offset,
     sort: createOrderBy({ orderBy }),
-    where: createFilter({ search, filter, chainId }),
+    where: createFilter({ search, filter, chainId, burned }),
   });
 
   if (!res.hypercerts?.data) {
@@ -183,7 +151,7 @@ export async function getAllHypercerts({
   const data = res.hypercerts.data.reduce<NonNullable<HypercertListFragment>[]>(
     (acc, hypercert) => {
       const hcData = readFragment(HypercertListFragment, hypercert);
-      if (hcData?.hypercert_id && !filteredIds.has(hcData.hypercert_id)) {
+      if (hcData?.hypercert_id) {
         acc.push(hcData);
       }
       return acc;
@@ -191,15 +159,8 @@ export async function getAllHypercerts({
     [],
   );
 
-  const difference = res.hypercerts?.data?.length
-    ? res.hypercerts?.data?.length - data.length
-    : 0;
-  const totalCount = res.hypercerts?.count
-    ? res.hypercerts?.count - difference
-    : 0;
-
   return {
-    count: totalCount,
+    count: res.hypercerts?.count ?? 0,
     data,
   };
 }
