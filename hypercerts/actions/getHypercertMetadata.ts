@@ -8,7 +8,7 @@ import { HypercertMetadataFragment } from "../fragments/hypercert-metadata.fragm
 const query = graphql(
   `
     query Metadata($hypercert_id: String!) {
-      metadata(where: { hypercerts: { hypercert_id: { eq: $hypercert_id } } }) {
+      metadata(where: { hypercert: { hypercert_id: { eq: $hypercert_id } } }) {
         data {
           ...HypercertMetadataFragment
         }

@@ -9,7 +9,7 @@ const query = graphql(
     query AttestationsQuery($where: AttestationWhereInput) {
       attestations(
         where: $where
-        sort: { by: { creation_block_timestamp: descending } }
+        sortBy: { creation_block_timestamp: descending }
       ) {
         count
         data {
@@ -38,18 +38,23 @@ export async function getCreatorFeedAttestations({
 }: GetAttestationsParams) {
   const where: Record<string, any> = {};
 
-  if (filter?.chainId) {
-    where.chain_id = { eq: filter.chainId.toString() };
-  }
   if (filter?.contractAddress) {
     where.contract_address = { eq: filter.contractAddress };
   }
+
   if (filter?.tokenId) {
-    where.token_id = { eq: filter.tokenId.toString() };
+    where.hypercert = { token_id: { eq: filter.tokenId } };
   }
 
   if (filter?.schemaId) {
     where.eas_schema = { uid: { eq: filter.schemaId } };
+  }
+
+  if (filter?.chainId) {
+    where.eas_schema = {
+      ...(where.eas_schema || {}),
+      chain_id: { eq: Number(filter.chainId) },
+    };
   }
 
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {

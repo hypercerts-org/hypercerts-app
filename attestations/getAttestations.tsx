@@ -43,18 +43,24 @@ export async function getAttestations({
 }: GetAttestationsParams) {
   const where: Record<string, any> = {};
 
-  if (filter?.chainId) {
-    where.chain_id = { eq: filter.chainId.toString() };
-  }
+  // where: {hypercert: {token_id: {eq: 292983117918928017041965536998752430063616}}, eas_schema: {uid: {eq: "0x2f4f575d5df78ac52e8b124c4c900ec4c540f1d44f5b8825fac0af5308c91449"}, chain_id: {eq: 11155111}}}
   if (filter?.contractAddress) {
     where.contract_address = { eq: filter.contractAddress };
   }
+
   if (filter?.tokenId) {
-    where.token_id = { eq: filter.tokenId.toString() };
+    where.hypercert = { token_id: { eq: filter.tokenId } };
   }
 
   if (filter?.schemaId) {
     where.eas_schema = { uid: { eq: filter.schemaId } };
+  }
+
+  if (filter?.chainId) {
+    where.eas_schema = {
+      ...(where.eas_schema || {}),
+      chain_id: { eq: Number(filter.chainId) },
+    };
   }
 
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {

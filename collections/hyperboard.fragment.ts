@@ -4,8 +4,10 @@ export const HyperboardFragment = graphql(`
   fragment HyperboardFragment on Hyperboard {
     id
     admins {
-      address
-      chain_id
+      data {
+        address
+        chain_id
+      }
     }
     name
     background_image
@@ -15,7 +17,7 @@ export const HyperboardFragment = graphql(`
       count
       data {
         label
-        collection {
+        collections {
           name
           admins {
             address
@@ -32,18 +34,22 @@ export const HyperboardFragment = graphql(`
           name
           total_units
           owners {
-            percentage
-            address
-            units
-            avatar
-            display_name
+            data {
+              percentage
+              address
+              units
+              avatar
+              display_name
+            }
           }
         }
         owners {
-          percentage_owned
-          address
-          display_name
-          avatar
+          data {
+            percentage_owned
+            address
+            display_name
+            avatar
+          }
         }
       }
     }

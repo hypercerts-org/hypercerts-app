@@ -98,7 +98,7 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       );
     }
 
-    const totalPrice = BigInt(order.price) * unitAmount;
+    const totalPrice = BigInt(pricePerUnit) * unitAmount;
     try {
       await setStep("ERC20");
       if (currency.address !== zeroAddress) {
