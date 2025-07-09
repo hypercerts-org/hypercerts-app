@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState } from "react";
+import { useReadTransferRestrictions } from "@/hooks/use-read-transfer-restrictions";
 
 export default function TransferRestrictionsLabel({
   hypercertId,
@@ -21,39 +22,8 @@ export default function TransferRestrictionsLabel({
   showSeparator?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { contractAddress, id } = parseClaimOrFractionId(hypercertId);
-  const { data: transferRestrictions } = useReadContract({
-    abi: [
-      {
-        inputs: [{ internalType: "uint256", name: "tokenID", type: "uint256" }],
-        name: "readTransferRestriction",
-        outputs: [
-          {
-            internalType: "string",
-            name: "",
-            type: "string",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-    ],
-    address: getAddress(contractAddress || ""),
-    functionName: "readTransferRestriction",
-    args: [id],
-    query: {
-      enabled: !!contractAddress && !!id,
-      select: (data) => {
-        if (data === "AllowAll") {
-          return TransferRestrictions.AllowAll;
-        } else if (data === "DisallowAll") {
-          return TransferRestrictions.DisallowAll;
-        } else if (data === "FromCreatorOnly") {
-          return TransferRestrictions.FromCreatorOnly;
-        }
-      },
-    },
-  });
+  const transferRestrictions = useReadTransferRestrictions(hypercertId);
+
   if (transferRestrictions === undefined) return null;
   return (
     <>
