@@ -21,11 +21,11 @@ importers:
         specifier: 2.0.0-alpha.12
         version: 2.0.0-alpha.12(bufferutil@4.0.9)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@hypercerts-org/marketplace-sdk':
-        specifier: 0.5.0-alpha.0
-        version: 0.5.0-alpha.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+        specifier: 0.8.0
+        version: 0.8.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@hypercerts-org/sdk':
-        specifier: 2.6.0
-        version: 2.6.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
+        specifier: 2.8.1
+        version: 2.8.1(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@next/env':
         specifier: ^14.2.10
         version: 14.2.23
@@ -824,19 +824,20 @@ packages:
   '@hypercerts-org/contracts@2.0.0-alpha.12':
     resolution: {integrity: sha512-Nr0aTJIt6/H1mI3N0uve3yF922kCVpAeN3aUqhWZfizukTVSD5aRE64fmKYpwzCWe0JNR9mBBR+Ogxq5lcGSvA==}
 
-  '@hypercerts-org/marketplace-sdk@0.5.0-alpha.0':
-    resolution: {integrity: sha512-8Ezlat84BdtPfY3wMeJ93rGEr+Tqy0DrTW9p+zuU+A6HjUQRlFOJXhiphq7h9zP8dRAs8OaKKtnWnTi+156IBA==}
+  '@hypercerts-org/marketplace-sdk@0.8.0':
+    resolution: {integrity: sha512-fm56Kl/oopti4XdPKX19+0SNDPYuY7m46fk4rDSXUeST1tFf8lei4qKate2IBsoknRWCrE8O77QMw1BkJiK2FA==}
     engines: {node: '>= 16.15.1 <= 20.x'}
     peerDependencies:
       '@safe-global/api-kit': ^2.5.7
       '@safe-global/protocol-kit': ^5.2.0
+      '@safe-global/types-kit': ^1.0.4
       ethers: ^6.6.2
 
   '@hypercerts-org/sdk@2.4.0':
     resolution: {integrity: sha512-9vxQW3zBwi3WCOUBMwU1fWEk3z29eyxtDWlaIS7jdUlGwnCcN9IkPzIk7w/jHO96yiH8+vcL/EWFvOp06mtXAw==}
 
-  '@hypercerts-org/sdk@2.6.0':
-    resolution: {integrity: sha512-uq+9WzgW+GWazEKTUEhUPZr8sTxhORaNI6DfRfDTZ8w0FJtPEXSSLt5mr9x5VN8EghM1NsPvKzf38jkO8wBkZg==}
+  '@hypercerts-org/sdk@2.8.1':
+    resolution: {integrity: sha512-r38wOiSESxXet1A2DnvsZVLbsTCc6UqibJAuRquj0vqeXxT5fFcutqaElyt94frwVP8GOrh0XF7rSgxv/gaHxQ==}
     peerDependencies:
       '@safe-global/api-kit': ^2.5.7
       '@safe-global/protocol-kit': ^5.2.0
@@ -7242,12 +7243,13 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/marketplace-sdk@0.5.0-alpha.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
+  '@hypercerts-org/marketplace-sdk@0.8.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
     dependencies:
       '@hypercerts-org/sdk': 2.4.0(@swc/helpers@0.5.5)(bufferutil@4.0.9)(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@looksrare/contracts-libs': 3.5.1
       '@safe-global/api-kit': 2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@safe-global/protocol-kit': 5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      '@safe-global/types-kit': 1.0.2(typescript@5.7.3)(zod@3.24.1)
       '@urql/core': 5.1.0(graphql@16.10.0)
       ethers: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       gql.tada: 1.8.10(graphql@16.10.0)(typescript@5.7.3)
@@ -7293,7 +7295,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/sdk@2.6.0(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)':
+  '@hypercerts-org/sdk@2.8.1(@safe-global/api-kit@2.5.9(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/protocol-kit@5.2.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(@safe-global/types-kit@1.0.2(typescript@5.7.3)(zod@3.24.1))(@swc/helpers@0.5.5)(bufferutil@4.0.9)(ethers@6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10))(graphql@16.10.0)(rollup@4.31.0)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
       '@hypercerts-org/contracts': 2.0.0-alpha.12(bufferutil@4.0.9)(ts-node@10.9.2(@swc/core@1.10.9(@swc/helpers@0.5.5))(@types/node@20.17.14)(typescript@5.7.3))(typescript@5.7.3)(utf-8-validate@5.0.10)
