@@ -18,6 +18,8 @@ import { useState } from "react";
 import { getAddress } from "viem";
 
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
+import { useReadTransferRestrictions } from "@/hooks/use-read-transfer-restrictions";
+import { TransferRestrictions } from "@hypercerts-org/sdk";
 
 export function ListForSaleButton({
   hypercert,
@@ -34,29 +36,9 @@ export function ListForSaleButton({
   const { chain_id: chainId, contract_address: contractAddress } =
     hypercert.contract || {};
 
-  const { data: transferRestrictions } = useReadContract({
-    abi: [
-      {
-        inputs: [{ internalType: "uint256", name: "tokenID", type: "uint256" }],
-        name: "readTransferRestriction",
-        outputs: [
-          {
-            internalType: "string",
-            name: "",
-            type: "string",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-    ],
-    address: getAddress(contractAddress || ""),
-    functionName: "readTransferRestriction",
-    args: [tokenId!],
-    query: {
-      enabled: !!contractAddress && !!tokenId,
-    },
-  });
+  const transferRestrictions = useReadTransferRestrictions(
+    hypercert.hypercert_id || "",
+  );
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -87,8 +69,8 @@ export function ListForSaleButton({
     !client ||
     !client.isClaimOrFractionOnConnectedChain(hypercertId) ||
     !fractionsOwnedByUser.length ||
-    transferRestrictions === "DisallowAll" ||
-    (transferRestrictions === "FromCreatorOnly" &&
+    transferRestrictions === TransferRestrictions.DisallowAll ||
+    (transferRestrictions === TransferRestrictions.FromCreatorOnly &&
       address?.toLowerCase() !== hypercert.creator_address?.toLowerCase());
 
   const getToolTipMessage = () => {
@@ -114,11 +96,11 @@ export function ListForSaleButton({
       return "You do not own any fractions of this hypercert";
     }
 
-    if (transferRestrictions === "DisallowAll") {
+    if (transferRestrictions === TransferRestrictions.DisallowAll) {
       return "Secondary sales are not allowed for this hypercert";
     }
 
-    if (transferRestrictions === "FromCreatorOnly") {
+    if (transferRestrictions === TransferRestrictions.FromCreatorOnly) {
       return "Only the creator can sell this hypercert";
     }
 
