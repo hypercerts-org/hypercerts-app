@@ -19,8 +19,6 @@ export default function ReadMore({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log(text);
-
   if (!text) {
     return null;
   }
