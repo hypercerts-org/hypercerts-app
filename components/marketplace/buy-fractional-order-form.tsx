@@ -24,6 +24,7 @@ import {
   getPricePerUnit,
 } from "@/marketplace/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 import { useForm } from "react-hook-form";
 import { parseUnits } from "viem";
 import z from "zod";
@@ -80,7 +81,14 @@ export const BuyFractionalOrderForm = ({
   const { minUnitAmount, maxUnitAmount, minUnitsToKeep } =
     decodeFractionalOrderParams(order.additionalParameters);
 
-  const availableUnits = BigInt(hypercert?.units || 0) - BigInt(minUnitsToKeep);
+  const fractionTokenId = BigInt(order.itemIds[0]);
+  const fraction = hypercert.fractions?.data?.find(
+    (fraction) =>
+      parseClaimOrFractionId(fraction.fraction_id || "").id === fractionTokenId,
+  );
+  const fractionUnits = BigInt(fraction?.units || 0);
+
+  const availableUnits = fractionUnits - BigInt(minUnitsToKeep);
   const maxUnitAmountToBuy =
     availableUnits > maxUnitAmount ? maxUnitAmount : availableUnits;
 
@@ -124,6 +132,7 @@ export const BuyFractionalOrderForm = ({
   const form = useForm<BuyFractionalOrderFormValues>({
     resolver: zodResolver(formSchema),
     reValidateMode: "onChange",
+    mode: "onChange",
     defaultValues: {
       minPercentageAmount,
       maxPercentageAmount,
@@ -143,6 +152,7 @@ export const BuyFractionalOrderForm = ({
     }
 
     const unitAmount = getUnitsToBuy(values.percentageAmount);
+
     const pricePerUnit = getPricePerUnit(
       values.pricePerPercent,
       hypercertUnits,
